@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useFinanceStore } from '../hooks/useFinanceStore';
 import { useAuthStore } from '../store/authStore';
 import { formatRupiah, formatDate, formatNumberInput } from '../utils/formatters';
@@ -24,9 +24,44 @@ export function Debts() {
     name: ''
   });
 
-  if (!store.isLoaded) return null;
+  // Optimize calculations with useMemo
+  const debtsWithTotals = useMemo(() => {
+    return store.debts.map(person => ({
+      ...person,
+      totalDebt: store.getPersonTotalDebt(person)
+    }));
+  }, [store.debts, store.getPersonTotalDebt]);
+
+  const filteredDebts = useMemo(() => {
+    return debtsWithTotals
+      .filter(d => d.personName.toLowerCase().includes(searchQuery.toLowerCase()))
+      .sort((a, b) => {
+        if (sortBy === 'name') return a.personName.localeCompare(b.personName);
+        if (sortBy === 'amount') return b.totalDebt - a.totalDebt;
+        return 0; 
+      });
+  }, [debtsWithTotals, searchQuery, sortBy]);
+
+  const branchDebtData = useMemo(() => {
+    if (role !== 'bos' || branchId) return [];
+    
+    return [...store.branches]
+      .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
+      .map(branch => {
+        const branchDebts = debtsWithTotals.filter(d => d.branchId === branch.id);
+        const branchTotal = branchDebts.reduce((sum, d) => sum + d.totalDebt, 0);
+        return { ...branch, branchTotal };
+      });
+  }, [role, branchId, store.branches, debtsWithTotals]);
+
+  const isBosGlobal = role === 'bos' && !branchId;
+  const totalDebtAll = useMemo(() => 
+    filteredDebts.reduce((sum, p) => sum + p.totalDebt, 0)
+  , [filteredDebts]);
 
   const [isAddingPerson, setIsAddingPerson] = useState(false);
+
+  if (!store.isLoaded) return null;
 
   const handleAddPerson = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -219,18 +254,6 @@ export function Debts() {
     );
   }
 
-  const filteredDebts = store.debts
-    .filter(d => d.personName.toLowerCase().includes(searchQuery.toLowerCase()))
-    .sort((a, b) => {
-      if (sortBy === 'name') return a.personName.localeCompare(b.personName);
-      if (sortBy === 'amount') return store.getPersonTotalDebt(b) - store.getPersonTotalDebt(a);
-      // Latest is default (by ID or timestamp if available, here we use index/id as proxy if no timestamp)
-      return 0; 
-    });
-
-  const isBosGlobal = role === 'bos' && !branchId;
-  const totalDebtAll = filteredDebts.reduce((sum, p) => sum + store.getPersonTotalDebt(p), 0);
-
   return (
     <div className="p-4 space-y-6">
       {/* Summary Header */}
@@ -285,10 +308,7 @@ export function Debts() {
             </div>
           </div>
           <div className="grid grid-cols-1 gap-3">
-            {[...store.branches].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })).map(branch => {
-              const branchDebts = store.debts.filter(d => d.branchId === branch.id);
-              const branchTotal = branchDebts.reduce((sum, d) => sum + store.getPersonTotalDebt(d), 0);
-              
+            {branchDebtData.map(branch => {
               return (
                 <div key={branch.id} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center hover:border-blue-200 transition-colors group">
                   <div className="flex items-center gap-3">
@@ -297,7 +317,7 @@ export function Debts() {
                     </div>
                     <h4 className="text-xs font-black text-gray-700 uppercase">{branch.name}</h4>
                   </div>
-                  <p className="text-sm font-black text-rose-600">{formatRupiah(branchTotal)}</p>
+                  <p className="text-sm font-black text-rose-600">{formatRupiah(branch.branchTotal)}</p>
                 </div>
               );
             })}
@@ -393,7 +413,7 @@ export function Debts() {
               </div>
             ) : (
               filteredDebts.map((person) => {
-                const total = store.getPersonTotalDebt(person);
+                const total = person.totalDebt;
                 const initials = person.personName.substring(0, 2).toUpperCase();
                 
                 // Varied colors for avatars

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useFinanceStore } from '../hooks/useFinanceStore';
 import { useAuthStore } from '../store/authStore';
 import { formatRupiah, formatDate, formatNumberInput } from '../utils/formatters';
@@ -28,9 +28,7 @@ export function Deposits() {
     name: ''
   });
 
-  if (!store.isLoaded) return null;
-
-  const myBranch = store.branches.find(b => b.id === branchId);
+  const myBranch = useMemo(() => store.branches.find(b => b.id === branchId), [store.branches, branchId]);
 
   const handleTabChange = (tab: 'active' | 'history') => {
     setActiveTab(tab);
@@ -39,43 +37,53 @@ export function Deposits() {
   };
 
   // Flatten all deposits from all branches, filtered by branch if not bos/mandor
-  const allDeposits = store.branches
-    .filter(branch => role === 'bos' || role === 'mandor' || branch.id === branchId)
-    .flatMap(branch => 
-      branch.deposits.map(dep => ({
-        ...dep,
-        branchName: branch.name,
-        branchId: branch.id
-      }))
-    ).sort((a, b) => {
-      // First sort by branch name numerically (Alfath 1, Alfath 2, Alfath 3)
-      const nameCompare = a.branchName.localeCompare(b.branchName, undefined, { numeric: true, sensitivity: 'base' });
-      if (nameCompare !== 0) return nameCompare;
-      // Then sort by date (latest first) within the same branch
-      return new Date(b.date).getTime() - new Date(a.date).getTime();
+  const allDeposits = useMemo(() => {
+    return store.branches
+      .filter(branch => role === 'bos' || role === 'mandor' || branch.id === branchId)
+      .flatMap(branch => 
+        branch.deposits.map(dep => ({
+          ...dep,
+          branchName: branch.name,
+          branchId: branch.id
+        }))
+      ).sort((a, b) => {
+        // First sort by branch name numerically (Alfath 1, Alfath 2, Alfath 3)
+        const nameCompare = a.branchName.localeCompare(b.branchName, undefined, { numeric: true, sensitivity: 'base' });
+        if (nameCompare !== 0) return nameCompare;
+        // Then sort by date (latest first) within the same branch
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      });
+  }, [store.branches, role, branchId]);
+
+  const filteredDeposits = useMemo(() => {
+    return allDeposits.filter(dep => {
+      const matchesSearch = dep.branchName.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                           dep.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           dep.createdByName?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      // Filter by tab
+      const matchesTab = activeTab === 'active' 
+        ? (dep.status === 'pending' || dep.status === 'received')
+        : (dep.status === 'verified');
+
+      const matchesStatus = filterStatus === 'all' || dep.status === filterStatus;
+      return matchesSearch && matchesStatus && matchesTab;
     });
+  }, [allDeposits, searchQuery, activeTab, filterStatus]);
 
-  const filteredDeposits = allDeposits.filter(dep => {
-    const matchesSearch = dep.branchName.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                         dep.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         dep.createdByName?.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    // Filter by tab
-    const matchesTab = activeTab === 'active' 
-      ? (dep.status === 'pending' || dep.status === 'received')
-      : (dep.status === 'verified');
+  const displayedDeposits = useMemo(() => {
+    return activeTab === 'active' 
+      ? filteredDeposits 
+      : filteredDeposits.slice(0, historyLimit);
+  }, [filteredDeposits, activeTab, historyLimit]);
 
-    const matchesStatus = filterStatus === 'all' || dep.status === filterStatus;
-    return matchesSearch && matchesStatus && matchesTab;
-  });
+  const stats = useMemo(() => {
+    return (role === 'bos' || role === 'mandor') ? store.getTotalAllBranches() : (myBranch ? store.getBranchStats(myBranch) : { totalSetor: 0, sisaSetor: 0, berhasilDisetor: 0 });
+  }, [role, store, myBranch]);
 
-  const displayedDeposits = activeTab === 'active' 
-    ? filteredDeposits 
-    : filteredDeposits.slice(0, historyLimit);
+  const hasPending = useMemo(() => allDeposits.some(d => d.status === 'pending'), [allDeposits]);
 
-  const stats = (role === 'bos' || role === 'mandor') ? store.getTotalAllBranches() : (myBranch ? store.getBranchStats(myBranch) : { totalSetor: 0, sisaSetor: 0, berhasilDisetor: 0 });
-
-  const hasPending = allDeposits.some(d => d.status === 'pending');
+  if (!store.isLoaded) return null;
   const primaryAmount = role === 'mandor' ? stats.sisaSetor : stats.berhasilDisetor;
   const primaryLabel = role === 'mandor' ? 'Uang Belum Setor (Aktif)' : (role === 'bos' ? 'Total Setoran Berhasil (Hari Ini)' : `Total Setoran Berhasil (${myBranch?.name || 'Cabang'})`);
 

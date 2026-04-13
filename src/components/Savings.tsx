@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useFinanceStore } from '../hooks/useFinanceStore';
 import { useAuthStore } from '../store/authStore';
 import { formatRupiah, formatDate, formatNumberInput } from '../utils/formatters';
@@ -25,9 +25,29 @@ export function Savings() {
     name: ''
   });
 
-  if (!store.isLoaded) return null;
+  // Optimize calculations with useMemo
+  const savingsWithTotals = useMemo(() => {
+    return store.savings.map(person => ({
+      ...person,
+      totalSavings: store.getPersonTotalSavings(person)
+    }));
+  }, [store.savings, store.getPersonTotalSavings]);
+
+  const filteredSavings = useMemo(() => {
+    return savingsWithTotals
+      .filter(s => s.personName.toLowerCase().includes(searchQuery.toLowerCase()))
+      .sort((a, b) => {
+        if (sortBy === 'name') return a.personName.localeCompare(b.personName);
+        if (sortBy === 'amount') return b.totalSavings - a.totalSavings;
+        return 0;
+      });
+  }, [savingsWithTotals, searchQuery, sortBy]);
+
+  const totalAllSavings = useMemo(() => store.getTotalSavings(), [store.getTotalSavings]);
 
   const [isAddingPerson, setIsAddingPerson] = useState(false);
+
+  if (!store.isLoaded) return null;
 
   const handleAddPerson = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -287,15 +307,6 @@ export function Savings() {
     );
   }
 
-  const filteredSavings = store.savings
-    .filter(s => s.personName.toLowerCase().includes(searchQuery.toLowerCase()))
-    .sort((a, b) => {
-      if (sortBy === 'name') return a.personName.localeCompare(b.personName);
-      if (sortBy === 'amount') return store.getPersonTotalSavings(b) - store.getPersonTotalSavings(a);
-      return 0;
-    });
-  const totalAllSavings = store.getTotalSavings();
-
   return (
     <div className="p-4 space-y-6">
       {/* Summary Header */}
@@ -444,7 +455,7 @@ export function Savings() {
               </div>
             ) : (
               filteredSavings.map((person) => {
-                const total = store.getPersonTotalSavings(person);
+                const total = person.totalSavings;
                 const initials = person.personName.substring(0, 2).toUpperCase();
                 
                 // Varied colors for avatars

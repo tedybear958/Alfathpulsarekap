@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useFinanceStore } from '../hooks/useFinanceStore';
 import { useAuthStore } from '../store/authStore';
 import { formatRupiah, formatNumberInput, formatDate } from '../utils/formatters';
@@ -29,45 +29,69 @@ export function Dashboard() {
   const [editingBankId, setEditingBankId] = useState<string | null>(null);
   const [bankInput, setBankInput] = useState('');
 
-  if (!store.isLoaded) return null;
-
   const totalBank = store.getTotalBankBalance();
   const totalDebt = store.getTotalDebt();
   const totalSavings = store.getTotalSavings();
-  
-  const myBranch = store.branches?.find(b => b.id === branchId);
   
   // Logic for Bos: Show overall stats
   // Logic for Branch: Show branch-specific stats
   const isBosGlobal = role === 'bos' && !branchId;
   
+  // Optimize calculations with useMemo
+  const branchData = useMemo(() => {
+    if (!store.branches) return [];
+    
+    return store.branches.map(branch => {
+      const branchBanks = (store.bankBalances || []).filter(b => b.branchId === branch.id);
+      const branchBankTotal = branchBanks.reduce((sum, b) => sum + (Number(b.balance) || 0), 0);
+      const branchDebts = (store.debts || []).filter(d => d.branchId === branch.id);
+      const branchDebtTotal = branchDebts.reduce((sum, d) => sum + store.getPersonTotalDebt(d), 0);
+      const branchPhysicalCapital = Number(branch.physicalCapital) || 0;
+      const branchNonPhysicalCapital = Number(branch.capital) || 0;
+      const branchCash = branchNonPhysicalCapital - branchBankTotal - branchDebtTotal;
+
+      return {
+        ...branch,
+        branchBankTotal,
+        branchDebtTotal,
+        branchPhysicalCapital,
+        branchNonPhysicalCapital,
+        branchCash
+      };
+    });
+  }, [store.branches, store.bankBalances, store.debts, store.getPersonTotalDebt]);
+
+  const myBranch = useMemo(() => 
+    branchId ? branchData.find(b => b.id === branchId) : null
+  , [branchData, branchId]);
+
   const effectiveFixedBalance = isBosGlobal ? (Number(store.fixedBalance) || 0) : (Number(myBranch?.capital) || 0);
   
-  // Fix: Ensure totalBank and totalDebt are filtered correctly for the current context
-  const currentBankTotal = isBosGlobal 
-    ? (store.bankBalances || []).reduce((sum, b) => sum + (Number(b.balance) || 0), 0)
-    : (store.bankBalances || []).filter(b => b.branchId === branchId).reduce((sum, b) => sum + (Number(b.balance) || 0), 0);
+  const currentBankTotal = useMemo(() => 
+    isBosGlobal 
+      ? (store.bankBalances || []).reduce((sum, b) => sum + (Number(b.balance) || 0), 0)
+      : (store.bankBalances || []).filter(b => b.branchId === branchId).reduce((sum, b) => sum + (Number(b.balance) || 0), 0)
+  , [isBosGlobal, store.bankBalances, branchId]);
     
-  const currentDebtTotal = isBosGlobal
-    ? (store.debts || []).reduce((sum, d) => sum + store.getPersonTotalDebt(d), 0)
-    : (store.debts || []).filter(d => d.branchId === branchId).reduce((sum, d) => sum + store.getPersonTotalDebt(d), 0);
+  const currentDebtTotal = useMemo(() => 
+    isBosGlobal
+      ? (store.debts || []).reduce((sum, d) => sum + store.getPersonTotalDebt(d), 0)
+      : (store.debts || []).filter(d => d.branchId === branchId).reduce((sum, d) => sum + store.getPersonTotalDebt(d), 0)
+  , [isBosGlobal, store.debts, branchId, store.getPersonTotalDebt]);
 
   const cashInHand = effectiveFixedBalance - currentBankTotal - currentDebtTotal;
 
-  // Calculate total cash in hand across all branches for Bos
-  const totalAllBranchesCash = (store.branches || []).reduce((sum, b) => {
-    const branchBanks = (store.bankBalances || []).filter(bank => bank.branchId === b.id);
-    const branchBankTotal = branchBanks.reduce((s, bank) => s + (Number(bank.balance) || 0), 0);
-    const branchDebts = (store.debts || []).filter(d => d.branchId === b.id);
-    const branchDebtTotal = branchDebts.reduce((s, d) => s + store.getPersonTotalDebt(d), 0);
-    return sum + ((Number(b.capital) || 0) - branchBankTotal - branchDebtTotal);
-  }, 0);
+  const totalAllBranchesPhysicalCapital = useMemo(() => 
+    branchData.reduce((sum, b) => sum + b.branchPhysicalCapital, 0), 
+  [branchData]);
 
-  // Calculate total physical capital across all branches for Bos
-  const totalAllBranchesPhysicalCapital = (store.branches || []).reduce((sum, b) => sum + (Number(b.physicalCapital) || 0), 0);
-  const totalAllBranchesNonPhysicalCapital = (store.branches || []).reduce((sum, b) => sum + (Number(b.capital) || 0), 0);
+  const totalAllBranchesNonPhysicalCapital = useMemo(() => 
+    branchData.reduce((sum, b) => sum + b.branchNonPhysicalCapital, 0), 
+  [branchData]);
   
   const totalGlobalCapital = totalAllBranchesPhysicalCapital + totalAllBranchesNonPhysicalCapital;
+
+  if (!store.isLoaded) return null;
 
   const handleSaveFixed = async () => {
     const val = parseInt(fixedInput.replace(/\D/g, ''), 10);
@@ -217,12 +241,10 @@ export function Dashboard() {
             <h3 className="text-sm font-bold text-gray-900">Rincian Modal & Fisik Per Cabang</h3>
           </div>
           <div className="grid grid-cols-1 gap-3">
-            {store.branches.map(branch => {
-              const branchBanks = store.bankBalances.filter(b => b.branchId === branch.id);
-              const branchBankTotal = branchBanks.reduce((sum, b) => sum + (Number(b.balance) || 0), 0);
-              const branchDebts = store.debts.filter(d => d.branchId === branch.id);
-              const branchDebtTotal = branchDebts.reduce((sum, d) => sum + store.getPersonTotalDebt(d), 0);
-              const branchCash = (branch.capital || 0) - branchBankTotal - branchDebtTotal;
+            {branchData.map(branch => {
+              const branchBankTotal = branch.branchBankTotal;
+              const branchDebtTotal = branch.branchDebtTotal;
+              const branchCash = branch.branchCash;
 
               return (
                 <div key={branch.id} className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 space-y-3">
@@ -237,11 +259,11 @@ export function Dashboard() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-[10px] text-gray-400 uppercase font-bold mb-1">Modal Non-Fisik</p>
-                      <p className="text-xs font-bold text-gray-700">{formatRupiah(branch.capital || 0)}</p>
+                      <p className="text-xs font-bold text-gray-700">{formatRupiah(branch.branchNonPhysicalCapital)}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-[10px] text-gray-400 uppercase font-bold mb-1">Modal Fisik</p>
-                      <p className="text-xs font-bold text-orange-600">{formatRupiah(branch.physicalCapital || 0)}</p>
+                      <p className="text-xs font-bold text-orange-600">{formatRupiah(branch.branchPhysicalCapital)}</p>
                     </div>
                   </div>
                 </div>
