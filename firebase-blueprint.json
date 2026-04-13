@@ -1,0 +1,146 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with role-based access",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "name": { "type": "string" },
+        "role": { "type": "string", "enum": ["bos", "mandor", "karyawan"] },
+        "branchId": { "type": "string", "description": "Assigned branch ID for karyawan" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "name", "role", "createdAt"]
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Global settings like fixed balance",
+      "type": "object",
+      "properties": {
+        "fixedBalance": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["fixedBalance"]
+    },
+    "Bank": {
+      "title": "Bank",
+      "description": "Bank account balance",
+      "type": "object",
+      "properties": {
+        "bankName": { "type": "string" },
+        "balance": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["bankName", "balance"]
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "Customer with debts",
+      "type": "object",
+      "properties": {
+        "personName": { "type": "string" },
+        "branchId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["personName", "branchId"]
+    },
+    "DebtTransaction": {
+      "title": "DebtTransaction",
+      "description": "Individual debt transaction",
+      "type": "object",
+      "properties": {
+        "amount": { "type": "number" },
+        "description": { "type": "string" },
+        "type": { "type": "string", "enum": ["add", "pay"] },
+        "date": { "type": "string", "format": "date-time" },
+        "createdBy": { "type": "string" }
+      },
+      "required": ["amount", "description", "type", "date"]
+    },
+    "SavingCustomer": {
+      "title": "SavingCustomer",
+      "description": "Customer with savings",
+      "type": "object",
+      "properties": {
+        "personName": { "type": "string" },
+        "branchId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["personName", "branchId"]
+    },
+    "SavingTransaction": {
+      "title": "SavingTransaction",
+      "description": "Individual saving transaction",
+      "type": "object",
+      "properties": {
+        "amount": { "type": "number" },
+        "description": { "type": "string" },
+        "type": { "type": "string", "enum": ["deposit", "withdraw"] },
+        "date": { "type": "string", "format": "date-time" },
+        "createdBy": { "type": "string" },
+        "createdByName": { "type": "string" }
+      },
+      "required": ["amount", "description", "type", "date", "createdBy", "createdByName"]
+    },
+    "Branch": {
+      "title": "Branch",
+      "description": "Branch information",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "totalSetor": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "totalSetor"]
+    },
+    "BranchDeposit": {
+      "title": "BranchDeposit",
+      "description": "Deposit from a branch",
+      "type": "object",
+      "properties": {
+        "totalSetor": { "type": "number" },
+        "sisaSetor": { "type": "number" },
+        "berhasilDisetor": { "type": "number" },
+        "destination": { "type": "string" },
+        "description": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "createdBy": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "verified"] }
+      },
+      "required": ["totalSetor", "sisaSetor", "berhasilDisetor", "destination", "description", "date"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles and roles"
+    },
+    "/settings/general": {
+      "schema": { "$ref": "#/entities/Settings" },
+      "description": "Global application settings"
+    },
+    "/banks/{bankId}": {
+      "schema": { "$ref": "#/entities/Bank" },
+      "description": "Bank accounts"
+    },
+    "/customers/{customerId}": {
+      "schema": { "$ref": "#/entities/Customer" },
+      "description": "Customers with debts"
+    },
+    "/customers/{customerId}/transactions/{transactionId}": {
+      "schema": { "$ref": "#/entities/DebtTransaction" },
+      "description": "Debt transactions for a customer"
+    },
+    "/branches/{branchId}": {
+      "schema": { "$ref": "#/entities/Branch" },
+      "description": "Branches"
+    },
+    "/branches/{branchId}/deposits/{depositId}": {
+      "schema": { "$ref": "#/entities/BranchDeposit" },
+      "description": "Deposits for a branch"
+    }
+  }
+}

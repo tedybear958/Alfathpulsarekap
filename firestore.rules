@@ -1,0 +1,112 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isBos() {
+      return isAuthenticated() && (
+        request.auth.token.email == "alfathpulsa27@gmail.com" ||
+        getUserData().get('role', 'karyawan') == 'bos'
+      );
+    }
+
+    function isMandor() {
+      return isAuthenticated() && getUserData().get('role', 'karyawan') == 'mandor';
+    }
+
+    function isKaryawan() {
+      return isAuthenticated() && getUserData().get('role', 'karyawan') == 'karyawan';
+    }
+
+    function isBosGlobal() {
+      return isBos() && getUserData().get('branchId', null) == null;
+    }
+
+    function isAssignedToBranch(branchId) {
+      return isAuthenticated() && getUserData().get('branchId', null) == branchId;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (isBos() || request.auth.uid == userId);
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isAuthenticated() && (isBos() || (request.auth.uid == userId && request.resource.data.role == resource.data.role));
+      allow delete: if isBos();
+    }
+
+    match /settings/{settingId} {
+      allow read: if isAuthenticated();
+      allow write: if isBos();
+    }
+
+    match /banks/{bankId} {
+      allow read: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(resource.data.branchId));
+      allow create: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(request.resource.data.branchId));
+      allow update, delete: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(resource.data.branchId));
+    }
+
+    match /branches/{branchId} {
+      allow read: if isAuthenticated();
+      allow create: if isBosGlobal();
+      allow update: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(branchId));
+      allow delete: if isBosGlobal();
+      
+      match /deposits/{depositId} {
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated() && (isBosGlobal() || isMandor() || isAssignedToBranch(branchId));
+      }
+    }
+
+    match /customers/{customerId} {
+      allow read: if isAuthenticated() && (isBosGlobal() || isMandor() || isAssignedToBranch(resource.data.branchId));
+      allow create: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(request.resource.data.branchId));
+      allow update, delete: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(resource.data.branchId));
+
+      match /transactions/{txId} {
+        allow read: if isAuthenticated() && (isBosGlobal() || isMandor() || isAssignedToBranch(get(/databases/$(database)/documents/customers/$(customerId)).data.branchId));
+        allow write: if isAuthenticated() && (isBosGlobal() || isMandor() || isAssignedToBranch(get(/databases/$(database)/documents/customers/$(customerId)).data.branchId));
+      }
+    }
+
+    match /savings/{savingId} {
+      allow read: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(resource.data.branchId));
+      allow create: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(request.resource.data.branchId));
+      allow update, delete: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(resource.data.branchId));
+
+      match /transactions/{txId} {
+        allow read: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(get(/databases/$(database)/documents/savings/$(savingId)).data.branchId));
+        allow write: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(get(/databases/$(database)/documents/savings/$(savingId)).data.branchId));
+      }
+    }
+
+    match /voucherRecaps/{recapId} {
+      allow read: if isAuthenticated() && (
+        (isBosGlobal() && resource.data.get('status', 'reported') == 'reported') || 
+        isAssignedToBranch(resource.data.branchId)
+      );
+      allow create: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(request.resource.data.branchId));
+      allow update: if isAuthenticated() && (
+        isBosGlobal() || 
+        (isAssignedToBranch(resource.data.branchId) && resource.data.get('status', 'reported') == 'draft')
+      );
+      allow delete: if isAuthenticated() && (
+        isBosGlobal() || 
+        (isAssignedToBranch(resource.data.branchId) && resource.data.get('status', 'reported') == 'draft')
+      );
+    }
+  }
+}
