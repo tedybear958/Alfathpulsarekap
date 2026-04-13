@@ -10,6 +10,8 @@ export function Deposits() {
   const store = useFinanceStore();
   const { role, branchId } = useAuthStore();
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'active' | 'history'>('active');
+  const [historyLimit, setHistoryLimit] = useState(10);
   const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'received' | 'verified'>('all');
 
   const [setorAmount, setSetorAmount] = useState('');
@@ -30,6 +32,12 @@ export function Deposits() {
 
   const myBranch = store.branches.find(b => b.id === branchId);
 
+  const handleTabChange = (tab: 'active' | 'history') => {
+    setActiveTab(tab);
+    setFilterStatus('all');
+    setHistoryLimit(10);
+  };
+
   // Flatten all deposits from all branches, filtered by branch if not bos/mandor
   const allDeposits = store.branches
     .filter(branch => role === 'bos' || role === 'mandor' || branch.id === branchId)
@@ -45,9 +53,19 @@ export function Deposits() {
     const matchesSearch = dep.branchName.toLowerCase().includes(searchQuery.toLowerCase()) || 
                          dep.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          dep.createdByName?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Filter by tab
+    const matchesTab = activeTab === 'active' 
+      ? (dep.status === 'pending' || dep.status === 'received')
+      : (dep.status === 'verified');
+
     const matchesStatus = filterStatus === 'all' || dep.status === filterStatus;
-    return matchesSearch && matchesStatus;
+    return matchesSearch && matchesStatus && matchesTab;
   });
+
+  const displayedDeposits = activeTab === 'active' 
+    ? filteredDeposits 
+    : filteredDeposits.slice(0, historyLimit);
 
   const stats = (role === 'bos' || role === 'mandor') ? store.getTotalAllBranches() : (myBranch ? store.getBranchStats(myBranch) : { totalSetor: 0, sisaSetor: 0, berhasilDisetor: 0 });
 
@@ -243,10 +261,27 @@ export function Deposits() {
 
       {/* Filters & Search */}
       <div className="space-y-3">
-        <div className="flex items-center gap-2 px-1">
-          <Clock className="w-4 h-4 text-gray-400" />
-          <h3 className="text-sm font-bold text-gray-900">Riwayat Setoran</h3>
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-2">
+            <Clock className="w-4 h-4 text-gray-400" />
+            <h3 className="text-sm font-bold text-gray-900">Daftar Setoran</h3>
+          </div>
+          <div className="flex bg-gray-100 p-1 rounded-xl">
+            <button
+              onClick={() => handleTabChange('active')}
+              className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${activeTab === 'active' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500'}`}
+            >
+              AKTIF
+            </button>
+            <button
+              onClick={() => handleTabChange('history')}
+              className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${activeTab === 'history' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500'}`}
+            >
+              RIWAYAT
+            </button>
+          </div>
         </div>
+
         <div className="flex flex-col gap-3">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -258,52 +293,52 @@ export function Deposits() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-            <button
-              onClick={() => setFilterStatus('all')}
-              className={`px-5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${filterStatus === 'all' ? 'bg-emerald-600 text-white shadow-md shadow-emerald-100' : 'bg-white text-gray-500 border border-gray-100'}`}
-            >
-              Semua
-            </button>
-            <button
-              onClick={() => setFilterStatus('pending')}
-              className={`px-5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all relative ${filterStatus === 'pending' ? 'bg-orange-500 text-white shadow-md shadow-orange-100' : 'bg-white text-gray-500 border border-gray-100'}`}
-            >
-              Pending
-              {hasPending && (
-                <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500 border-2 border-white"></span>
-                </span>
-              )}
-            </button>
-            <button
-              onClick={() => setFilterStatus('received')}
-              className={`px-5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${filterStatus === 'received' ? 'bg-blue-500 text-white shadow-md shadow-blue-100' : 'bg-white text-gray-500 border border-gray-100'}`}
-            >
-              Diterima Mandor
-            </button>
-            <button
-              onClick={() => setFilterStatus('verified')}
-              className={`px-5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${filterStatus === 'verified' ? 'bg-emerald-500 text-white shadow-md shadow-emerald-100' : 'bg-white text-gray-500 border border-gray-100'}`}
-            >
-              Selesai
-            </button>
-          </div>
+          
+          {activeTab === 'active' && (
+            <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+              <button
+                onClick={() => setFilterStatus('all')}
+                className={`px-5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${filterStatus === 'all' ? 'bg-emerald-600 text-white shadow-md shadow-emerald-100' : 'bg-white text-gray-500 border border-gray-100'}`}
+              >
+                Semua Aktif
+              </button>
+              <button
+                onClick={() => setFilterStatus('pending')}
+                className={`px-5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all relative ${filterStatus === 'pending' ? 'bg-orange-500 text-white shadow-md shadow-orange-100' : 'bg-white text-gray-500 border border-gray-100'}`}
+              >
+                Pending
+                {hasPending && (
+                  <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500 border-2 border-white"></span>
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => setFilterStatus('received')}
+                className={`px-5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${filterStatus === 'received' ? 'bg-blue-500 text-white shadow-md shadow-blue-100' : 'bg-white text-gray-500 border border-gray-100'}`}
+              >
+                Diterima Mandor
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Deposits Feed */}
-      <div className="space-y-4">
-        {filteredDeposits.length === 0 ? (
+      <div className="space-y-4 pb-10">
+        {displayedDeposits.length === 0 ? (
           <div className="bg-white rounded-3xl p-12 text-center border border-gray-100 shadow-sm">
             <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <Clock className="w-8 h-8 text-gray-200" />
             </div>
-            <p className="text-sm font-medium text-gray-400">Tidak ada data setoran ditemukan.</p>
+            <p className="text-sm font-medium text-gray-400">
+              {activeTab === 'active' ? 'Tidak ada setoran aktif.' : 'Tidak ada riwayat setoran.'}
+            </p>
           </div>
         ) : (
-          filteredDeposits.map((deposit) => {
+          <>
+            {displayedDeposits.map((deposit) => {
             const totalSetor = deposit.totalSetor ?? 0;
             const berhasilDisetor = deposit.berhasilDisetor ?? 0;
             const sisaSetor = deposit.sisaSetor ?? (totalSetor - berhasilDisetor);
@@ -609,9 +644,19 @@ export function Deposits() {
                 )}
               </div>
             );
-          })
-        )}
-      </div>
+          })}
+
+          {activeTab === 'history' && filteredDeposits.length > historyLimit && (
+            <button
+              onClick={() => setHistoryLimit(prev => prev + 10)}
+              className="w-full py-4 bg-white border border-gray-100 rounded-2xl text-xs font-bold text-blue-600 hover:bg-gray-50 transition-all shadow-sm"
+            >
+              Tampilkan Lebih Banyak ({filteredDeposits.length - historyLimit} lagi)
+            </button>
+          )}
+        </>
+      )}
+    </div>
 
       <ConfirmModal
         isOpen={deleteConfirm.isOpen}
