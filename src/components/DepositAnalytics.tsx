@@ -104,7 +104,7 @@ export function DepositAnalytics() {
         total: stats.totalSetor,
         verified: stats.berhasilDisetor,
       };
-    }).sort((a, b) => b.total - a.total);
+    }).sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
   }, [store.branches]);
 
   const CustomTooltip = ({ active, payload, label }: any) => {

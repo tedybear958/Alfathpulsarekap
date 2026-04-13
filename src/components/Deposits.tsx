@@ -47,7 +47,13 @@ export function Deposits() {
         branchName: branch.name,
         branchId: branch.id
       }))
-    ).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    ).sort((a, b) => {
+      // First sort by branch name numerically (Alfath 1, Alfath 2, Alfath 3)
+      const nameCompare = a.branchName.localeCompare(b.branchName, undefined, { numeric: true, sensitivity: 'base' });
+      if (nameCompare !== 0) return nameCompare;
+      // Then sort by date (latest first) within the same branch
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
 
   const filteredDeposits = allDeposits.filter(dep => {
     const matchesSearch = dep.branchName.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -126,45 +132,51 @@ export function Deposits() {
           {role === 'mandor' && (
             <button
               onClick={() => {
-                if (allDeposits.length === 0) return;
+                const verifiedDeposits = allDeposits.filter(d => d.status === 'verified' && d.completedAt);
+                if (verifiedDeposits.length === 0 && !hasPending) return;
 
-                const latestDate = new Date(allDeposits[0].date);
-                latestDate.setHours(0, 0, 0, 0);
+                let latestCompletionTime = new Date();
+                if (verifiedDeposits.length > 0) {
+                  const sortedByCompletion = [...verifiedDeposits].sort((a, b) => 
+                    new Date(b.completedAt!).getTime() - new Date(a.completedAt!).getTime()
+                  );
+                  latestCompletionTime = new Date(sortedByCompletion[0].completedAt!);
+                }
                 
-                const today = latestDate.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
-                const time = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                const oneHourAgo = new Date(latestCompletionTime.getTime() - (60 * 60 * 1000));
+                const todayStr = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+                const timeStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
                 
-                // Group by Bank for Verified
+                // Group by Bank for Verified (Only those completed in the last hour of the latest completion)
                 const bankGroups: Record<string, { total: number, branches: Record<string, number> }> = {};
-                // Group by Branch for Unset (Pending/Received)
-                const unSetGroups: Record<string, number> = {};
                 
-                allDeposits
-                  .filter(d => {
-                    const dDate = new Date(d.date);
-                    dDate.setHours(0, 0, 0, 0);
-                    return dDate.getTime() === latestDate.getTime();
-                  })
+                verifiedDeposits
+                  .filter(d => new Date(d.completedAt!).getTime() >= oneHourAgo.getTime())
                   .forEach(d => {
-                    if (d.status === 'verified') {
-                      const bank = d.atmName || 'BANK LAIN';
-                      if (!bankGroups[bank]) {
-                        bankGroups[bank] = { total: 0, branches: {} };
-                      }
-                      bankGroups[bank].total += d.berhasilDisetor;
-                      bankGroups[bank].branches[d.branchName] = (bankGroups[bank].branches[d.branchName] || 0) + d.berhasilDisetor;
-                    } else {
-                      unSetGroups[d.branchName] = (unSetGroups[d.branchName] || 0) + d.totalSetor;
+                    const bank = d.atmName || 'BANK LAIN';
+                    if (!bankGroups[bank]) {
+                      bankGroups[bank] = { total: 0, branches: {} };
                     }
+                    bankGroups[bank].total += d.berhasilDisetor;
+                    bankGroups[bank].branches[d.branchName] = (bankGroups[bank].branches[d.branchName] || 0) + d.berhasilDisetor;
                   });
 
-                let message = `*🏦 LAPORAN SETORAN BANK*\n`;
+                // Group by Branch for Unset (Only currently active: Pending/Received)
+                const unSetGroups: Record<string, number> = {};
+                allDeposits
+                  .filter(d => d.status === 'pending' || d.status === 'received')
+                  .forEach(d => {
+                    unSetGroups[d.branchName] = (unSetGroups[d.branchName] || 0) + d.totalSetor;
+                  });
+                
+                let message = `*🏦 LAPORAN SETORAN GABUNGAN*\n`;
+                message += `_(Batch Terbaru)_\n`;
                 message += `━━━━━━━━━━━━━━━━━━\n\n`;
 
                 if (Object.keys(bankGroups).length > 0) {
                   Object.entries(bankGroups).forEach(([bank, data]) => {
                     message += `*Setor Ke ${bank.toUpperCase()}*\n`;
-                    message += `*Total total:* *${formatRupiah(data.total)}*\n\n`;
+                    message += `*Total:* *${formatRupiah(data.total)}*\n\n`;
                     
                     Object.entries(data.branches)
                       .sort((a, b) => a[0].localeCompare(b[0], undefined, { numeric: true, sensitivity: 'base' }))
@@ -173,10 +185,12 @@ export function Deposits() {
                       });
                     message += `\n━━━━━━━━━━━━━━━━━━\n\n`;
                   });
+                } else if (verifiedDeposits.length > 0) {
+                  message += `_Tidak ada setoran baru dalam 1 jam terakhir._\n\n`;
                 }
 
                 if (Object.keys(unSetGroups).length > 0) {
-                  message += `*⚠️ BELUM SETOR (FISIK)*\n`;
+                  message += `*⚠️ BELUM SETOR (AKTIF)*\n`;
                   let totalUnset = 0;
                   Object.entries(unSetGroups)
                     .sort((a, b) => a[0].localeCompare(b[0], undefined, { numeric: true, sensitivity: 'base' }))
@@ -184,11 +198,11 @@ export function Deposits() {
                       message += `${branch} # *${formatRupiah(amount)}*\n`;
                       totalUnset += amount;
                     });
-                  message += `*Total:* *${formatRupiah(totalUnset)}*\n`;
+                  message += `*Total Belum Setor:* *${formatRupiah(totalUnset)}*\n`;
                   message += `\n━━━━━━━━━━━━━━━━━━\n\n`;
                 }
 
-                message += `📅 _${today} - ${time}_ \n`;
+                message += `📅 _${todayStr} - ${timeStr}_ \n`;
                 message += `_ALFATH PULSA GROUP_`;
 
                 window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
