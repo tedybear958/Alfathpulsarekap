@@ -285,7 +285,7 @@ export function Debts() {
             </div>
           </div>
           <div className="grid grid-cols-1 gap-3">
-            {store.branches.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })).map(branch => {
+            {[...store.branches].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })).map(branch => {
               const branchDebts = store.debts.filter(d => d.branchId === branch.id);
               const branchTotal = branchDebts.reduce((sum, d) => sum + store.getPersonTotalDebt(d), 0);
               
