@@ -12,6 +12,7 @@ import { Deposits } from './components/Deposits';
 import { VoucherRecaps } from './components/VoucherRecaps';
 import { Login } from './components/Login';
 import { Team } from './components/Team';
+import { NotificationManager } from './components/NotificationManager';
 import { useAuthStore } from './store/authStore';
 import { initFinanceStoreListeners, stopFinanceStoreListeners } from './hooks/useFinanceStore';
 
@@ -87,6 +88,7 @@ export default function App() {
 
   return (
     <Layout activeTab={activeTab} setActiveTab={setActiveTab} role={role}>
+      <NotificationManager />
       {renderContent()}
     </Layout>
   );

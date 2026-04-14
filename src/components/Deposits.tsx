@@ -23,6 +23,7 @@ export function Deposits() {
   const [completingDeposit, setCompletingDeposit] = useState<{ branchId: string; depositId: string; amount: string; atmName: string } | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [whatsappShare, setWhatsappShare] = useState<{ isOpen: boolean; message: string } | null>(null);
 
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; branchId: string; depositId: string; name: string }>({
     isOpen: false,
@@ -218,7 +219,7 @@ export function Deposits() {
                 message += `📅 _${todayStr} - ${timeStr}_ \n`;
                 message += `_ALFATH PULSA GROUP_`;
 
-                window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+                setWhatsappShare({ isOpen: true, message });
               }}
               className="mt-4 w-full bg-white/20 hover:bg-white/30 backdrop-blur-md text-white py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 border border-white/30 transition-all active:scale-[0.98]"
             >
@@ -551,7 +552,7 @@ export function Deposits() {
                                 `--------------------------\n` +
                                 `_Laporan otomatis dari ALFATHPulsa_`;
                               
-                              window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+                              setWhatsappShare({ isOpen: true, message });
                             }}
                             className="flex-1 bg-emerald-50 text-emerald-600 py-3 rounded-2xl text-xs font-bold hover:bg-emerald-100 active:scale-[0.98] transition-all flex items-center justify-center gap-2 border border-emerald-100"
                           >
@@ -707,6 +708,58 @@ export function Deposits() {
         message={successMsg} 
         onClose={() => setShowSuccess(false)} 
       />
+
+      {/* WhatsApp Choice Modal */}
+      {whatsappShare?.isOpen && (
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div 
+            className="bg-white w-full max-w-sm rounded-[2.5rem] overflow-hidden shadow-2xl animate-in slide-in-from-bottom-10 duration-300"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-8 text-center">
+              <div className="w-20 h-20 bg-emerald-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <Share2 className="w-10 h-10 text-emerald-600" />
+              </div>
+              <h3 className="text-xl font-black text-gray-900 mb-2">Kirim Laporan</h3>
+              <p className="text-sm text-gray-500 font-medium mb-8">Pilih aplikasi WhatsApp yang ingin Anda gunakan:</p>
+              
+              <div className="space-y-3">
+                <button
+                  onClick={() => {
+                    window.open(`https://wa.me/?text=${encodeURIComponent(whatsappShare.message)}`, '_blank');
+                    setWhatsappShare(null);
+                  }}
+                  className="w-full py-4 bg-emerald-600 text-white rounded-2xl font-black text-sm shadow-lg shadow-emerald-200 hover:bg-emerald-700 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                >
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" className="w-5 h-5 brightness-0 invert" alt="" />
+                  WhatsApp Biasa
+                </button>
+                
+                <button
+                  onClick={() => {
+                    // WhatsApp Business often uses the same wa.me link, but we can try the specific intent for Android if needed
+                    // However, wa.me is the most universal. On Android, it usually asks.
+                    // Some use whatsapp://send?text=... but wa.me is better.
+                    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappShare.message)}`, '_blank');
+                    setWhatsappShare(null);
+                  }}
+                  className="w-full py-4 bg-emerald-50 text-emerald-700 border-2 border-emerald-100 rounded-2xl font-black text-sm hover:bg-emerald-100 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                >
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" className="w-5 h-5" alt="" />
+                  WhatsApp Business
+                </button>
+                
+                <button
+                  onClick={() => setWhatsappShare(null)}
+                  className="w-full py-4 bg-gray-50 text-gray-500 rounded-2xl font-bold text-sm hover:bg-gray-100 transition-all mt-2"
+                >
+                  Batal
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
