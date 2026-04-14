@@ -66,8 +66,16 @@ export function Deposits() {
       
       // Filter by tab
       const matchesTab = activeTab === 'active' 
-        ? (dep.status === 'pending' || dep.status === 'received')
-        : (dep.status === 'verified');
+        ? (
+            dep.status === 'pending' || 
+            dep.status === 'received' || 
+            (role === 'mandor' && dep.status === 'verified' && dep.completedAt && (new Date().getTime() - new Date(dep.completedAt).getTime() < 3600000))
+          )
+        : (
+            role === 'mandor' 
+              ? (dep.status === 'verified' && (!dep.completedAt || (new Date().getTime() - new Date(dep.completedAt).getTime() >= 3600000)))
+              : (dep.status === 'verified')
+          );
 
       const matchesStatus = filterStatus === 'all' || dep.status === filterStatus;
       return matchesSearch && matchesStatus && matchesTab;
@@ -355,6 +363,14 @@ export function Deposits() {
               >
                 Diterima Mandor
               </button>
+              {role === 'mandor' && (
+                <button
+                  onClick={() => setFilterStatus('verified')}
+                  className={`px-5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${filterStatus === 'verified' ? 'bg-emerald-600 text-white shadow-md shadow-emerald-100' : 'bg-white text-gray-500 border border-gray-100'}`}
+                >
+                  Baru Selesai
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -417,9 +433,16 @@ export function Deposits() {
                           DITERIMA MANDOR
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100 uppercase tracking-tighter">
-                          SETORAN SELESAI
-                        </span>
+                        <div className="flex flex-col items-end gap-1">
+                          <span className="inline-flex items-center gap-1 text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100 uppercase tracking-tighter">
+                            SETORAN SELESAI
+                          </span>
+                          {role === 'mandor' && activeTab === 'active' && (
+                            <span className="text-[8px] font-bold text-emerald-500 animate-pulse">
+                              BARU SAJA SELESAI
+                            </span>
+                          )}
+                        </div>
                       )}
                     </div>
                   </div>
