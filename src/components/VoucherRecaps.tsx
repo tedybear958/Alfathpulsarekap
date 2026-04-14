@@ -50,8 +50,8 @@ export function VoucherRecaps() {
     if (!selectedBranchId) return [];
     const recaps = [...voucherRecaps].filter(r => r.branchId === selectedBranchId);
     
-    // Sort by date ascending (oldest first)
-    recaps.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    // Sort by date descending (newest first)
+    recaps.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     // Boss only sees reported recaps
     if (role === 'bos') {
@@ -181,24 +181,53 @@ export function VoucherRecaps() {
   const totalVoucher = totalVouS + totalVouM;
   const grandTotal = labaBersihAdm + totalVoucher;
 
-  // Trend Analysis (Compare latest recap with previous one in full history)
+  // Trend Analysis (Compare latest batch with previous batch)
+  const batches = useMemo(() => {
+    if (filteredRecaps.length === 0) return [];
+    
+    // Sort by createdAt DESC to group by submission time
+    const sortedByCreated = [...filteredRecaps].sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+    
+    const result: VoucherRecap[][] = [];
+    let currentBatch: VoucherRecap[] = [];
+    let batchRefTime: number | null = null;
+    
+    // Group recaps submitted within 48 hours of each other as one "batch"
+    sortedByCreated.forEach(recap => {
+      const time = new Date(recap.createdAt).getTime();
+      if (batchRefTime === null || (batchRefTime - time) < (48 * 60 * 60 * 1000)) {
+        if (batchRefTime === null) batchRefTime = time;
+        currentBatch.push(recap);
+      } else {
+        result.push(currentBatch);
+        currentBatch = [recap];
+        batchRefTime = time;
+      }
+    });
+    
+    if (currentBatch.length > 0) result.push(currentBatch);
+    return result;
+  }, [filteredRecaps]);
+
   const trend = useMemo(() => {
-    if (filteredRecaps.length < 2) return { admin: 'neutral', voucher: 'neutral' };
+    if (batches.length < 2) return { admin: 'neutral', voucher: 'neutral' };
     
-    const latest = filteredRecaps[0];
-    const previous = filteredRecaps[1];
+    const batch1 = batches[0]; // Latest batch
+    const batch2 = batches[1]; // Previous batch
     
-    const latestAdm = (latest.adminSiang + latest.adminMalam) - (latest.expenseAmount || 0);
-    const prevAdm = (previous.adminSiang + previous.adminMalam) - (previous.expenseAmount || 0);
+    const b1Adm = batch1.reduce((sum, r) => sum + (r.adminSiang + r.adminMalam - (r.expenseAmount || 0)), 0);
+    const b2Adm = batch2.reduce((sum, r) => sum + (r.adminSiang + r.adminMalam - (r.expenseAmount || 0)), 0);
     
-    const latestVou = latest.voucherSiang + latest.voucherMalam;
-    const prevVou = previous.voucherSiang + previous.voucherMalam;
+    const b1Vou = batch1.reduce((sum, r) => sum + (r.voucherSiang + r.voucherMalam), 0);
+    const b2Vou = batch2.reduce((sum, r) => sum + (r.voucherSiang + r.voucherMalam), 0);
     
     return {
-      admin: latestAdm > prevAdm ? 'up' : latestAdm < prevAdm ? 'down' : 'neutral',
-      voucher: latestVou > prevVou ? 'up' : latestVou < prevVou ? 'down' : 'neutral'
+      admin: b1Adm > b2Adm ? 'up' : b1Adm < b2Adm ? 'down' : 'neutral',
+      voucher: b1Vou > b2Vou ? 'up' : b1Vou < b2Vou ? 'down' : 'neutral'
     };
-  }, [filteredRecaps]);
+  }, [batches]);
 
   // If Bos and no branch selected, show branch cards
   if (role === 'bos' && !selectedBranchId) {
