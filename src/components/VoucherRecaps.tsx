@@ -229,72 +229,148 @@ export function VoucherRecaps() {
     };
   }, [batches]);
 
-  // If Bos and no branch selected, show branch cards
+  // If Bos and no branch selected, show Executive Dashboard
   if (role === 'bos' && !selectedBranchId) {
+    // Global Stats Calculation (All Reported Recaps)
+    const reportedRecaps = voucherRecaps.filter(r => r.status === 'reported');
+    const globalTotalAdm = reportedRecaps.reduce((sum, r) => sum + (r.adminSiang + r.adminMalam), 0);
+    const globalTotalExp = reportedRecaps.reduce((sum, r) => sum + (r.expenseAmount || 0), 0);
+    const globalTotalVou = reportedRecaps.reduce((sum, r) => sum + (r.voucherSiang + r.voucherMalam), 0);
+    const globalNetProfit = (globalTotalAdm - globalTotalExp) + globalTotalVou;
+
+    // Calculate Latest Batch Stats for each branch
+    const branchStats = branches.map(branch => {
+      const bRecaps = reportedRecaps.filter(r => r.branchId === branch.id);
+      // Sort by createdAt to find the latest batch
+      const sorted = [...bRecaps].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      
+      // Group latest batch (within 48h of the very latest)
+      const latestTime = sorted.length > 0 ? new Date(sorted[0].createdAt).getTime() : 0;
+      const latestBatch = sorted.filter(r => (latestTime - new Date(r.createdAt).getTime()) < (48 * 60 * 60 * 1000));
+      
+      const batchTotal = latestBatch.reduce((sum, r) => sum + r.total, 0);
+      const lastReportDate = sorted.length > 0 ? sorted[0].date : null;
+      
+      return {
+        ...branch,
+        batchTotal,
+        lastReportDate,
+        totalRecaps: bRecaps.length,
+        isRecentlyActive: lastReportDate ? (new Date().getTime() - new Date(lastReportDate).getTime()) < (5 * 24 * 60 * 60 * 1000) : false
+      };
+    });
+
+    // Sort branches by batch total (Performance Ranking)
+    const topBranches = [...branchStats].sort((a, b) => b.batchTotal - a.batchTotal);
+
     return (
-      <div className="p-2 space-y-6">
-        <div className="flex items-center gap-3 mb-2 px-2">
-          <div className="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-100">
-            <TrendingUp className="w-6 h-6" />
-          </div>
+      <div className="p-2 space-y-6 pb-20">
+        {/* Executive Header */}
+        <div className="flex items-center justify-between px-2">
           <div>
-            <h2 className="text-xl font-black text-slate-800">Halaman Rekap</h2>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Pilih Cabang untuk Melihat Detail</p>
+            <h2 className="text-2xl font-black text-slate-900 tracking-tight">Executive Dashboard</h2>
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Financial Overview • All Branches</p>
+          </div>
+          <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-white shadow-xl">
+            <TrendingUp className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {branches.map((branch, index) => {
-            // Boss only sees reported recaps in the summary
-            const branchRecaps = voucherRecaps.filter(r => r.branchId === branch.id && r.status === 'reported');
-            const branchTotal = branchRecaps.reduce((sum, r) => sum + r.total, 0);
-            
-            const gradients = [
-              'from-blue-600 to-indigo-700',
-              'from-emerald-500 to-teal-700',
-              'from-rose-500 to-pink-700',
-              'from-amber-500 to-orange-700',
-              'from-violet-600 to-purple-800',
-              'from-cyan-500 to-blue-700'
-            ];
-            const gradient = gradients[index % gradients.length];
+        {/* Global Summary Cards */}
+        <div className="grid grid-cols-1 gap-4">
+          <div className="bg-gradient-to-br from-indigo-600 via-blue-600 to-blue-700 rounded-[2.5rem] p-8 text-white shadow-2xl shadow-blue-200 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-2 mb-2 opacity-80">
+                <Wallet className="w-4 h-4" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">Total Laba Bersih Grup</span>
+              </div>
+              <h3 className="text-4xl font-black tracking-tighter mb-6">
+                {formatRupiah(globalNetProfit)}
+              </h3>
+              
+              <div className="grid grid-cols-2 gap-6 pt-6 border-t border-white/20">
+                <div>
+                  <p className="text-[9px] text-blue-100 font-bold uppercase tracking-wider mb-1">Total Pendapatan</p>
+                  <p className="text-lg font-black">{formatRupiah(globalTotalAdm + globalTotalVou)}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[9px] text-blue-100 font-bold uppercase tracking-wider mb-1">Total Pengeluaran</p>
+                  <p className="text-lg font-black text-rose-200">-{formatRupiah(globalTotalExp)}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-            return (
-              <button
-                key={branch.id}
-                onClick={() => setSelectedBranchId(branch.id)}
-                className={`relative group overflow-hidden rounded-3xl p-0.5 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-slate-200/40`}
-              >
-                {/* Background Gradient */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`}></div>
-                
-                {/* Decorative Circles */}
-                <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10 blur-xl group-hover:scale-110 transition-transform duration-500"></div>
+        {/* Performance Ranking Section */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between px-2">
+            <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider">Performa Cabang (Batch Terbaru)</h3>
+            <span className="text-[9px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg">Top Performer</span>
+          </div>
+          
+          <div className="grid grid-cols-1 gap-3">
+            {topBranches.map((branch, index) => {
+              const gradients = [
+                'from-blue-600 to-indigo-700',
+                'from-emerald-500 to-teal-700',
+                'from-rose-500 to-pink-700',
+                'from-amber-500 to-orange-700',
+                'from-violet-600 to-purple-800',
+                'from-cyan-500 to-blue-700'
+              ];
+              const gradient = gradients[index % gradients.length];
 
-                {/* Glass Content */}
-                <div className="relative z-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-[1.4rem] p-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white shadow-inner border border-white/30">
-                      <Wallet className="w-5 h-5" />
+              return (
+                <button
+                  key={branch.id}
+                  onClick={() => setSelectedBranchId(branch.id)}
+                  className="group relative bg-white rounded-[2rem] p-4 flex items-center justify-between shadow-sm border border-slate-100 hover:shadow-xl hover:border-blue-100 transition-all duration-300 active:scale-[0.98]"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-500`}>
+                      {index === 0 ? <TrendingUp className="w-7 h-7" /> : <Calculator className="w-7 h-7" />}
                     </div>
-                    <div>
-                      <h3 className="text-sm font-black text-white tracking-tight leading-tight">{branch.name}</h3>
-                      <div className="flex items-center gap-1.5 mt-0.5">
-                        <div className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse"></div>
-                        <p className="text-[9px] font-bold text-white/80 uppercase tracking-wider">
-                          {formatRupiah(branchTotal)}
-                        </p>
+                    <div className="text-left">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-base font-black text-slate-800 tracking-tight">{branch.name}</h4>
+                        {branch.isRecentlyActive && (
+                          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        )}
                       </div>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase">
+                        {branch.lastReportDate ? `Laporan Terakhir: ${new Date(branch.lastReportDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })}` : 'Belum ada laporan'}
+                      </p>
                     </div>
                   </div>
                   
-                  <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-white border border-white/20 group-hover:bg-white group-hover:text-slate-900 transition-all duration-300">
-                    <ChevronRight className="w-5 h-5" />
+                  <div className="text-right">
+                    <p className="text-sm font-black text-slate-900">{formatRupiah(branch.batchTotal)}</p>
+                    <p className="text-[9px] text-blue-600 font-bold uppercase tracking-tighter">Batch Ini</p>
                   </div>
-                </div>
-              </button>
-            );
-          })}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Reporting Status / Quick Insights */}
+        <div className="bg-slate-50 rounded-[2rem] p-6 border border-slate-100">
+          <div className="flex items-center gap-2 mb-4">
+            <AlertCircle className="w-4 h-4 text-slate-400" />
+            <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Reporting Insights</h3>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+              <p className="text-[8px] font-bold text-slate-400 uppercase mb-1">Cabang Aktif</p>
+              <p className="text-xl font-black text-emerald-600">{branchStats.filter(b => b.isRecentlyActive).length} / {branches.length}</p>
+            </div>
+            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+              <p className="text-[8px] font-bold text-slate-400 uppercase mb-1">Total Laporan</p>
+              <p className="text-xl font-black text-blue-600">{reportedRecaps.length}</p>
+            </div>
+          </div>
         </div>
       </div>
     );
