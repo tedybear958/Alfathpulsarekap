@@ -695,6 +695,8 @@ export function Deposits() {
         message={`Apakah Anda yakin ingin menghapus setoran "${deleteConfirm.name}"? Data yang dihapus tidak dapat dikembalikan.`}
         onConfirm={() => {
           store.deleteBranchDeposit(deleteConfirm.branchId, deleteConfirm.depositId);
+          setSuccessMsg("Setoran berhasil dihapus");
+          setShowSuccess(true);
           setDeleteConfirm({ isOpen: false, branchId: '', depositId: '', name: '' });
         }}
         onCancel={() => setDeleteConfirm({ isOpen: false, branchId: '', depositId: '', name: '' })}

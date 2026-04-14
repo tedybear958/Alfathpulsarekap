@@ -520,7 +520,7 @@ export function Savings() {
                       {canEdit && (
                         <button
                           onClick={() => setDeleteConfirm({ isOpen: true, type: 'person', personId: person.id, name: person.personName })}
-                          className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all opacity-0 group-hover:opacity-100"
+                          className="p-2 text-rose-300 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
                           title="Hapus"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -543,9 +543,13 @@ export function Savings() {
           if (deleteConfirm.type === 'person') {
             store.deleteSavingCustomer(deleteConfirm.personId);
             if (selectedPersonId === deleteConfirm.personId) setSelectedPersonId(null);
+            setSuccessMsg("Penabung berhasil dihapus");
           } else if (deleteConfirm.transactionId) {
             store.deleteSavingTransaction(deleteConfirm.personId, deleteConfirm.transactionId);
+            setSuccessMsg("Transaksi berhasil dihapus");
           }
+          setShowSuccess(true);
+          setDeleteConfirm({ isOpen: false, type: 'person', personId: '', name: '' });
         }}
         onCancel={() => setDeleteConfirm({ isOpen: false, type: 'person', personId: '', name: '' })}
       />
