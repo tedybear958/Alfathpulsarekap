@@ -8,13 +8,18 @@ export const NotificationManager: React.FC = () => {
   
   // Track processed deposits to avoid double notifications
   const processedDepositsRef = useRef<Set<string>>(new Set());
-  const isFirstLoadRef = useRef(true);
+  const isInitializedRef = useRef(false);
+  const appStartTimeRef = useRef(Date.now());
 
   // Sound URLs
   const NEW_DEPOSIT_SOUND = 'https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3';
   const COMPLETED_DEPOSIT_SOUND = 'https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3';
 
   const playSound = (url: string) => {
+    // Only play sound if user has interacted or after a short delay
+    // and only if initialized
+    if (!isInitializedRef.current) return;
+    
     const audio = new Audio(url);
     audio.play().catch(err => console.error('Error playing sound:', err));
   };
@@ -24,13 +29,18 @@ export const NotificationManager: React.FC = () => {
 
     const allDeposits = branches.flatMap(b => (b.deposits || []).map(d => ({ ...d, branchName: b.name, branchId: b.id })));
     
-    // On first load, just populate the set without playing sounds
-    if (isFirstLoadRef.current) {
+    // On first load with data, just populate the set without playing sounds
+    if (!isInitializedRef.current) {
       allDeposits.forEach(d => {
         processedDepositsRef.current.add(`${d.id}_${d.status}`);
       });
-      isFirstLoadRef.current = false;
-      return;
+      
+      // Mark as initialized after a small delay to ensure initial data dump is processed
+      const timer = setTimeout(() => {
+        isInitializedRef.current = true;
+      }, 2000);
+      
+      return () => clearTimeout(timer);
     }
 
     allDeposits.forEach(deposit => {
@@ -39,7 +49,6 @@ export const NotificationManager: React.FC = () => {
       if (!processedDepositsRef.current.has(key)) {
         // New deposit logic (for Mandor)
         if (deposit.status === 'pending' && role === 'mandor') {
-          // Check if it's a completely new ID (not just a status change)
           const idExists = (Array.from(processedDepositsRef.current) as string[]).some(k => k.startsWith(deposit.id));
           if (!idExists) {
             playSound(NEW_DEPOSIT_SOUND);
@@ -48,8 +57,7 @@ export const NotificationManager: React.FC = () => {
 
         // Completed deposit logic (for Bos or related Branch)
         if (deposit.status === 'verified') {
-          const wasNotVerified = !Array.from(processedDepositsRef.current).some(k => k === `${deposit.id}_verified`);
-          
+          const wasNotVerified = !processedDepositsRef.current.has(`${deposit.id}_verified`);
           if (wasNotVerified) {
             if (role === 'bos' || (role === 'karyawan' && branchId === deposit.branchId)) {
               playSound(COMPLETED_DEPOSIT_SOUND);
