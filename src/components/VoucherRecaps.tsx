@@ -3,8 +3,9 @@ import { useFinanceStore } from '../hooks/useFinanceStore';
 import { useAuthStore } from '../store/authStore';
 import { formatRupiah, formatNumberInput } from '../utils/formatters';
 import { VoucherRecap } from '../types';
-import { Plus, Trash2, Calendar, Calculator, FileText, TrendingUp, Wallet, ArrowDownCircle, ChevronRight, ArrowLeft, TrendingDown, AlertCircle, Edit2 } from 'lucide-react';
+import { Plus, Trash2, Calendar, Calculator, FileText, TrendingUp, Wallet, ArrowDownCircle, ChevronRight, ArrowLeft, TrendingDown, AlertCircle, Edit2, CheckCircle2 } from 'lucide-react';
 import { ConfirmModal } from './ConfirmModal';
+import { SuccessToast } from './SuccessToast';
 
 export function VoucherRecaps() {
   const { voucherRecaps, addVoucherRecap, updateVoucherRecap, reportVoucherRecaps, deleteVoucherRecap, isLoaded, branches } = useFinanceStore();
@@ -23,6 +24,8 @@ export function VoucherRecaps() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isConfirmingReport, setIsConfirmingReport] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
 
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; id: string; date: string }>({
     isOpen: false,
@@ -117,6 +120,8 @@ export function VoucherRecaps() {
         await addVoucherRecap(date, admSVal, admMVal, siangVal, malamVal, expVal, expenseDescription, '', selectedBranchId, status);
       }
       
+      setSuccessMsg(editingId ? "Rekap berhasil diperbarui" : "Rekap berhasil disimpan");
+      setShowSuccess(true);
       resetForm();
       setIsFormOpen(false);
     } catch (error) {
@@ -675,6 +680,12 @@ export function VoucherRecaps() {
           setDeleteConfirm({ isOpen: false, id: '', date: '' });
         }}
         onCancel={() => setDeleteConfirm({ isOpen: false, id: '', date: '' })}
+      />
+
+      <SuccessToast 
+        show={showSuccess} 
+        message={successMsg} 
+        onClose={() => setShowSuccess(false)} 
       />
     </div>
   );

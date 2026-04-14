@@ -2,8 +2,9 @@ import React, { useState, useMemo } from 'react';
 import { useFinanceStore } from '../hooks/useFinanceStore';
 import { useAuthStore } from '../store/authStore';
 import { formatRupiah, formatDate, formatNumberInput } from '../utils/formatters';
-import { PiggyBank, Plus, Trash2, ArrowDownToLine, ArrowUpFromLine, ArrowLeft, Search } from 'lucide-react';
+import { PiggyBank, Plus, Trash2, ArrowDownToLine, ArrowUpFromLine, ArrowLeft, Search, CheckCircle2 } from 'lucide-react';
 import { ConfirmModal } from './ConfirmModal';
+import { SuccessToast } from './SuccessToast';
 
 export function Savings() {
   const store = useFinanceStore();
@@ -46,8 +47,9 @@ export function Savings() {
   const totalAllSavings = useMemo(() => store.getTotalSavings(), [store.getTotalSavings]);
 
   const [isAddingPerson, setIsAddingPerson] = useState(false);
-
-  if (!store.isLoaded) return null;
+  const [isAddingTransaction, setIsAddingTransaction] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
 
   const handleAddPerson = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,6 +57,8 @@ export function Savings() {
       setIsAddingPerson(true);
       try {
         await store.addSavingCustomer(newPersonName, newPersonPhone);
+        setSuccessMsg(`Nasabah ${newPersonName} berhasil ditambah`);
+        setShowSuccess(true);
         setNewPersonName('');
         setNewPersonPhone('');
       } finally {
@@ -65,8 +69,6 @@ export function Savings() {
 
   const selectedPerson = store.savings.find(s => s.id === selectedPersonId);
 
-  const [isAddingTransaction, setIsAddingTransaction] = useState(false);
-
   const handleAddTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedPersonId || !amountInput || !descInput || isAddingTransaction) return;
@@ -76,6 +78,8 @@ export function Savings() {
       setIsAddingTransaction(true);
       try {
         await store.addSavingTransaction(selectedPersonId, val, descInput, typeInput);
+        setSuccessMsg(`Transaksi ${typeInput === 'deposit' ? 'Nabung' : 'Tarik'} berhasil`);
+        setShowSuccess(true);
         setAmountInput('');
         setDescInput('');
       } finally {
@@ -302,6 +306,12 @@ export function Savings() {
             }
           }}
           onCancel={() => setDeleteConfirm({ isOpen: false, type: 'person', personId: '', name: '' })}
+        />
+
+        <SuccessToast 
+          show={showSuccess} 
+          message={successMsg} 
+          onClose={() => setShowSuccess(false)} 
         />
       </div>
     );
@@ -538,6 +548,12 @@ export function Savings() {
           }
         }}
         onCancel={() => setDeleteConfirm({ isOpen: false, type: 'person', personId: '', name: '' })}
+      />
+
+      <SuccessToast 
+        show={showSuccess} 
+        message={successMsg} 
+        onClose={() => setShowSuccess(false)} 
       />
     </div>
   );

@@ -2,8 +2,9 @@ import React, { useState, useMemo } from 'react';
 import { useFinanceStore } from '../hooks/useFinanceStore';
 import { useAuthStore } from '../store/authStore';
 import { formatRupiah, formatDate, formatNumberInput } from '../utils/formatters';
-import { Users, Plus, Trash2, ArrowDownToLine, ArrowUpFromLine, ArrowLeft, Search } from 'lucide-react';
+import { Users, Plus, Trash2, ArrowDownToLine, ArrowUpFromLine, ArrowLeft, Search, CheckCircle2 } from 'lucide-react';
 import { ConfirmModal } from './ConfirmModal';
+import { SuccessToast } from './SuccessToast';
 
 export function Debts() {
   const store = useFinanceStore();
@@ -60,8 +61,9 @@ export function Debts() {
   , [filteredDebts]);
 
   const [isAddingPerson, setIsAddingPerson] = useState(false);
-
-  if (!store.isLoaded) return null;
+  const [isAddingDetail, setIsAddingDetail] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
 
   const handleAddPerson = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,6 +71,8 @@ export function Debts() {
       setIsAddingPerson(true);
       try {
         await store.addDebtPerson(newPersonName);
+        setSuccessMsg(`Pelanggan ${newPersonName} berhasil ditambah`);
+        setShowSuccess(true);
         setNewPersonName('');
       } finally {
         setIsAddingPerson(false);
@@ -77,8 +81,6 @@ export function Debts() {
   };
 
   const selectedPerson = store.debts.find(d => d.id === selectedPersonId);
-
-  const [isAddingDetail, setIsAddingDetail] = useState(false);
 
   const handleAddDetail = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,6 +91,8 @@ export function Debts() {
       setIsAddingDetail(true);
       try {
         await store.addDebtDetail(selectedPersonId, val, descInput, typeInput);
+        setSuccessMsg(`Transaksi ${typeInput === 'add' ? 'Bon' : 'Bayar'} berhasil`);
+        setShowSuccess(true);
         setAmountInput('');
         setDescInput('');
       } finally {
@@ -249,6 +253,12 @@ export function Debts() {
             }
           }}
           onCancel={() => setDeleteConfirm({ isOpen: false, type: 'person', personId: '', name: '' })}
+        />
+
+        <SuccessToast 
+          show={showSuccess} 
+          message={successMsg} 
+          onClose={() => setShowSuccess(false)} 
         />
       </div>
     );
@@ -494,6 +504,12 @@ export function Debts() {
           }
         }}
         onCancel={() => setDeleteConfirm({ isOpen: false, type: 'person', personId: '', name: '' })}
+      />
+
+      <SuccessToast 
+        show={showSuccess} 
+        message={successMsg} 
+        onClose={() => setShowSuccess(false)} 
       />
     </div>
   );

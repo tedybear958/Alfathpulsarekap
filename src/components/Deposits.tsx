@@ -2,9 +2,10 @@ import React, { useState, useMemo } from 'react';
 import { useFinanceStore } from '../hooks/useFinanceStore';
 import { useAuthStore } from '../store/authStore';
 import { formatRupiah, formatDate, formatNumberInput } from '../utils/formatters';
-import { Send, Trash2, CheckCircle2, Clock, Search, Filter, AlertCircle, Share2 } from 'lucide-react';
+import { Send, Trash2, CheckCircle2, Clock, Search, Filter, AlertCircle, Share2, Check } from 'lucide-react';
 import { ConfirmModal } from './ConfirmModal';
 import { DepositAnalytics } from './DepositAnalytics';
+import { SuccessToast } from './SuccessToast';
 
 export function Deposits() {
   const store = useFinanceStore();
@@ -20,6 +21,8 @@ export function Deposits() {
 
   const [editingDeposit, setEditingDeposit] = useState<{ branchId: string; depositId: string; amount: string } | null>(null);
   const [completingDeposit, setCompletingDeposit] = useState<{ branchId: string; depositId: string; amount: string; atmName: string } | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
 
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; branchId: string; depositId: string; name: string }>({
     isOpen: false,
@@ -95,6 +98,8 @@ export function Deposits() {
       setIsSubmitting(true);
       try {
         await store.addBranchDeposit(branchId, val, 0, 'Mandor', setorDesc);
+        setSuccessMsg("Setoran berhasil diajukan");
+        setShowSuccess(true);
         setSetorAmount('');
         setSetorDesc('');
       } catch (error) {
@@ -609,6 +614,8 @@ export function Deposits() {
                             const val = parseInt(completingDeposit.amount.replace(/\D/g, ''), 10);
                             if (!isNaN(val) && completingDeposit.atmName) {
                               store.completeBranchDeposit(completingDeposit.branchId, completingDeposit.depositId, val, completingDeposit.atmName);
+                              setSuccessMsg("Setoran berhasil diselesaikan");
+                              setShowSuccess(true);
                               setCompletingDeposit(null);
                             }
                           }}
@@ -648,6 +655,8 @@ export function Deposits() {
                           const val = parseInt(editingDeposit.amount.replace(/\D/g, ''), 10);
                           if (!isNaN(val)) {
                             store.updateBranchDepositAmount(editingDeposit.branchId, editingDeposit.depositId, val);
+                            setSuccessMsg("Nominal setoran berhasil diubah");
+                            setShowSuccess(true);
                           }
                           setEditingDeposit(null);
                         }}
@@ -689,6 +698,12 @@ export function Deposits() {
           setDeleteConfirm({ isOpen: false, branchId: '', depositId: '', name: '' });
         }}
         onCancel={() => setDeleteConfirm({ isOpen: false, branchId: '', depositId: '', name: '' })}
+      />
+
+      <SuccessToast 
+        show={showSuccess} 
+        message={successMsg} 
+        onClose={() => setShowSuccess(false)} 
       />
     </div>
   );
