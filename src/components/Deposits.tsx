@@ -219,7 +219,15 @@ export function Deposits() {
                 message += `📅 _${todayStr} - ${timeStr}_ \n`;
                 message += `_ALFATH PULSA GROUP_`;
 
-                setWhatsappShare({ isOpen: true, message });
+                if (navigator.share) {
+                  navigator.share({
+                    text: message
+                  }).catch(() => {
+                    setWhatsappShare({ isOpen: true, message });
+                  });
+                } else {
+                  setWhatsappShare({ isOpen: true, message });
+                }
               }}
               className="mt-4 w-full bg-white/20 hover:bg-white/30 backdrop-blur-md text-white py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 border border-white/30 transition-all active:scale-[0.98]"
             >
@@ -552,7 +560,15 @@ export function Deposits() {
                                 `--------------------------\n` +
                                 `_Laporan otomatis dari ALFATHPulsa_`;
                               
-                              setWhatsappShare({ isOpen: true, message });
+                              if (navigator.share) {
+                                navigator.share({
+                                  text: message
+                                }).catch(() => {
+                                  setWhatsappShare({ isOpen: true, message });
+                                });
+                              } else {
+                                setWhatsappShare({ isOpen: true, message });
+                              }
                             }}
                             className="flex-1 bg-emerald-50 text-emerald-600 py-3 rounded-2xl text-xs font-bold hover:bg-emerald-100 active:scale-[0.98] transition-all flex items-center justify-center gap-2 border border-emerald-100"
                           >
