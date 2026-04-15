@@ -648,6 +648,14 @@ export function Deposits() {
                         <p className="text-[8px] text-emerald-500 font-medium ml-1">
                           Masuk Bank: {formatRupiah(totalSetor - parseInt(completingDeposit.amount || '0'))}
                         </p>
+                        {parseInt(completingDeposit.amount || '0') > 0 && (
+                          <div className="mt-2 p-2 bg-amber-50 border border-amber-100 rounded-lg flex items-start gap-2 animate-in fade-in zoom-in-95">
+                            <div className="w-1 h-1 rounded-full bg-amber-400 mt-1.5 shrink-0" />
+                            <p className="text-[9px] text-amber-700 font-bold leading-tight">
+                              INFO: Uang sisa {formatRupiah(parseInt(completingDeposit.amount))} akan otomatis masuk ke buku Hutang/Bon cabang ini.
+                            </p>
+                          </div>
+                        )}
                       </div>
                       
                       <div className="flex gap-2 pt-2">
