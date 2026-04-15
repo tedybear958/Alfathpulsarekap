@@ -2,7 +2,6 @@ import React from 'react';
 import { LayoutDashboard, Users, Wallet, Store, Download, LogOut, UserCog, PiggyBank, Ticket, ShoppingBag, AlertCircle, X } from 'lucide-react';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 import { logout } from '../firebase';
-import { motion, AnimatePresence } from 'motion/react';
 
 import { useFinanceStore } from '../hooks/useFinanceStore';
 import { useAuthStore } from '../store/authStore';
@@ -24,25 +23,20 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
     <div className="min-h-[100dvh] bg-gray-100 flex justify-center">
       <div className="w-full max-w-md bg-slate-50 h-[100dvh] flex flex-col relative shadow-2xl overflow-hidden">
         {/* Global Error Display */}
-        <AnimatePresence>
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -50 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -50 }}
-              className="absolute top-20 left-4 right-4 z-50 bg-rose-600 text-white p-4 rounded-2xl shadow-xl flex items-center gap-3"
-            >
-              <AlertCircle className="w-5 h-5 shrink-0" />
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold leading-tight">Terjadi Kesalahan</p>
-                <p className="text-[10px] opacity-90 truncate">{error}</p>
-              </div>
-              <button onClick={() => setError(null)} className="p-1 hover:bg-white/20 rounded-lg">
-                <X className="w-4 h-4" />
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {error && (
+          <div
+            className="absolute top-20 left-4 right-4 z-50 bg-rose-600 text-white p-4 rounded-2xl shadow-xl flex items-center gap-3"
+          >
+            <AlertCircle className="w-5 h-5 shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold leading-tight">Terjadi Kesalahan</p>
+              <p className="text-[10px] opacity-90 truncate">{error}</p>
+            </div>
+            <button onClick={() => setError(null)} className="p-1 hover:bg-white/20 rounded-lg">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
 
         {/* Top Header */}
         <header className="bg-blue-700 text-white sticky top-0 z-20 px-5 py-4 pt-safe flex items-center justify-between shadow-md">

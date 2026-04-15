@@ -1,6 +1,5 @@
-import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
-import App from './App.tsx';
+import App from './App';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import './index.css';
 // @ts-ignore - virtual module
@@ -10,9 +9,7 @@ import { registerSW } from 'virtual:pwa-register';
 registerSW({ immediate: true });
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <ErrorBoundary>
-      <App />
-    </ErrorBoundary>
-  </StrictMode>,
+  <ErrorBoundary>
+    <App />
+  </ErrorBoundary>,
 );

@@ -15,27 +15,23 @@ import { Login } from './components/Login';
 import { Team } from './components/Team';
 import { NotificationManager } from './components/NotificationManager';
 import { useAuthStore } from './store/authStore';
-import { initFinanceStoreListeners, stopFinanceStoreListeners } from './hooks/useFinanceStore';
+import { initFinanceStoreListeners } from './hooks/useFinanceStore';
 
 export default function App() {
+  const { user, isAuthLoaded, role } = useAuthStore();
   const [activeTab, setActiveTab] = useState<'dashboard' | 'debts' | 'savings' | 'deposits' | 'team' | 'vouchers' | 'shopping'>('dashboard');
-  const { user, isAuthLoaded, role, branchId } = useAuthStore();
 
   useEffect(() => {
     if (user && role) {
       initFinanceStoreListeners();
-    } else {
-      stopFinanceStoreListeners();
     }
-    return () => {
-      stopFinanceStoreListeners();
-    };
-  }, [user, role, branchId]);
+  }, [user, role]);
 
   if (!isAuthLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <span className="ml-3 text-gray-600 font-medium">Memuat Aplikasi...</span>
       </div>
     );
   }
@@ -44,56 +40,16 @@ export default function App() {
     return <Login />;
   }
 
-  // Role-based rendering logic
-  // Bos sees everything
-  // Mandor sees all except Team
-  // Karyawan sees Dashboard, Debts, and Savings
-  
-  const renderContent = () => {
-    if (role === 'mandor') {
-      return (
-        <>
-          {activeTab === 'dashboard' && <Dashboard />}
-          {activeTab === 'debts' && <Debts />}
-          {activeTab === 'savings' && <Savings />}
-          {activeTab === 'deposits' && <Deposits />}
-          {activeTab === 'vouchers' && <VoucherRecaps />}
-          {activeTab === 'shopping' && <ShoppingList />}
-        </>
-      );
-    }
-    
-    if (role === 'karyawan') {
-      return (
-        <>
-          {activeTab === 'dashboard' && <Dashboard />}
-          {activeTab === 'debts' && <Debts />}
-          {activeTab === 'savings' && <Savings />}
-          {activeTab === 'deposits' && <Deposits />}
-          {activeTab === 'vouchers' && <VoucherRecaps />}
-          {activeTab === 'shopping' && <ShoppingList />}
-        </>
-      );
-    }
-
-    // Bos
-    return (
-      <>
-        {activeTab === 'dashboard' && <Dashboard />}
-        {activeTab === 'debts' && <Debts />}
-        {activeTab === 'savings' && <Savings />}
-        {activeTab === 'deposits' && <Deposits />}
-        {activeTab === 'vouchers' && <VoucherRecaps />}
-        {activeTab === 'shopping' && <ShoppingList />}
-        {activeTab === 'team' && <Team />}
-      </>
-    );
-  };
-
   return (
     <Layout activeTab={activeTab} setActiveTab={setActiveTab} role={role}>
       <NotificationManager />
-      {renderContent()}
+      {activeTab === 'dashboard' && <Dashboard />}
+      {activeTab === 'debts' && <Debts />}
+      {activeTab === 'savings' && <Savings />}
+      {activeTab === 'deposits' && <Deposits />}
+      {activeTab === 'vouchers' && <VoucherRecaps />}
+      {activeTab === 'shopping' && <ShoppingList />}
+      {activeTab === 'team' && role === 'bos' && <Team />}
     </Layout>
   );
 }
