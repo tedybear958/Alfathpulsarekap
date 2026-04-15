@@ -265,11 +265,13 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
   completeBranchDeposit: async (branchId: string, depositId: string, berhasilDisetor: number, atmName: string) => {
     try {
       const user = useAuthStore.getState().user;
-      const deposit = get().branches.find(b => b.id === branchId)?.deposits.find(d => d.id === depositId);
+      const branch = get().branches.find(b => b.id === branchId);
+      const deposit = branch?.deposits.find(d => d.id === depositId);
       if (!deposit) return;
 
       const sisaSetor = deposit.totalSetor - berhasilDisetor;
 
+      // Update deposit status to verified
       await updateDoc(doc(db, 'branches', branchId, 'deposits', depositId), {
         status: 'verified',
         berhasilDisetor,
@@ -279,6 +281,35 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
         completedByName: user?.displayName || 'Mandor',
         completedAt: new Date().toISOString()
       });
+
+      // If there is a remaining amount, automatically add it to "Bon/Hutang"
+      if (sisaSetor > 0) {
+        const personName = "SISA SETOR";
+        // Find if "SISA SETOR" person already exists for this branch
+        let debtPerson = get().debts.find(d => d.personName === personName && d.branchId === branchId);
+        let personId = debtPerson?.id;
+
+        // If not exists, create the person first
+        if (!personId) {
+          const docRef = await addDoc(collection(db, 'customers'), { 
+            personName, 
+            branchId, 
+            createdAt: new Date().toISOString() 
+          });
+          personId = docRef.id;
+        }
+
+        // Add the debt detail
+        if (personId) {
+          await addDoc(collection(db, 'customers', personId, 'transactions'), {
+            amount: sisaSetor,
+            description: `Sisa Setor: ${deposit.description} (${branch?.name || ''})`,
+            type: 'add',
+            date: new Date().toISOString(),
+            createdBy: user?.uid || 'unknown'
+          });
+        }
+      }
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `branches/${branchId}/deposits/${depositId}`);
     }

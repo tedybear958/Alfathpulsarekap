@@ -544,7 +544,7 @@ export function Deposits() {
                               setCompletingDeposit({ 
                                 branchId: deposit.branchId, 
                                 depositId: deposit.id, 
-                                amount: totalSetor.toString(),
+                                amount: '0',
                                 atmName: ''
                               });
                             }}
@@ -634,7 +634,7 @@ export function Deposits() {
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-[9px] font-bold text-emerald-600 uppercase ml-1">Jumlah yang Berhasil Masuk</label>
+                        <label className="text-[9px] font-bold text-emerald-600 uppercase ml-1">Uang Sisa (Jika Ada)</label>
                         <div className="relative">
                           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-400 text-xs font-bold">Rp</span>
                           <input
@@ -645,14 +645,19 @@ export function Deposits() {
                             onChange={(e) => setCompletingDeposit({ ...completingDeposit, amount: e.target.value.replace(/\D/g, '') })}
                           />
                         </div>
+                        <p className="text-[8px] text-emerald-500 font-medium ml-1">
+                          Masuk Bank: {formatRupiah(totalSetor - parseInt(completingDeposit.amount || '0'))}
+                        </p>
                       </div>
                       
                       <div className="flex gap-2 pt-2">
                         <button
                           onClick={() => {
-                            const val = parseInt(completingDeposit.amount.replace(/\D/g, ''), 10);
-                            if (!isNaN(val) && completingDeposit.atmName) {
-                              store.completeBranchDeposit(completingDeposit.branchId, completingDeposit.depositId, val, completingDeposit.atmName);
+                            const sisaInput = parseInt(completingDeposit.amount.replace(/\D/g, ''), 10) || 0;
+                            const berhasilDisetor = totalSetor - sisaInput;
+                            
+                            if (berhasilDisetor >= 0 && completingDeposit.atmName) {
+                              store.completeBranchDeposit(completingDeposit.branchId, completingDeposit.depositId, berhasilDisetor, completingDeposit.atmName);
                               setSuccessMsg("Setoran berhasil diselesaikan");
                               setShowSuccess(true);
                               setCompletingDeposit(null);
