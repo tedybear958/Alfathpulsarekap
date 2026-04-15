@@ -47,7 +47,8 @@ export function Team() {
       await updateDoc(doc(db, 'users', uid), { role: newRole });
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `users/${uid}`);
-      alert('Gagal mengubah jabatan. Pastikan Anda memiliki akses Bos.');
+      // Error is handled by handleFirestoreError which throws a JSON string caught by ErrorBoundary
+      // But we can also set a user-friendly error in the store if we want to avoid the crash screen
     }
   };
 
@@ -68,7 +69,6 @@ export function Team() {
       });
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `users/${uid}`);
-      alert('Gagal mengubah penempatan cabang.');
     }
   };
 
@@ -83,7 +83,6 @@ export function Team() {
       setDeleteConfirm({ isOpen: false, type: 'user', id: '', name: '' });
     } catch (error) {
       handleFirestoreError(error, OperationType.DELETE, `${deleteConfirm.type === 'user' ? 'users' : 'branches'}/${deleteConfirm.id}`);
-      alert('Gagal menghapus. Pastikan Anda memiliki akses Bos.');
     }
   };
 

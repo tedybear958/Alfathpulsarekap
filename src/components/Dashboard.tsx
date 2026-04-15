@@ -106,7 +106,7 @@ export function Dashboard() {
         setIsEditingFixed(false);
       } catch (error) {
         console.error("Failed to save balance", error);
-        alert("Gagal menyimpan modal. Pastikan Anda memiliki akses yang sesuai.");
+        store.setError("Gagal menyimpan modal. Pastikan Anda memiliki akses yang sesuai.");
       } finally {
         setIsSavingFixed(false);
       }
@@ -127,7 +127,7 @@ export function Dashboard() {
         setNewBankBalance('');
       } catch (error) {
         console.error("Failed to add bank", error);
-        alert("Gagal menambah rekening. Pastikan koneksi internet stabil.");
+        store.setError("Gagal menambah rekening. Pastikan koneksi internet stabil.");
       } finally {
         setIsAddingBank(false);
       }

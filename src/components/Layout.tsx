@@ -1,28 +1,49 @@
 import React from 'react';
-import { LayoutDashboard, Users, Wallet, Store, Download, LogOut, UserCog, PiggyBank, Ticket, ShoppingBag } from 'lucide-react';
+import { LayoutDashboard, Users, Wallet, Store, Download, LogOut, UserCog, PiggyBank, Ticket, AlertCircle, X } from 'lucide-react';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 import { logout } from '../firebase';
+import { motion, AnimatePresence } from 'motion/react';
 
 import { useFinanceStore } from '../hooks/useFinanceStore';
 import { useAuthStore } from '../store/authStore';
 
 interface LayoutProps {
   children: React.ReactNode;
-  activeTab: 'dashboard' | 'debts' | 'savings' | 'deposits' | 'team' | 'vouchers' | 'shopping';
-  setActiveTab: (tab: 'dashboard' | 'debts' | 'savings' | 'deposits' | 'team' | 'vouchers' | 'shopping') => void;
+  activeTab: 'dashboard' | 'debts' | 'savings' | 'deposits' | 'team' | 'vouchers';
+  setActiveTab: (tab: 'dashboard' | 'debts' | 'savings' | 'deposits' | 'team' | 'vouchers') => void;
   role?: 'bos' | 'mandor' | 'karyawan' | null;
 }
 
 export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps) {
   const { isInstallable, installApp } = usePWAInstall();
   const { branchId, user } = useAuthStore();
-  const { branches } = useFinanceStore();
-
+  const { branches, error, setError } = useFinanceStore();
   const branchName = branchId ? branches.find(b => b.id === branchId)?.name : null;
 
   return (
     <div className="min-h-[100dvh] bg-gray-100 flex justify-center">
       <div className="w-full max-w-md bg-slate-50 h-[100dvh] flex flex-col relative shadow-2xl overflow-hidden">
+        {/* Global Error Display */}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -50 }}
+              className="absolute top-20 left-4 right-4 z-50 bg-rose-600 text-white p-4 rounded-2xl shadow-xl flex items-center gap-3"
+            >
+              <AlertCircle className="w-5 h-5 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold leading-tight">Terjadi Kesalahan</p>
+                <p className="text-[10px] opacity-90 truncate">{error}</p>
+              </div>
+              <button onClick={() => setError(null)} className="p-1 hover:bg-white/20 rounded-lg">
+                <X className="w-4 h-4" />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Top Header */}
         <header className="bg-blue-700 text-white sticky top-0 z-20 px-5 py-4 pt-safe flex items-center justify-between shadow-md">
           <div className="flex items-center gap-3">
@@ -124,18 +145,6 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
               >
                 <Ticket className={`w-6 h-6 ${activeTab === 'vouchers' ? 'fill-blue-50' : ''}`} />
                 <span className="text-[10px] font-bold">Rekap</span>
-              </button>
-            )}
-
-            {(role === 'bos' || role === 'karyawan' || role === 'mandor') && (
-              <button
-                onClick={() => setActiveTab('shopping')}
-                className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
-                  activeTab === 'shopping' ? 'text-blue-700' : 'text-gray-400 hover:text-gray-600'
-                }`}
-              >
-                <ShoppingBag className={`w-6 h-6 ${activeTab === 'shopping' ? 'fill-blue-50' : ''}`} />
-                <span className="text-[10px] font-bold">Belanja</span>
               </button>
             )}
 
