@@ -10,6 +10,7 @@ import { Debts } from './components/Debts';
 import { Savings } from './components/Savings';
 import { Deposits } from './components/Deposits';
 import { VoucherRecaps } from './components/VoucherRecaps';
+import { ShoppingList } from './components/ShoppingList';
 import { Login } from './components/Login';
 import { Team } from './components/Team';
 import { NotificationManager } from './components/NotificationManager';
@@ -17,7 +18,7 @@ import { useAuthStore } from './store/authStore';
 import { initFinanceStoreListeners, stopFinanceStoreListeners } from './hooks/useFinanceStore';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'debts' | 'savings' | 'deposits' | 'team' | 'vouchers'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'debts' | 'savings' | 'deposits' | 'team' | 'vouchers' | 'shopping'>('dashboard');
   const { user, isAuthLoaded, role, branchId } = useAuthStore();
 
   useEffect(() => {
@@ -57,6 +58,7 @@ export default function App() {
           {activeTab === 'savings' && <Savings />}
           {activeTab === 'deposits' && <Deposits />}
           {activeTab === 'vouchers' && <VoucherRecaps />}
+          {activeTab === 'shopping' && <ShoppingList />}
         </>
       );
     }
@@ -69,6 +71,7 @@ export default function App() {
           {activeTab === 'savings' && <Savings />}
           {activeTab === 'deposits' && <Deposits />}
           {activeTab === 'vouchers' && <VoucherRecaps />}
+          {activeTab === 'shopping' && <ShoppingList />}
         </>
       );
     }
@@ -81,6 +84,7 @@ export default function App() {
         {activeTab === 'savings' && <Savings />}
         {activeTab === 'deposits' && <Deposits />}
         {activeTab === 'vouchers' && <VoucherRecaps />}
+        {activeTab === 'shopping' && <ShoppingList />}
         {activeTab === 'team' && <Team />}
       </>
     );

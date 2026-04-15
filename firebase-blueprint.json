@@ -111,6 +111,43 @@
         "status": { "type": "string", "enum": ["pending", "verified"] }
       },
       "required": ["totalSetor", "sisaSetor", "berhasilDisetor", "destination", "description", "date"]
+    },
+    "ShoppingRequest": {
+      "title": "ShoppingRequest",
+      "description": "Request for voucher/quota shopping",
+      "type": "object",
+      "properties": {
+        "branchId": { "type": "string" },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "provider": { "type": "string" },
+              "quota": { "type": "string" },
+              "pcs": { "type": "number" }
+            }
+          }
+        },
+        "status": { "type": "string", "enum": ["pending", "completed"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "createdBy": { "type": "string" },
+        "createdByName": { "type": "string" }
+      },
+      "required": ["branchId", "items", "status", "createdAt", "createdBy", "createdByName"]
+    },
+    "ShoppingCatalog": {
+      "title": "ShoppingCatalog",
+      "description": "Catalog of available providers and quotas",
+      "type": "object",
+      "properties": {
+        "provider": { "type": "string" },
+        "options": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["provider", "options"]
     }
   },
   "firestore": {
@@ -141,6 +178,14 @@
     "/branches/{branchId}/deposits/{depositId}": {
       "schema": { "$ref": "#/entities/BranchDeposit" },
       "description": "Deposits for a branch"
+    },
+    "/shoppingRequests/{requestId}": {
+      "schema": { "$ref": "#/entities/ShoppingRequest" },
+      "description": "Shopping requests for vouchers"
+    },
+    "/shoppingCatalog/{catalogId}": {
+      "schema": { "$ref": "#/entities/ShoppingCatalog" },
+      "description": "Catalog of voucher products"
     }
   }
 }

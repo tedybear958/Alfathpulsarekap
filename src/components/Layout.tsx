@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Users, Wallet, Store, Download, LogOut, UserCog, PiggyBank, Ticket, AlertCircle, X } from 'lucide-react';
+import { LayoutDashboard, Users, Wallet, Store, Download, LogOut, UserCog, PiggyBank, Ticket, ShoppingBag, AlertCircle, X } from 'lucide-react';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 import { logout } from '../firebase';
 import { motion, AnimatePresence } from 'motion/react';
@@ -9,8 +9,8 @@ import { useAuthStore } from '../store/authStore';
 
 interface LayoutProps {
   children: React.ReactNode;
-  activeTab: 'dashboard' | 'debts' | 'savings' | 'deposits' | 'team' | 'vouchers';
-  setActiveTab: (tab: 'dashboard' | 'debts' | 'savings' | 'deposits' | 'team' | 'vouchers') => void;
+  activeTab: 'dashboard' | 'debts' | 'savings' | 'deposits' | 'team' | 'vouchers' | 'shopping';
+  setActiveTab: (tab: 'dashboard' | 'debts' | 'savings' | 'deposits' | 'team' | 'vouchers' | 'shopping') => void;
   role?: 'bos' | 'mandor' | 'karyawan' | null;
 }
 
@@ -145,6 +145,18 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
               >
                 <Ticket className={`w-6 h-6 ${activeTab === 'vouchers' ? 'fill-blue-50' : ''}`} />
                 <span className="text-[10px] font-bold">Rekap</span>
+              </button>
+            )}
+
+            {(role === 'bos' || role === 'karyawan' || role === 'mandor') && (
+              <button
+                onClick={() => setActiveTab('shopping')}
+                className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
+                  activeTab === 'shopping' ? 'text-blue-700' : 'text-gray-400 hover:text-gray-600'
+                }`}
+              >
+                <ShoppingBag className={`w-6 h-6 ${activeTab === 'shopping' ? 'fill-blue-50' : ''}`} />
+                <span className="text-[10px] font-bold">Belanja</span>
               </button>
             )}
 

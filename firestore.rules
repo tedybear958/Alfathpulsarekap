@@ -42,6 +42,18 @@ service cloud.firestore {
     // Rules
     // ===============================================================
 
+    match /shoppingCatalog/{catalogId} {
+      allow read: if isAuthenticated();
+      allow write: if isBos();
+    }
+
+    match /shoppingRequests/{requestId} {
+      allow read: if isAuthenticated() && (isBos() || isAssignedToBranch(resource.data.branchId));
+      allow create: if isAuthenticated() && (isBos() || isAssignedToBranch(request.resource.data.branchId));
+      allow update: if isAuthenticated() && (isBos() || (isAssignedToBranch(resource.data.branchId) && resource.data.status == 'pending'));
+      allow delete: if isAuthenticated() && (isBos() || (isAssignedToBranch(resource.data.branchId) && resource.data.status == 'pending'));
+    }
+
     match /users/{userId} {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated() && request.auth.uid == userId;

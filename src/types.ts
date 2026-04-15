@@ -95,3 +95,26 @@ export interface VoucherRecap {
   createdByName: string;
 }
 
+export interface ShoppingRequestItem {
+  provider: string;
+  quota: string;
+  pcs?: number;
+}
+
+export interface ShoppingRequest {
+  id: string;
+  branchId: string;
+  branchName?: string;
+  items: ShoppingRequestItem[];
+  status: 'pending' | 'completed';
+  createdAt: string;
+  createdBy: string;
+  createdByName: string;
+}
+
+export interface ShoppingCatalog {
+  id: string;
+  provider: string;
+  options: string[];
+}
+
