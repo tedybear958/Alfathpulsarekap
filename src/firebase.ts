@@ -7,24 +7,6 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 
-// Test connection to Firestore
-async function testConnection() {
-  try {
-    // Attempt to get a dummy doc to check connection
-    await getDocFromServer(doc(db, '_connection_test_', 'ping'));
-    console.log("Firestore connection successful.");
-  } catch (error) {
-    if (error instanceof Error) {
-      if (error.message.includes('the client is offline')) {
-        console.error("Firestore is offline. Please check your Firebase configuration and Authorized Domains.");
-      } else if (error.message.toLowerCase().includes('permission')) {
-        console.warn("Firestore connection test: Permission denied. This is normal if rules are strict.");
-      }
-    }
-  }
-}
-testConnection();
-
 export const googleProvider = new GoogleAuthProvider();
 
 export const loginWithGoogle = async () => {

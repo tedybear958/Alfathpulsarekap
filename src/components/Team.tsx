@@ -11,6 +11,7 @@ interface UserData {
   name: string;
   role: 'bos' | 'mandor' | 'karyawan';
   branchId?: string;
+  phoneNumber?: string;
   createdAt: string;
 }
 
@@ -53,9 +54,28 @@ export function Team() {
   };
 
   const [pendingBranchChanges, setPendingBranchChanges] = useState<Record<string, string>>({});
+  const [pendingPhoneChanges, setPendingPhoneChanges] = useState<Record<string, string>>({});
 
   const handleBranchChange = async (uid: string, newBranchId: string) => {
     setPendingBranchChanges(prev => ({ ...prev, [uid]: newBranchId }));
+  };
+
+  const handlePhoneChange = (uid: string, value: string) => {
+    setPendingPhoneChanges(prev => ({ ...prev, [uid]: value }));
+  };
+
+  const handleSavePhoneChange = async (uid: string) => {
+    const newPhone = pendingPhoneChanges[uid];
+    try {
+      await updateDoc(doc(db, 'users', uid), { phoneNumber: newPhone });
+      setPendingPhoneChanges(prev => {
+        const next = { ...prev };
+        delete next[uid];
+        return next;
+      });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `users/${uid}`);
+    }
   };
 
   const handleSaveBranchChange = async (uid: string) => {
@@ -296,29 +316,54 @@ export function Team() {
                 </div>
 
                 {(user.role === 'karyawan' || user.role === 'mandor' || user.role === 'bos') && (
-                  <div className="flex items-center gap-2 pl-14">
-                    <span className="text-[10px] text-gray-500 font-medium">Penempatan:</span>
-                    <div className="flex-1 flex items-center gap-2 max-w-[250px]">
-                      <select
-                        value={pendingBranchChanges[user.uid] !== undefined ? pendingBranchChanges[user.uid] : (user.branchId || '')}
-                        onChange={(e) => handleBranchChange(user.uid, e.target.value)}
-                        className={`text-xs rounded-lg px-2 py-1.5 border-0 outline-none flex-1 transition-all ${
-                          pendingBranchChanges[user.uid] !== undefined ? 'bg-blue-50 ring-2 ring-blue-100' : 'bg-gray-100'
-                        }`}
-                      >
-                        <option value="">-- {user.role === 'bos' ? 'Pusat (Global)' : 'Belum Ditempatkan'} --</option>
-                        {branches.map(b => (
-                          <option key={b.id} value={b.id}>{b.name}</option>
-                        ))}
-                      </select>
-                      {pendingBranchChanges[user.uid] !== undefined && (
-                        <button
-                          onClick={() => handleSaveBranchChange(user.uid)}
-                          className="p-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-all shadow-sm"
+                  <div className="space-y-2 pl-14">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-gray-500 font-medium w-16">WhatsApp:</span>
+                      <div className="flex-1 flex items-center gap-2 max-w-[250px]">
+                        <input
+                          type="text"
+                          placeholder="628123456789"
+                          value={pendingPhoneChanges[user.uid] !== undefined ? pendingPhoneChanges[user.uid] : (user.phoneNumber || '')}
+                          onChange={(e) => handlePhoneChange(user.uid, e.target.value)}
+                          className={`text-xs rounded-lg px-2 py-1.5 border-0 outline-none flex-1 transition-all ${
+                            pendingPhoneChanges[user.uid] !== undefined ? 'bg-blue-50 ring-2 ring-blue-100' : 'bg-gray-100'
+                          }`}
+                        />
+                        {pendingPhoneChanges[user.uid] !== undefined && (
+                          <button
+                            onClick={() => handleSavePhoneChange(user.uid)}
+                            className="p-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-all shadow-sm"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-gray-500 font-medium w-16">Penempatan:</span>
+                      <div className="flex-1 flex items-center gap-2 max-w-[250px]">
+                        <select
+                          value={pendingBranchChanges[user.uid] !== undefined ? pendingBranchChanges[user.uid] : (user.branchId || '')}
+                          onChange={(e) => handleBranchChange(user.uid, e.target.value)}
+                          className={`text-xs rounded-lg px-2 py-1.5 border-0 outline-none flex-1 transition-all ${
+                            pendingBranchChanges[user.uid] !== undefined ? 'bg-blue-50 ring-2 ring-blue-100' : 'bg-gray-100'
+                          }`}
                         >
-                          <Check className="w-3.5 h-3.5" />
-                        </button>
-                      )}
+                          <option value="">-- {user.role === 'bos' ? 'Pusat (Global)' : 'Belum Ditempatkan'} --</option>
+                          {branches.map(b => (
+                            <option key={b.id} value={b.id}>{b.name}</option>
+                          ))}
+                        </select>
+                        {pendingBranchChanges[user.uid] !== undefined && (
+                          <button
+                            onClick={() => handleSaveBranchChange(user.uid)}
+                            className="p-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-all shadow-sm"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 )}

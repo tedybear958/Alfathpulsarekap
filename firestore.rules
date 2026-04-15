@@ -10,32 +10,46 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function getUserData() {
-      let path = /databases/$(database)/documents/users/$(request.auth.uid);
-      return exists(path) ? get(path).data : {};
+    function getUserDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function userExists() {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function hasRole(role) {
+      return isAuthenticated() && userExists() && getUserDoc().data.role == role;
     }
 
     function isBos() {
       return isAuthenticated() && (
-        ('email' in request.auth.token && request.auth.token.email == "alfathpulsa27@gmail.com") ||
-        getUserData().get('role', 'karyawan') == 'bos'
+        request.auth.uid == "RU9vfuH9VyS6arM2kRFJ9eEpAeL2" ||
+        hasRole('bos')
       );
     }
 
     function isMandor() {
-      return isAuthenticated() && getUserData().get('role', 'karyawan') == 'mandor';
+      return hasRole('mandor');
     }
 
     function isKaryawan() {
-      return isAuthenticated() && getUserData().get('role', 'karyawan') == 'karyawan';
+      return hasRole('karyawan');
     }
 
     function isBosGlobal() {
-      return isBos() && (getUserData().get('branchId', null) == null || getUserData().get('branchId', null) == '');
+      return isBos() && (
+        !userExists() || 
+        !('branchId' in getUserDoc().data) || 
+        getUserDoc().data.branchId == null || 
+        getUserDoc().data.branchId == ''
+      );
     }
 
     function isAssignedToBranch(branchId) {
-      return isAuthenticated() && getUserData().get('branchId', null) == branchId;
+      return isAuthenticated() && userExists() && 
+             'branchId' in getUserDoc().data && 
+             getUserDoc().data.branchId == branchId;
     }
 
     // ===============================================================
