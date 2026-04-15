@@ -77,22 +77,24 @@ export const ShoppingList: React.FC = () => {
   const handleAddOption = async (catalog: ShoppingCatalog) => {
     if (!newOption.trim()) return;
     try {
-      const updatedOptions = [...catalog.options, newOption.trim()];
+      const currentOptions = catalog.options || [];
+      const updatedOptions = [...currentOptions, newOption.trim()];
       await updateShoppingCatalog(catalog.provider, updatedOptions);
       setNewOption('');
       setEditingCatalog(null);
     } catch (error: any) {
-      setErrorMsg('Gagal menambah opsi.');
+      setErrorMsg(`Gagal menambah opsi: ${error.message || 'Error tidak diketahui'}`);
       console.error(error);
     }
   };
 
   const handleRemoveOption = async (catalog: ShoppingCatalog, optionToRemove: string) => {
     try {
-      const updatedOptions = catalog.options.filter(opt => opt !== optionToRemove);
+      const currentOptions = catalog.options || [];
+      const updatedOptions = currentOptions.filter(opt => opt !== optionToRemove);
       await updateShoppingCatalog(catalog.provider, updatedOptions);
     } catch (error: any) {
-      setErrorMsg('Gagal menghapus opsi.');
+      setErrorMsg(`Gagal menghapus opsi: ${error.message || 'Error tidak diketahui'}`);
       console.error(error);
     }
   };
@@ -218,7 +220,7 @@ export const ShoppingList: React.FC = () => {
                 </div>
                 <div className="p-4">
                   <div className="flex flex-wrap gap-2 mb-3">
-                    {catalog.options.map(opt => (
+                    {(catalog.options || []).map(opt => (
                       <span key={opt} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
                         {opt}
                         <button onClick={() => handleRemoveOption(catalog, opt)} className="hover:bg-blue-200 p-0.5 rounded-full ml-1">
@@ -293,7 +295,7 @@ export const ShoppingList: React.FC = () => {
                       
                       {expandedProviders.includes(group.provider) && (
                         <div className="p-2 grid grid-cols-2 sm:grid-cols-3 gap-2 bg-white">
-                          {group.options.map((opt) => (
+                          {(group.options || []).map((opt) => (
                             <button
                               key={opt}
                               onClick={() => handleAddItem(group.provider, opt)}
