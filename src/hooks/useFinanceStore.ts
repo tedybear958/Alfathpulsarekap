@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { BankBalance, Debt, DebtDetail, Branch, BranchDeposit, SavingCustomer, SavingTransaction, VoucherRecap } from '../types';
+import { BankBalance, Debt, DebtDetail, Branch, BranchDeposit, SavingCustomer, SavingTransaction, VoucherRecap, ShoppingRequest, ShoppingCatalog } from '../types';
 import { collection, doc, onSnapshot, setDoc, updateDoc, deleteDoc, addDoc, query, orderBy, where } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../firebase';
 import { useAuthStore } from '../store/authStore';
@@ -11,6 +11,8 @@ interface FinanceState {
   savings: SavingCustomer[];
   branches: Branch[];
   voucherRecaps: VoucherRecap[];
+  shoppingRequests: ShoppingRequest[];
+  shoppingCatalog: ShoppingCatalog[];
   isLoaded: boolean;
   
   updateFixedBalance: (amount: number) => Promise<void>;
@@ -45,6 +47,12 @@ interface FinanceState {
   reportVoucherRecaps: (branchId: string) => Promise<void>;
   deleteVoucherRecap: (id: string) => Promise<void>;
 
+  addShoppingRequest: (branchId: string, items: { provider: string, quota: string }[]) => Promise<void>;
+  updateShoppingRequestStatus: (id: string, status: 'pending' | 'completed') => Promise<void>;
+  deleteShoppingRequest: (id: string) => Promise<void>;
+  updateShoppingCatalog: (provider: string, options: string[]) => Promise<void>;
+  deleteShoppingCatalog: (id: string) => Promise<void>;
+
   getTotalBankBalance: () => number;
   getPersonTotalDebt: (person: Debt) => number;
   getTotalDebt: () => number;
@@ -60,6 +68,8 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
   savings: [],
   branches: [],
   voucherRecaps: [],
+  shoppingRequests: [],
+  shoppingCatalog: [],
   isLoaded: false,
 
   updateFixedBalance: async (amount: number) => {
@@ -396,6 +406,61 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
     }
   },
 
+  addShoppingRequest: async (branchId: string, items: { provider: string, quota: string }[]) => {
+    try {
+      const user = useAuthStore.getState().user;
+      await addDoc(collection(db, 'shoppingRequests'), {
+        branchId,
+        items,
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        createdBy: user?.uid || 'unknown',
+        createdByName: user?.displayName || 'Karyawan'
+      });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.CREATE, 'shoppingRequests');
+    }
+  },
+
+  updateShoppingRequestStatus: async (id: string, status: 'pending' | 'completed') => {
+    try {
+      await updateDoc(doc(db, 'shoppingRequests', id), { status });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `shoppingRequests/${id}`);
+    }
+  },
+
+  deleteShoppingRequest: async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'shoppingRequests', id));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, `shoppingRequests/${id}`);
+    }
+  },
+
+  updateShoppingCatalog: async (provider: string, options: string[]) => {
+    try {
+      const catalog = useFinanceStore.getState().shoppingCatalog;
+      const existing = catalog.find(c => c.provider === provider);
+      
+      if (existing) {
+        await updateDoc(doc(db, 'shoppingCatalog', existing.id), { options });
+      } else {
+        await addDoc(collection(db, 'shoppingCatalog'), { provider, options });
+      }
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, 'shoppingCatalog');
+    }
+  },
+
+  deleteShoppingCatalog: async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'shoppingCatalog', id));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, `shoppingCatalog/${id}`);
+    }
+  },
+
   getTotalBankBalance: () => {
     const authState = useAuthStore.getState();
     const isBosGlobal = authState.role === 'bos' && !authState.branchId;
@@ -688,6 +753,32 @@ export const initFinanceStoreListeners = () => {
   } else {
     useFinanceStore.setState({ voucherRecaps: [] });
   }
+
+  // Shopping Requests
+  const shoppingQuery = authState.branchId
+    ? query(collection(db, 'shoppingRequests'), where('branchId', '==', authState.branchId))
+    : query(collection(db, 'shoppingRequests'));
+
+  unsubscribers.push(
+    onSnapshot(shoppingQuery, (snapshot) => {
+      const requests = snapshot.docs.map(doc => {
+        const data = doc.data();
+        const branch = useFinanceStore.getState().branches.find(b => b.id === data.branchId);
+        return { id: doc.id, ...data, branchName: branch?.name || 'Cabang' } as ShoppingRequest;
+      });
+      // Sort by createdAt desc
+      requests.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+      useFinanceStore.setState({ shoppingRequests: requests });
+    }, (error) => handleFirestoreError(error, OperationType.GET, 'shoppingRequests'))
+  );
+
+  // Shopping Catalog
+  unsubscribers.push(
+    onSnapshot(collection(db, 'shoppingCatalog'), (snapshot) => {
+      const catalog = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ShoppingCatalog));
+      useFinanceStore.setState({ shoppingCatalog: catalog });
+    }, (error) => handleFirestoreError(error, OperationType.GET, 'shoppingCatalog'))
+  );
 
   useFinanceStore.setState({ isLoaded: true });
 };

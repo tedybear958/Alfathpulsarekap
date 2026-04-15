@@ -1,6 +1,13 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    match /shoppingRequests/{requestId} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /shoppingCatalog/{catalogId} {
+      allow read, write: if request.auth != null;
+    }
 
     // ===============================================================
     // Helper Functions
@@ -11,7 +18,8 @@ service cloud.firestore {
     }
 
     function getUserData() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+      let path = /databases/$(database)/documents/users/$(request.auth.uid);
+      return exists(path) ? get(path).data : {};
     }
 
     function isBos() {
@@ -37,15 +45,21 @@ service cloud.firestore {
       return isAuthenticated() && getUserData().get('branchId', null) == branchId;
     }
 
+    function isValidShoppingRequest(data) {
+      return data.branchId is string &&
+             data.items is list &&
+             data.status in ['pending', 'completed'] &&
+             data.createdAt is string &&
+             data.createdBy is string &&
+             data.createdByName is string;
+    }
+
     // ===============================================================
     // Rules
     // ===============================================================
 
     match /users/{userId} {
-      allow read: if isAuthenticated() && (isBos() || request.auth.uid == userId);
-      allow create: if isAuthenticated() && request.auth.uid == userId;
-      allow update: if isAuthenticated() && (isBos() || (request.auth.uid == userId && request.resource.data.role == resource.data.role));
-      allow delete: if isBos();
+      allow read, write: if request.auth != null;
     }
 
     match /settings/{settingId} {
