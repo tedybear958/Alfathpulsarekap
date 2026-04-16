@@ -1,12 +1,21 @@
-import axios from 'axios';
-
 export const sendWhatsAppMessage = async (target: string, message: string) => {
   try {
-    const response = await axios.post('/api/whatsapp/send', {
-      target,
-      message,
+    const response = await fetch('/api/whatsapp/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        target,
+        message,
+      }),
     });
-    return response.data;
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return await response.json();
   } catch (error) {
     console.error('Error sending WhatsApp message:', error);
     throw error;

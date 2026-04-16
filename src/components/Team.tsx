@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { collection, onSnapshot, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../firebase';
-import { Shield, UserCog, User as UserIcon, Trash2, Store, Plus, Check, Phone, Send, AlertCircle } from 'lucide-react';
+import { Shield, UserCog, User as UserIcon, Trash2, Store, Plus, Check, Phone, Send } from 'lucide-react';
 import { useFinanceStore } from '../hooks/useFinanceStore';
 import { UserProfile } from '../types';
 import { ConfirmModal } from './ConfirmModal';
@@ -10,7 +10,7 @@ import { sendWhatsAppMessage } from '../services/whatsappService';
 export function Team() {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { branches, addBranch, deleteBranch, setError } = useFinanceStore();
+  const { branches, addBranch, deleteBranch } = useFinanceStore();
   const [newBranchName, setNewBranchName] = useState('');
   
   const [editingBranch, setEditingBranch] = useState<{ id: string; capital: string; physicalCapital: string } | null>(null);
