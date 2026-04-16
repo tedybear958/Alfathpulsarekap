@@ -202,7 +202,6 @@ export function Team() {
             </div>
           </div>
         )}
-
         <button
           onClick={handleBroadcastTest}
           disabled={isBroadcasting}

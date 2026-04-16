@@ -11,7 +11,7 @@ service cloud.firestore {
     }
 
     function getUserDoc() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
 
     function userExists() {
@@ -19,13 +19,14 @@ service cloud.firestore {
     }
 
     function hasRole(role) {
-      return isAuthenticated() && userExists() && getUserDoc().data.role == role;
+      return isAuthenticated() && userExists() && getUserDoc().get('role', '') == role;
     }
 
     function isBos() {
       return isAuthenticated() && (
         request.auth.uid == "RU9vfuH9VyS6arM2kRFJ9eEpAeL2" ||
-        hasRole('bos')
+        request.auth.token.email == "alfathpulsa27@gmail.com" ||
+        (userExists() && getUserDoc().get('role', '') == 'bos')
       );
     }
 
@@ -40,16 +41,15 @@ service cloud.firestore {
     function isBosGlobal() {
       return isBos() && (
         !userExists() || 
-        !('branchId' in getUserDoc().data) || 
-        getUserDoc().data.branchId == null || 
-        getUserDoc().data.branchId == ''
+        !('branchId' in getUserDoc()) || 
+        getUserDoc().get('branchId', null) == null || 
+        getUserDoc().get('branchId', '') == ''
       );
     }
 
     function isAssignedToBranch(branchId) {
       return isAuthenticated() && userExists() && 
-             'branchId' in getUserDoc().data && 
-             getUserDoc().data.branchId == branchId;
+             getUserDoc().get('branchId', '') == branchId;
     }
 
     // ===============================================================

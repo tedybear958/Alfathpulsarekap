@@ -11,6 +11,7 @@ export const ShoppingList: React.FC = () => {
   const { 
     shoppingRequests, 
     shoppingCatalog,
+    isLoaded,
     addShoppingRequest, 
     updateShoppingRequestStatus, 
     updateShoppingRequestItems,
@@ -23,6 +24,8 @@ export const ShoppingList: React.FC = () => {
   const [selectedItems, setSelectedItems] = useState<{ provider: string, quota: string }[]>([]);
   const [newProvider, setNewProvider] = useState('');
   const [newOption, setNewOption] = useState('');
+  const [manualProvider, setManualProvider] = useState('');
+  const [manualQuota, setManualQuota] = useState('');
   const [editingCatalog, setEditingCatalog] = useState<ShoppingCatalog | null>(null);
   const [expandedProviders, setExpandedProviders] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -36,6 +39,13 @@ export const ShoppingList: React.FC = () => {
     setSelectedItems([...selectedItems, { provider, quota }]);
   };
 
+  const handleAddManualItem = () => {
+    if (!manualProvider.trim() || !manualQuota.trim()) return;
+    handleAddItem(manualProvider.trim(), manualQuota.trim());
+    setManualProvider('');
+    setManualQuota('');
+  };
+
   const handleRemoveItem = (index: number) => {
     setSelectedItems(selectedItems.filter((_, i) => i !== index));
   };
@@ -47,7 +57,6 @@ export const ShoppingList: React.FC = () => {
       return;
     }
     
-    // If bos is testing, use a dummy branch or let them select (for now just use their branchId if any, or block)
     const targetBranchId = branchId || 'pusat';
 
     setIsSubmitting(true);
@@ -66,10 +75,11 @@ export const ShoppingList: React.FC = () => {
   const handleSaveCatalog = async () => {
     if (!newProvider.trim()) return;
     try {
+      setErrorMsg('');
       await updateShoppingCatalog(newProvider, []);
       setNewProvider('');
     } catch (error: any) {
-      setErrorMsg('Gagal menambah provider.');
+      setErrorMsg('Gagal menambah provider. Pastikan Anda memiliki izin Bos.');
       console.error(error);
     }
   };
@@ -77,6 +87,7 @@ export const ShoppingList: React.FC = () => {
   const handleAddOption = async (catalog: ShoppingCatalog) => {
     if (!newOption.trim()) return;
     try {
+      setErrorMsg('');
       const currentOptions = catalog.options || [];
       const updatedOptions = [...currentOptions, newOption.trim()];
       await updateShoppingCatalog(catalog.provider, updatedOptions);
@@ -90,6 +101,7 @@ export const ShoppingList: React.FC = () => {
 
   const handleRemoveOption = async (catalog: ShoppingCatalog, optionToRemove: string) => {
     try {
+      setErrorMsg('');
       const currentOptions = catalog.options || [];
       const updatedOptions = currentOptions.filter(opt => opt !== optionToRemove);
       await updateShoppingCatalog(catalog.provider, updatedOptions);
@@ -118,6 +130,7 @@ export const ShoppingList: React.FC = () => {
 
   const savePcs = async (request: ShoppingRequest) => {
     try {
+      setErrorMsg('');
       const updatedItems = request.items.map((item, index) => ({
         ...item,
         pcs: tempPcsData[index] !== undefined ? tempPcsData[index] : item.pcs
@@ -141,6 +154,14 @@ export const ShoppingList: React.FC = () => {
     });
 
   const availableCatalogs = shoppingCatalog.filter(c => c.options && c.options.length > 0);
+
+  if (!isLoaded) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 max-w-4xl mx-auto pb-24">
@@ -177,7 +198,7 @@ export const ShoppingList: React.FC = () => {
               activeTab === 'catalog' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
             }`}
           >
-            Katalog Provider
+            Atur Produk (Katalog)
           </button>
         </div>
       )}
@@ -270,45 +291,92 @@ export const ShoppingList: React.FC = () => {
 
       {activeTab === 'requests' && (
         <div className="space-y-6">
-          {/* Form Buat Pesanan (Karyawan/Mandor) */}
-          {(role === 'karyawan' || role === 'mandor') && (
+          {/* Form Buat Pesanan (Bos/Mandor/Karyawan) */}
+          {(role === 'karyawan' || role === 'mandor' || role === 'bos') && (
             <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
               <h3 className="text-sm font-semibold text-gray-900 mb-4">Buat Daftar Belanja</h3>
               
-              <div className="space-y-2 mb-4">
-                {availableCatalogs.length === 0 ? (
-                  <p className="text-sm text-gray-500 italic">Katalog kosong. Hubungi Bos untuk mengisi katalog.</p>
-                ) : (
-                  availableCatalogs.map((group) => (
-                    <div key={group.id} className="border border-gray-200 rounded-lg overflow-hidden">
-                      <button
-                        onClick={() => toggleProvider(group.provider)}
-                        className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
-                      >
-                        <span className="font-medium text-gray-900">{group.provider}</span>
-                        {expandedProviders.includes(group.provider) ? (
-                          <ChevronUp className="w-4 h-4 text-gray-500" />
-                        ) : (
-                          <ChevronDown className="w-4 h-4 text-gray-500" />
-                        )}
-                      </button>
-                      
-                      {expandedProviders.includes(group.provider) && (
-                        <div className="p-2 grid grid-cols-2 sm:grid-cols-3 gap-2 bg-white">
-                          {(group.options || []).map((opt) => (
-                            <button
-                              key={opt}
-                              onClick={() => handleAddItem(group.provider, opt)}
-                              className="text-left px-3 py-2 rounded-lg border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-colors text-sm"
-                            >
-                              {opt}
-                            </button>
-                          ))}
-                        </div>
-                      )}
+              <div className="space-y-4 mb-6">
+                {/* Manual Input Section */}
+                <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
+                  <h4 className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-3">Tulis Pesanan Manual</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-medium text-gray-500 ml-1">Nama Provider</label>
+                      <input
+                        type="text"
+                        value={manualProvider}
+                        onChange={(e) => setManualProvider(e.target.value)}
+                        placeholder="Contoh: Telkomsel"
+                        className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                      />
                     </div>
-                  ))
-                )}
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-medium text-gray-500 ml-1">Jenis Kuota / Barang</label>
+                      <input
+                        type="text"
+                        value={manualQuota}
+                        onChange={(e) => setManualQuota(e.target.value)}
+                        placeholder="Contoh: 5GB 3 Hari"
+                        className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleAddManualItem}
+                    disabled={!manualProvider.trim() || !manualQuota.trim()}
+                    className="mt-3 w-full py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Tambah ke Daftar
+                  </button>
+                </div>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-100"></div>
+                  </div>
+                  <div className="relative flex justify-center text-[10px] uppercase font-bold text-gray-400">
+                    <span className="bg-white px-2">Atau Pilih dari Produk Bos</span>
+                  </div>
+                </div>
+
+                {/* Catalog Selection Section */}
+                <div className="space-y-2">
+                  {availableCatalogs.length === 0 ? (
+                    <p className="text-sm text-gray-500 italic text-center py-2">Belum ada produk di katalog Bos.</p>
+                  ) : (
+                    availableCatalogs.map((group) => (
+                      <div key={group.id} className="border border-gray-200 rounded-lg overflow-hidden">
+                        <button
+                          onClick={() => toggleProvider(group.provider)}
+                          className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+                        >
+                          <span className="font-medium text-gray-900">{group.provider}</span>
+                          {expandedProviders.includes(group.provider) ? (
+                            <ChevronUp className="w-4 h-4 text-gray-500" />
+                          ) : (
+                            <ChevronDown className="w-4 h-4 text-gray-500" />
+                          )}
+                        </button>
+                        
+                        {expandedProviders.includes(group.provider) && (
+                          <div className="p-2 grid grid-cols-2 sm:grid-cols-3 gap-2 bg-white">
+                            {(group.options || []).map((opt) => (
+                              <button
+                                key={opt}
+                                onClick={() => handleAddItem(group.provider, opt)}
+                                className="text-left px-3 py-2 rounded-lg border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-colors text-sm"
+                              >
+                                {opt}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
 
               {selectedItems.length > 0 && (
@@ -390,7 +458,6 @@ export const ShoppingList: React.FC = () => {
                       ))}
                     </ul>
 
-                    {/* Actions */}
                     <div className="mt-4 pt-4 border-t border-gray-100 flex justify-end gap-2">
                       {role === 'bos' && request.status === 'pending' && (
                         <>
