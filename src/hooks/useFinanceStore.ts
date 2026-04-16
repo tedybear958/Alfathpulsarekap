@@ -1,8 +1,10 @@
 import { create } from 'zustand';
 import { BankBalance, Debt, DebtDetail, Branch, BranchDeposit, SavingCustomer, SavingTransaction, VoucherRecap, ShoppingRequest, ShoppingCatalog } from '../types';
-import { collection, doc, onSnapshot, setDoc, updateDoc, deleteDoc, addDoc, query, orderBy, where } from 'firebase/firestore';
+import { collection, doc, onSnapshot, setDoc, updateDoc, deleteDoc, addDoc, query, orderBy, where, getDocs } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../firebase';
 import { useAuthStore } from '../store/authStore';
+import { sendWhatsAppMessage } from '../services/whatsappService';
+import { formatRupiah } from '../utils/formatters';
 
 interface FinanceState {
   fixedBalance: number;
@@ -325,6 +327,41 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
           });
         }
       }
+
+      // --- WhatsApp Notification ---
+      try {
+        // Find all users in this branch to notify
+        const usersSnapshot = await getDocs(query(collection(db, 'users'), where('branchId', '==', branchId)));
+        const branchUsers = usersSnapshot.docs.map(doc => doc.data());
+        
+        // Also notify Bos (Global)
+        const bosSnapshot = await getDocs(query(collection(db, 'users'), where('role', '==', 'bos')));
+        const bosUsers = bosSnapshot.docs.map(doc => doc.data());
+        
+        const allTargets = [...branchUsers, ...bosUsers];
+        const uniquePhones = Array.from(new Set(allTargets.map(u => u.phone).filter(Boolean)));
+
+        if (uniquePhones.length > 0) {
+          const message = `*NOTIFIKASI SETORAN SELESAI*\n\n` +
+            `Cabang: ${branch?.name || '...'}\n` +
+            `Oleh: ${user?.displayName || 'Mandor'}\n` +
+            `Total Setor: ${formatRupiah(deposit.totalSetor)}\n` +
+            `Berhasil: ${formatRupiah(berhasilDisetor)}\n` +
+            `Sisa: ${formatRupiah(sisaSetor)}\n` +
+            `ATM: ${atmName}\n` +
+            `Waktu: ${new Date().toLocaleString('id-ID')}\n\n` +
+            `_Pesan otomatis dari ALFATHPulsa App_`;
+
+          // Send to all unique phones
+          for (const phone of uniquePhones) {
+            if (phone) await sendWhatsAppMessage(phone as string, message);
+          }
+        }
+      } catch (waError) {
+        console.warn("WhatsApp notification failed:", waError);
+        // Don't throw, we don't want to block the main process
+      }
+      // -----------------------------
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `branches/${branchId}/deposits/${depositId}`);
     }

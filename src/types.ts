@@ -118,3 +118,13 @@ export interface ShoppingCatalog {
   options: string[];
 }
 
+export interface UserProfile {
+  uid: string;
+  email: string;
+  name: string;
+  role: 'bos' | 'mandor' | 'karyawan';
+  branchId: string | null;
+  phone?: string;
+  createdAt: string;
+}
+

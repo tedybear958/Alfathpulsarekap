@@ -1,26 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { collection, onSnapshot, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../firebase';
-import { Shield, UserCog, User as UserIcon, Trash2, Store, Plus, Check } from 'lucide-react';
+import { Shield, UserCog, User as UserIcon, Trash2, Store, Plus, Check, Phone } from 'lucide-react';
 import { useFinanceStore } from '../hooks/useFinanceStore';
+import { UserProfile } from '../types';
 import { ConfirmModal } from './ConfirmModal';
 
-interface UserData {
-  uid: string;
-  email: string;
-  name: string;
-  role: 'bos' | 'mandor' | 'karyawan';
-  branchId?: string;
-  createdAt: string;
-}
-
 export function Team() {
-  const [users, setUsers] = useState<UserData[]>([]);
+  const [users, setUsers] = useState<UserProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { branches, addBranch, deleteBranch } = useFinanceStore();
   const [newBranchName, setNewBranchName] = useState('');
   
   const [editingBranch, setEditingBranch] = useState<{ id: string; capital: string; physicalCapital: string } | null>(null);
+  const [editingPhone, setEditingPhone] = useState<{ uid: string; phone: string } | null>(null);
   
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; type: 'user' | 'branch'; id: string; name: string }>({
     isOpen: false,
@@ -31,7 +24,7 @@ export function Team() {
 
   useEffect(() => {
     const unsub = onSnapshot(collection(db, 'users'), (snapshot) => {
-      const usersData = snapshot.docs.map(doc => doc.data() as UserData);
+      const usersData = snapshot.docs.map(doc => ({ ...doc.data(), uid: doc.id } as UserProfile));
       setUsers(usersData);
       setIsLoading(false);
     }, (error) => {
@@ -41,6 +34,15 @@ export function Team() {
 
     return () => unsub();
   }, []);
+
+  const handlePhoneChange = async (uid: string, phone: string) => {
+    try {
+      await updateDoc(doc(db, 'users', uid), { phone });
+      setEditingPhone(null);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `users/${uid}`);
+    }
+  };
 
   const handleRoleChange = async (uid: string, newRole: 'bos' | 'mandor' | 'karyawan') => {
     try {
@@ -294,29 +296,65 @@ export function Team() {
                 </div>
 
                 {(user.role === 'karyawan' || user.role === 'mandor' || user.role === 'bos') && (
-                  <div className="flex items-center gap-2 pl-14">
-                    <span className="text-[10px] text-gray-500 font-medium">Penempatan:</span>
-                    <div className="flex-1 flex items-center gap-2 max-w-[250px]">
-                      <select
-                        value={pendingBranchChanges[user.uid] !== undefined ? pendingBranchChanges[user.uid] : (user.branchId || '')}
-                        onChange={(e) => handleBranchChange(user.uid, e.target.value)}
-                        className={`text-xs rounded-lg px-2 py-1.5 border-0 outline-none flex-1 transition-all ${
-                          pendingBranchChanges[user.uid] !== undefined ? 'bg-blue-50 ring-2 ring-blue-100' : 'bg-gray-100'
-                        }`}
-                      >
-                        <option value="">-- {user.role === 'bos' ? 'Pusat (Global)' : 'Belum Ditempatkan'} --</option>
-                        {branches.map(b => (
-                          <option key={b.id} value={b.id}>{b.name}</option>
-                        ))}
-                      </select>
-                      {pendingBranchChanges[user.uid] !== undefined && (
-                        <button
-                          onClick={() => handleSaveBranchChange(user.uid)}
-                          className="p-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-all shadow-sm"
+                  <div className="space-y-2 pl-14">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-gray-500 font-medium w-16">Penempatan:</span>
+                      <div className="flex-1 flex items-center gap-2 max-w-[250px]">
+                        <select
+                          value={pendingBranchChanges[user.uid] !== undefined ? pendingBranchChanges[user.uid] : (user.branchId || '')}
+                          onChange={(e) => handleBranchChange(user.uid, e.target.value)}
+                          className={`text-xs rounded-lg px-2 py-1.5 border-0 outline-none flex-1 transition-all ${
+                            pendingBranchChanges[user.uid] !== undefined ? 'bg-blue-50 ring-2 ring-blue-100' : 'bg-gray-100'
+                          }`}
                         >
-                          <Check className="w-3.5 h-3.5" />
-                        </button>
-                      )}
+                          <option value="">-- {user.role === 'bos' ? 'Pusat (Global)' : 'Belum Ditempatkan'} --</option>
+                          {branches.map(b => (
+                            <option key={b.id} value={b.id}>{b.name}</option>
+                          ))}
+                        </select>
+                        {pendingBranchChanges[user.uid] !== undefined && (
+                          <button
+                            onClick={() => handleSaveBranchChange(user.uid)}
+                            className="p-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-all shadow-sm"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-gray-500 font-medium w-16">WhatsApp:</span>
+                      <div className="flex-1 flex items-center gap-2 max-w-[250px]">
+                        {editingPhone?.uid === user.uid ? (
+                          <div className="flex-1 flex items-center gap-2">
+                            <input
+                              type="text"
+                              placeholder="62812345678"
+                              className="flex-1 px-2 py-1.5 text-xs bg-white border border-blue-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100"
+                              value={editingPhone.phone}
+                              onChange={(e) => setEditingPhone({ ...editingPhone, phone: e.target.value.replace(/\D/g, '') })}
+                              autoFocus
+                            />
+                            <button
+                              onClick={() => handlePhoneChange(user.uid, editingPhone.phone)}
+                              className="p-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-all shadow-sm"
+                            >
+                              <Check className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setEditingPhone({ uid: user.uid, phone: user.phone || '' })}
+                            className="flex-1 flex items-center justify-between px-2 py-1.5 bg-gray-100 rounded-lg text-xs text-gray-700 hover:bg-gray-200 transition-all group"
+                          >
+                            <span className={user.phone ? 'font-medium' : 'text-gray-400 italic'}>
+                              {user.phone || 'Belum diatur'}
+                            </span>
+                            <Phone className="w-3 h-3 text-gray-400 group-hover:text-blue-500" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 )}

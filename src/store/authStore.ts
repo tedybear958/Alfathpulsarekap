@@ -42,6 +42,7 @@ onAuthStateChanged(auth, (user) => {
         const data = docSnap.data();
         const role = data.role || 'karyawan';
         const branchId = data.branchId || null;
+        const phone = data.phone || null;
         
         useAuthStore.setState({
           role: role as 'bos' | 'mandor' | 'karyawan',
@@ -57,6 +58,7 @@ onAuthStateChanged(auth, (user) => {
           name: user.displayName || 'Pengguna',
           role: role,
           branchId: null,
+          phone: null,
           createdAt: new Date().toISOString()
         });
         // The next snapshot will trigger the state update
