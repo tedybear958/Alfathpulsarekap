@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { collection, onSnapshot, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../firebase';
-import { Shield, UserCog, User as UserIcon, Trash2, Store, Plus, Check, Phone } from 'lucide-react';
+import { Shield, UserCog, User as UserIcon, Trash2, Store, Plus, Check, Phone, Send, AlertCircle } from 'lucide-react';
 import { useFinanceStore } from '../hooks/useFinanceStore';
 import { UserProfile } from '../types';
 import { ConfirmModal } from './ConfirmModal';
+import { sendWhatsAppMessage } from '../services/whatsappService';
 
 export function Team() {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { branches, addBranch, deleteBranch } = useFinanceStore();
+  const { branches, addBranch, deleteBranch, setError } = useFinanceStore();
   const [newBranchName, setNewBranchName] = useState('');
   
   const [editingBranch, setEditingBranch] = useState<{ id: string; capital: string; physicalCapital: string } | null>(null);
   const [editingPhone, setEditingPhone] = useState<{ uid: string; phone: string } | null>(null);
+  const [isBroadcasting, setIsBroadcasting] = useState(false);
+  const [broadcastStatus, setBroadcastStatus] = useState<{ total: number; success: number; failed: number } | null>(null);
   
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; type: 'user' | 'branch'; id: string; name: string }>({
     isOpen: false,
@@ -42,6 +45,37 @@ export function Team() {
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `users/${uid}`);
     }
+  };
+
+  const handleBroadcastTest = async () => {
+    const targets = users.filter(u => u.phone);
+    if (targets.length === 0) {
+      alert("Tidak ada nomor WhatsApp yang terdaftar.");
+      return;
+    }
+
+    setIsBroadcasting(true);
+    setBroadcastStatus({ total: targets.length, success: 0, failed: 0 });
+
+    const message = `*TES BROADCAST ALFATHPulsa*\n\n` +
+      `Halo! Ini adalah pesan tes dari sistem ALFATHPulsa untuk memastikan nomor Anda sudah terdaftar dengan benar.\n\n` +
+      `Waktu: ${new Date().toLocaleString('id-ID')}\n` +
+      `_Pesan ini dikirim secara otomatis._`;
+
+    for (const user of targets) {
+      try {
+        if (user.phone) {
+          await sendWhatsAppMessage(user.phone, message);
+          setBroadcastStatus(prev => prev ? { ...prev, success: prev.success + 1 } : null);
+        }
+      } catch (error) {
+        console.error(`Failed to send to ${user.name}:`, error);
+        setBroadcastStatus(prev => prev ? { ...prev, failed: prev.failed + 1 } : null);
+      }
+    }
+
+    setIsBroadcasting(false);
+    setTimeout(() => setBroadcastStatus(null), 5000);
   };
 
   const handleRoleChange = async (uid: string, newRole: 'bos' | 'mandor' | 'karyawan') => {
@@ -132,6 +166,46 @@ export function Team() {
             Atur jabatan, penempatan cabang, dan daftar cabang toko.
           </p>
         </div>
+      </div>
+
+      {/* Broadcast Test Section */}
+      <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Send className="w-4 h-4 text-emerald-600" />
+            <h3 className="text-sm font-bold text-gray-900">Tes Broadcast WhatsApp</h3>
+          </div>
+          {isBroadcasting && (
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-[10px] font-bold text-emerald-600 uppercase">Mengirim...</span>
+            </div>
+          )}
+        </div>
+        
+        <p className="text-[10px] text-gray-500 leading-relaxed">
+          Gunakan fitur ini untuk mengetes apakah semua nomor yang terdaftar sudah bisa menerima pesan dari bot Fonnte.
+        </p>
+
+        {broadcastStatus && (
+          <div className="bg-emerald-50 p-3 rounded-2xl border border-emerald-100 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-emerald-600" />
+              <span className="text-xs font-bold text-emerald-700">
+                Selesai: {broadcastStatus.success} Berhasil, {broadcastStatus.failed} Gagal
+              </span>
+            </div>
+          </div>
+        )}
+
+        <button
+          onClick={handleBroadcastTest}
+          disabled={isBroadcasting}
+          className="w-full py-3 bg-emerald-600 text-white rounded-2xl text-xs font-black hover:bg-emerald-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-100 disabled:opacity-50"
+        >
+          <Send className="w-4 h-4" />
+          <span>Kirim Pesan Tes ke Semua Nomor</span>
+        </button>
       </div>
 
       {/* Branch Management Section */}
