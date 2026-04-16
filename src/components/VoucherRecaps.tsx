@@ -260,6 +260,8 @@ export function VoucherRecaps() {
       };
     });
 
+    const globalNewRecapTotal = branchStats.reduce((sum, b) => sum + b.batchTotal, 0);
+
     // Sort branches by batch total (Performance Ranking)
     const topBranches = [...branchStats].sort((a, b) => b.batchTotal - a.batchTotal);
 
@@ -283,15 +285,15 @@ export function VoucherRecaps() {
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-2 opacity-80">
                 <Wallet className="w-4 h-4" />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Total Laba Bersih Grup</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest">Total Rekapan Baru</span>
               </div>
               <h3 className="text-4xl font-black tracking-tighter mb-6">
-                {formatRupiah(globalNetProfit)}
+                {formatRupiah(globalNewRecapTotal)}
               </h3>
               
               <div className="grid grid-cols-2 gap-6 pt-6 border-t border-white/20">
                 <div>
-                  <p className="text-[9px] text-blue-100 font-bold uppercase tracking-wider mb-1">Total Pendapatan</p>
+                  <p className="text-[9px] text-blue-100 font-bold uppercase tracking-wider mb-1">Total Laba</p>
                   <p className="text-lg font-black">{formatRupiah(globalTotalAdm + globalTotalVou)}</p>
                 </div>
                 <div className="text-right">
@@ -414,7 +416,7 @@ export function VoucherRecaps() {
           <p className="text-2xl font-bold tracking-tight">
             {formatRupiah(grandTotal)}
           </p>
-          <p className="text-[10px] text-blue-200 uppercase font-bold tracking-wider mt-1">Grand Total Kas Masuk (Bersih)</p>
+          <p className="text-[10px] text-blue-200 uppercase font-bold tracking-wider mt-1">Total Laba</p>
         </div>
       </div>
 
