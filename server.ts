@@ -3,8 +3,15 @@ import { createServer as createViteServer } from "vite";
 import path from "path";
 import axios from "axios";
 import dotenv from "dotenv";
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, addDoc, updateDoc, doc, deleteDoc, getDocs, query, where } from "firebase/firestore";
+import firebaseConfig from "./firebase-applet-config.json";
 
 dotenv.config();
+
+// Initialize Firebase on server
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId);
 
 async function startServer() {
   const app = express();

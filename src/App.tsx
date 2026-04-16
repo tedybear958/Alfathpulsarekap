@@ -10,7 +10,6 @@ import { Debts } from './components/Debts';
 import { Savings } from './components/Savings';
 import { Deposits } from './components/Deposits';
 import { VoucherRecaps } from './components/VoucherRecaps';
-import { ShoppingList } from './components/ShoppingList';
 import { Login } from './components/Login';
 import { Team } from './components/Team';
 import { NotificationManager } from './components/NotificationManager';
@@ -19,7 +18,7 @@ import { initFinanceStoreListeners } from './hooks/useFinanceStore';
 
 export default function App() {
   const { user, isAuthLoaded, role } = useAuthStore();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'debts' | 'savings' | 'deposits' | 'team' | 'vouchers' | 'shopping'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'debts' | 'savings' | 'deposits' | 'team' | 'vouchers'>('dashboard');
 
   useEffect(() => {
     if (user && role) {
@@ -48,7 +47,6 @@ export default function App() {
       {activeTab === 'savings' && <Savings />}
       {activeTab === 'deposits' && <Deposits />}
       {activeTab === 'vouchers' && <VoucherRecaps />}
-      {activeTab === 'shopping' && <ShoppingList />}
       {activeTab === 'team' && role === 'bos' && <Team />}
     </Layout>
   );
