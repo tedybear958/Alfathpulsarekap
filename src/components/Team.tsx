@@ -65,10 +65,15 @@ export function Team() {
     for (const user of targets) {
       try {
         if (user.phone) {
-          await sendWhatsAppMessage(user.phone, message);
-          setBroadcastStatus(prev => prev ? { ...prev, success: prev.success + 1 } : null);
+          const result = await sendWhatsAppMessage(user.phone, message);
+          if (result.status === true || result.status === 'true') {
+            setBroadcastStatus(prev => prev ? { ...prev, success: prev.success + 1 } : null);
+          } else {
+            console.error(`Fonnte rejected message to ${user.name}:`, result);
+            setBroadcastStatus(prev => prev ? { ...prev, failed: prev.failed + 1 } : null);
+          }
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error(`Failed to send to ${user.name}:`, error);
         setBroadcastStatus(prev => prev ? { ...prev, failed: prev.failed + 1 } : null);
       }
