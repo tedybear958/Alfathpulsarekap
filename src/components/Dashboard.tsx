@@ -93,6 +93,18 @@ export function Dashboard() {
 
   if (!store.isLoaded) return null;
 
+  const handleNumericInput = (e: React.ChangeEvent<HTMLInputElement>, setter: (val: string) => void) => {
+    const value = e.target.value.replace(/\D/g, '');
+    setter(value);
+    
+    // Explicitly set cursor to the end
+    const target = e.target;
+    requestAnimationFrame(() => {
+      const len = target.value.length;
+      target.setSelectionRange(len, len);
+    });
+  };
+
   const handleSaveFixed = async () => {
     const val = parseInt(fixedInput.replace(/\D/g, ''), 10);
     if (!isNaN(val)) {
@@ -189,7 +201,7 @@ export function Dashboard() {
                       inputMode="numeric"
                       className="w-full pl-7 pr-2 py-1.5 bg-blue-800/50 border border-blue-400/50 rounded-lg text-sm text-white focus:outline-none focus:ring-1 focus:ring-white"
                       value={formatNumberInput(fixedInput)}
-                      onChange={(e) => setFixedInput(e.target.value.replace(/\D/g, ''))}
+                      onChange={(e) => handleNumericInput(e, setFixedInput)}
                       autoFocus
                     />
                   </div>
@@ -334,7 +346,7 @@ export function Dashboard() {
                       inputMode="numeric"
                       className="w-full pl-10 pr-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none bg-white font-bold shadow-sm"
                       value={formatNumberInput(newBankBalance)}
-                      onChange={(e) => setNewBankBalance(e.target.value.replace(/\D/g, ''))}
+                      onChange={(e) => handleNumericInput(e, setNewBankBalance)}
                       required
                     />
                   </div>
@@ -384,7 +396,7 @@ export function Dashboard() {
                               : 'bg-gray-50 border-transparent text-gray-700'
                           }`}
                           value={editingBankId === bank.id ? formatNumberInput(bankInput) : (bank.balance === 0 ? '0' : formatNumberInput(bank.balance))}
-                          onChange={(e) => handleBankBalanceChange(bank.id, e.target.value)}
+                          onChange={(e) => handleNumericInput(e, setBankInput)}
                           onFocus={() => {
                             setEditingBankId(bank.id);
                             setBankInput(bank.balance.toString());

@@ -87,6 +87,18 @@ export function VoucherRecaps() {
   const [showHistory, setShowHistory] = useState(false);
   const displayRecaps = showHistory ? filteredRecaps : recentRecaps;
 
+  const handleNumericInput = (e: React.ChangeEvent<HTMLInputElement>, setter: (val: string) => void) => {
+    const value = e.target.value.replace(/\D/g, '');
+    setter(value);
+    
+    // Explicitly set cursor to the end
+    const target = e.target;
+    requestAnimationFrame(() => {
+      const len = target.value.length;
+      target.setSelectionRange(len, len);
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     handleConfirmSave();
@@ -468,7 +480,7 @@ export function VoucherRecaps() {
                   inputMode="numeric"
                   className="w-full px-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold"
                   value={formatNumberInput(adminSiang)}
-                  onChange={(e) => setAdminSiang(e.target.value.replace(/\D/g, ''))}
+                  onChange={(e) => handleNumericInput(e, setAdminSiang)}
                   required
                 />
               </div>
@@ -480,7 +492,7 @@ export function VoucherRecaps() {
                   inputMode="numeric"
                   className="w-full px-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold"
                   value={formatNumberInput(adminMalam)}
-                  onChange={(e) => setAdminMalam(e.target.value.replace(/\D/g, ''))}
+                  onChange={(e) => handleNumericInput(e, setAdminMalam)}
                   required
                 />
               </div>
@@ -495,7 +507,7 @@ export function VoucherRecaps() {
                   inputMode="numeric"
                   className="w-full px-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold"
                   value={formatNumberInput(voucherSiang)}
-                  onChange={(e) => setVoucherSiang(e.target.value.replace(/\D/g, ''))}
+                  onChange={(e) => handleNumericInput(e, setVoucherSiang)}
                   required
                 />
               </div>
@@ -507,7 +519,7 @@ export function VoucherRecaps() {
                   inputMode="numeric"
                   className="w-full px-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold"
                   value={formatNumberInput(voucherMalam)}
-                  onChange={(e) => setVoucherMalam(e.target.value.replace(/\D/g, ''))}
+                  onChange={(e) => handleNumericInput(e, setVoucherMalam)}
                   required
                 />
               </div>
@@ -522,7 +534,7 @@ export function VoucherRecaps() {
                   inputMode="numeric"
                   className="w-full px-4 py-3 text-sm border border-rose-100 rounded-2xl focus:ring-2 focus:ring-rose-500 outline-none bg-rose-50/30 font-bold text-rose-600"
                   value={formatNumberInput(expenseAmount)}
-                  onChange={(e) => setExpenseAmount(e.target.value.replace(/\D/g, ''))}
+                  onChange={(e) => handleNumericInput(e, setExpenseAmount)}
                 />
               </div>
               <div className="space-y-1.5">

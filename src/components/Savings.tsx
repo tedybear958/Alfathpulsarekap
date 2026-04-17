@@ -19,6 +19,18 @@ export function Savings() {
   const [descInput, setDescInput] = useState('');
   const [typeInput, setTypeInput] = useState<'deposit' | 'withdraw'>('deposit');
 
+  const handleNumericInput = (e: React.ChangeEvent<HTMLInputElement>, setter: (val: string) => void) => {
+    const value = e.target.value.replace(/\D/g, '');
+    setter(value);
+    
+    // Explicitly set cursor to the end
+    const target = e.target;
+    requestAnimationFrame(() => {
+      const len = target.value.length;
+      target.setSelectionRange(len, len);
+    });
+  };
+
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; type: 'person' | 'transaction'; personId: string; transactionId?: string; name: string }>({
     isOpen: false,
     type: 'person',
@@ -140,7 +152,7 @@ export function Savings() {
                         inputMode="numeric"
                         className="w-full pl-8 pr-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white font-medium"
                         value={formatNumberInput(amountInput)}
-                        onChange={(e) => setAmountInput(e.target.value.replace(/\D/g, ''))}
+                        onChange={(e) => handleNumericInput(e, setAmountInput)}
                         required
                       />
                     </div>
