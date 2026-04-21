@@ -16,9 +16,9 @@ export default defineConfig(({mode}) => {
           globPatterns: ['**/*.{js,css,html,ico,png,svg}']
         },
         manifest: {
-          name: 'ALFATHPulsa',
-          short_name: 'ALFATHPulsa',
-          description: 'Aplikasi pembukuan keuangan dan pencatatan bon untuk agen ALFATHPulsa.',
+          name: 'AlfathPulsa',
+          short_name: 'AlfathPulsa',
+          description: 'Aplikasi pembukuan keuangan dan pencatatan bon untuk agen AlfathPulsa.',
           theme_color: '#1d4ed8',
           background_color: '#ffffff',
           display: 'standalone',

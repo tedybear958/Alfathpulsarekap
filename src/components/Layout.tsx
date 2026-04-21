@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Users, Wallet, Store, Download, LogOut, UserCog, PiggyBank, Ticket, ShoppingBag, AlertCircle, X, Palette, Check } from 'lucide-react';
+import { LayoutDashboard, Users, Store, Download, LogOut, UserCog, PiggyBank, Ticket, ShoppingBag, AlertCircle, X, Palette, Check } from 'lucide-react';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 import { logout } from '../firebase';
 
@@ -163,7 +163,7 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
         <main className="flex-1 overflow-y-auto pb-24 scroll-smooth">
           {children}
           <div className="px-5 py-4 text-center">
-            <p className="text-[8px] text-gray-300 font-mono">v2026.04.08.01 - ALFATHPulsa</p>
+            <p className="text-[8px] text-gray-300 font-mono">v2026.04.08.01 - AlfathPulsa</p>
           </div>
         </main>
 
