@@ -1,18 +1,17 @@
 import React from 'react';
 import { loginWithGoogle } from '../firebase';
-import { Wallet } from 'lucide-react';
 
 export function Login() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          <div className="w-16 h-16 bg-brand-600 rounded-2xl flex items-center justify-center shadow-lg shadow-brand-500/30">
-            <Wallet className="w-8 h-8 text-white" />
+          <div className="bg-black px-6 py-4 rounded-2xl flex items-center justify-center shadow-xl">
+            <span className="text-white font-black tracking-tighter text-2xl">AlfathPulsa</span>
           </div>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          ALFATHPulsa
+        <h2 className="mt-6 text-center text-sm font-bold text-gray-400 uppercase tracking-[0.2em]">
+          Manajemen Keuangan
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
           Sistem Manajemen Keuangan Agen BRILink

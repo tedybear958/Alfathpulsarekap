@@ -58,11 +58,11 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
         {/* Top Header */}
         <header className="bg-brand-700 text-white sticky top-0 z-20 px-5 py-4 pt-safe flex items-center justify-between shadow-md">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center shrink-0">
-              <Wallet className="w-5 h-5 text-white" />
+            <div className="bg-black px-3 py-1.5 rounded-lg flex items-center justify-center shrink-0 shadow-inner">
+              <span className="text-[10px] font-black text-white tracking-tighter uppercase">AP</span>
             </div>
             <div>
-              <h1 className="text-base font-bold leading-none">{user?.displayName || 'ALFATHPulsa'}</h1>
+              <h1 className="text-base font-bold leading-none">{user?.displayName || 'AlfathPulsa'}</h1>
               <p className="text-[10px] text-brand-200 mt-1 font-medium">
                 {role === 'bos' ? (branchId ? `Bos - ${branchName || branchId}` : 'Bos - Pusat') : 
                  role === 'mandor' ? `Mandor - ${branchName || branchId || '...'}` : 
