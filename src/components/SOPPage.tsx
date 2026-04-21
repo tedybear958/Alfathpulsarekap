@@ -40,12 +40,20 @@ export const SOPPage: React.FC = () => {
         <section className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
           <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
             <AlertCircle className="w-5 h-5 text-brand-600" />
-            3. Aturan BON & Kas
+            3. Penanganan Kas & Uang Besar
           </h2>
           <ul className="text-sm text-gray-600 space-y-2 list-disc list-inside">
-            <li>Prinsip: Perputaran kas tunai.</li>
-            <li>Dilarang BON tanpa izin Bos.</li>
+            <li>Prinsip: Perputaran kas tunai. Dilarang BON tanpa izin Bos.</li>
             <li>Lapor transaksi/kendala agar kas sinkron.</li>
+            <li className="list-none mt-2">
+              <span className="font-bold text-brand-700">Peringatan Menghitung Uang Nominal Besar:</span>
+              <ul className="list-decimal list-inside ml-4 mt-1 space-y-1">
+                <li>Lakukan di area tertutup dari pandangan umum.</li>
+                <li>Wajib hitung ulang minimal 2x untuk akurasi.</li>
+                <li>Jika tersedia, gunakan mesin hitung. Jika manual, usahakan disaksikan rekan saat shift ganda.</li>
+                <li>Simpan di brankas/tempat terkunci segera setelah dihitung. Dilarang meninggalkan uang besar di meja.</li>
+              </ul>
+            </li>
           </ul>
         </section>
 
