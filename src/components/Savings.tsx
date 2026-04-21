@@ -483,7 +483,7 @@ export function Savings() {
                 // Varied colors for avatars
                 const colors = [
                   'from-emerald-500 to-emerald-600',
-                  'from-blue-500 to-blue-600',
+                  'from-brand-500 to-brand-600',
                   'from-teal-500 to-teal-600',
                   'from-cyan-500 to-cyan-600',
                   'from-indigo-500 to-indigo-600',

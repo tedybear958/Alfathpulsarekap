@@ -201,7 +201,7 @@ export function Dashboard() {
             {!isEditingAnnouncement ? (
               <button 
                 onClick={() => { setAnnouncementInput(store.announcement); setIsEditingAnnouncement(true); }}
-                className="text-[10px] font-bold text-blue-600 px-3 py-1 bg-blue-50 rounded-full hover:bg-blue-100"
+                className="text-[10px] font-bold text-brand-600 px-3 py-1 bg-brand-50 rounded-full hover:bg-brand-100"
               >
                 Ubah Pesan
               </button>
@@ -216,7 +216,7 @@ export function Dashboard() {
                 <button 
                   onClick={handleSaveAnnouncement}
                   disabled={isSavingAnnouncement}
-                  className="text-[10px] font-bold text-white px-3 py-1 bg-blue-600 rounded-full shadow-sm disabled:opacity-50"
+                  className="text-[10px] font-bold text-white px-3 py-1 bg-brand-600 rounded-full shadow-sm disabled:opacity-50"
                 >
                   {isSavingAnnouncement ? '...' : 'Simpan'}
                 </button>
@@ -226,7 +226,7 @@ export function Dashboard() {
           
           {isEditingAnnouncement ? (
             <textarea
-              className="w-full p-3 text-sm bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none resize-none min-h-[80px]"
+              className="w-full p-3 text-sm bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none resize-none min-h-[80px]"
               placeholder="Masukkan pesan untuk karyawan (misal: INFO: Pastikan teliti sebelum klik!...)"
               value={announcementInput}
               onChange={(e) => setAnnouncementInput(e.target.value)}
@@ -242,7 +242,7 @@ export function Dashboard() {
       )}
 
       {/* Main Balance Card (Banking Style) */}
-      <div className="bg-gradient-to-br from-blue-700 to-blue-900 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
+      <div className="bg-gradient-to-br from-brand-700 to-brand-900 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-10 -mt-10 blur-2xl"></div>
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-1 opacity-90">
@@ -255,19 +255,19 @@ export function Dashboard() {
             {formatRupiah(isBosGlobal ? totalGlobalCapital : cashInHand)}
           </p>
           
-          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-blue-500/30">
+          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-brand-500/30">
             <div className="w-full">
-              <p className="text-xs text-blue-200 mb-1.5">
+              <p className="text-xs text-brand-200 mb-1.5">
                 {isBosGlobal ? 'Total Modal Non-Fisik' : 'Modal Non-Fisik'}
               </p>
               {isEditingFixed ? (
                 <div className="flex items-center gap-2">
                   <div className="relative flex-1">
-                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-blue-200 text-xs">Rp</span>
+                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-brand-200 text-xs">Rp</span>
                     <input
                       type="text"
                       inputMode="numeric"
-                      className="w-full pl-7 pr-2 py-1.5 bg-blue-800/50 border border-blue-400/50 rounded-lg text-sm text-white focus:outline-none focus:ring-1 focus:ring-white"
+                      className="w-full pl-7 pr-2 py-1.5 bg-brand-800/50 border border-brand-400/50 rounded-lg text-sm text-white focus:outline-none focus:ring-1 focus:ring-white"
                       value={formatNumberInput(fixedInput)}
                       onChange={(e) => handleNumericInput(e, setFixedInput)}
                       autoFocus
@@ -276,10 +276,10 @@ export function Dashboard() {
                   <button 
                     onClick={handleSaveFixed} 
                     disabled={isSavingFixed}
-                    className="p-1.5 bg-white text-blue-700 rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-50"
+                    className="p-1.5 bg-white text-brand-700 rounded-lg hover:bg-brand-50 transition-colors disabled:opacity-50"
                   >
                     {isSavingFixed ? (
-                      <div className="w-4 h-4 border-2 border-blue-700 border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-4 h-4 border-2 border-brand-700 border-t-transparent rounded-full animate-spin"></div>
                     ) : (
                       <Check className="w-4 h-4" />
                     )}
@@ -289,7 +289,7 @@ export function Dashboard() {
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-semibold">{formatRupiah(isBosGlobal ? totalAllBranchesNonPhysicalCapital : effectiveFixedBalance)}</p>
                   {role === 'bos' && !isBosGlobal && (
-                    <button onClick={() => { setFixedInput(effectiveFixedBalance.toString()); setIsEditingFixed(true); }} className="text-blue-200 hover:text-white p-1">
+                    <button onClick={() => { setFixedInput(effectiveFixedBalance.toString()); setIsEditingFixed(true); }} className="text-brand-200 hover:text-white p-1">
                       <Edit3 className="w-4 h-4" />
                     </button>
                   )}
@@ -298,14 +298,14 @@ export function Dashboard() {
             </div>
 
             {!isBosGlobal && (
-              <div className="w-full border-l border-blue-500/30 pl-4">
-                <p className="text-xs text-blue-200 mb-1.5">Modal Fisik</p>
+              <div className="w-full border-l border-brand-500/30 pl-4">
+                <p className="text-xs text-brand-200 mb-1.5">Modal Fisik</p>
                 <p className="text-sm font-semibold">{formatRupiah(myBranch?.physicalCapital || 0)}</p>
               </div>
             )}
             {isBosGlobal && (
-              <div className="w-full border-l border-blue-500/30 pl-4">
-                <p className="text-xs text-blue-200 mb-1.5">Total Modal Fisik</p>
+              <div className="w-full border-l border-brand-500/30 pl-4">
+                <p className="text-xs text-brand-200 mb-1.5">Total Modal Fisik</p>
                 <p className="text-sm font-semibold">{formatRupiah(totalAllBranchesPhysicalCapital)}</p>
               </div>
             )}
@@ -317,7 +317,7 @@ export function Dashboard() {
       {isBosGlobal && (
         <div className="space-y-3">
           <div className="flex items-center gap-2 px-1">
-            <Building2 className="w-4 h-4 text-blue-600" />
+            <Building2 className="w-4 h-4 text-brand-600" />
             <h3 className="text-sm font-bold text-gray-900">Rincian Modal & Fisik Per Cabang</h3>
           </div>
           <div className="grid grid-cols-1 gap-3">
@@ -332,7 +332,7 @@ export function Dashboard() {
                     <h4 className="text-sm font-bold text-gray-900">{branch.name}</h4>
                     <div className="text-right">
                       <p className="text-[10px] text-gray-400 uppercase font-bold">Sisa Uang Fisik</p>
-                      <p className="text-sm font-bold text-blue-600">{formatRupiah(branchCash)}</p>
+                      <p className="text-sm font-bold text-brand-600">{formatRupiah(branchCash)}</p>
                     </div>
                   </div>
                   
@@ -371,7 +371,7 @@ export function Dashboard() {
             <p className="text-sm font-bold text-gray-900">{formatRupiah(currentDebtTotal)}</p>
           </div>
           <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center col-span-2">
-            <div className="flex items-center gap-2 text-blue-600 mb-1">
+            <div className="flex items-center gap-2 text-brand-600 mb-1">
               <PiggyBank className="w-4 h-4" />
               <span className="text-xs font-semibold uppercase tracking-wider">Total Tabungan</span>
             </div>
@@ -385,7 +385,7 @@ export function Dashboard() {
         <div className="space-y-3">
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-2">
-              <Landmark className="w-4 h-4 text-blue-600" />
+              <Landmark className="w-4 h-4 text-brand-600" />
               <h3 className="text-sm font-bold text-gray-900">Rekening Bank</h3>
             </div>
           </div>
@@ -398,7 +398,7 @@ export function Dashboard() {
                   <input
                     type="text"
                     placeholder="Contoh: BCA, BRI, Mandiri"
-                    className="w-full px-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium shadow-sm"
+                    className="w-full px-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none bg-white font-medium shadow-sm"
                     value={newBankName}
                     onChange={(e) => setNewBankName(e.target.value)}
                     required
@@ -412,7 +412,7 @@ export function Dashboard() {
                       type="text"
                       placeholder="0"
                       inputMode="numeric"
-                      className="w-full pl-10 pr-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none bg-white font-bold shadow-sm"
+                      className="w-full pl-10 pr-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none bg-white font-bold shadow-sm"
                       value={formatNumberInput(newBankBalance)}
                       onChange={(e) => handleNumericInput(e, setNewBankBalance)}
                       required
@@ -422,7 +422,7 @@ export function Dashboard() {
                 <button 
                   type="submit" 
                   disabled={isAddingBank}
-                  className="w-full py-3.5 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2 font-bold shadow-md shadow-blue-200 disabled:opacity-50"
+                  className="w-full py-3.5 bg-brand-600 text-white rounded-2xl hover:bg-brand-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2 font-bold shadow-md shadow-brand-200 disabled:opacity-50"
                 >
                   {isAddingBank ? (
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -444,7 +444,7 @@ export function Dashboard() {
                 store.bankBalances.map((bank) => (
                   <div key={bank.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors group">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-100 transition-colors">
+                      <div className="w-10 h-10 rounded-2xl bg-brand-50 flex items-center justify-center text-brand-600 group-hover:bg-brand-100 transition-colors">
                         <Landmark className="w-5 h-5" />
                       </div>
                       <div>
@@ -460,7 +460,7 @@ export function Dashboard() {
                           inputMode="numeric"
                           className={`w-32 pl-7 pr-2 py-1.5 text-sm font-bold rounded-lg transition-all text-right ${
                             editingBankId === bank.id 
-                              ? 'bg-white border-blue-200 ring-2 ring-blue-100 outline-none text-gray-900' 
+                              ? 'bg-white border-brand-200 ring-2 ring-brand-100 outline-none text-gray-900' 
                               : 'bg-gray-50 border-transparent text-gray-700'
                           }`}
                           value={editingBankId === bank.id ? formatNumberInput(bankInput) : (bank.balance === 0 ? '0' : formatNumberInput(bank.balance))}

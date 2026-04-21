@@ -125,7 +125,7 @@ export function DepositAnalytics() {
         <div className="bg-white p-3 border border-gray-100 shadow-xl rounded-2xl text-xs">
           <p className="font-bold text-gray-900 mb-1">{payload[0].payload.fullDate}</p>
           <div className="space-y-1">
-            <p className="text-blue-600">Total Setor: {formatRupiah(payload[0].value)}</p>
+            <p className="text-brand-600">Total Setor: {formatRupiah(payload[0].value)}</p>
             <p className="text-emerald-600">Masuk Bank: {formatRupiah(payload[1].value)}</p>
           </div>
         </div>
@@ -139,7 +139,7 @@ export function DepositAnalytics() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shadow-sm">
+          <div className="w-10 h-10 bg-brand-50 text-brand-600 rounded-2xl flex items-center justify-center shadow-sm">
             <TrendingUp className="w-5 h-5" />
           </div>
           <div>
@@ -154,7 +154,7 @@ export function DepositAnalytics() {
               onClick={() => setTimeRange(range)}
               className={`px-3 py-1.5 text-[9px] font-black rounded-lg transition-all uppercase tracking-tighter ${
                 timeRange === range 
-                  ? 'bg-white text-blue-600 shadow-sm border border-blue-50' 
+                  ? 'bg-white text-brand-600 shadow-sm border border-brand-50' 
                   : 'text-gray-400 hover:text-gray-600'
               }`}
             >
@@ -170,7 +170,7 @@ export function DepositAnalytics() {
           <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Omset Setoran Per Cabang</h4>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+              <div className="w-2 h-2 rounded-full bg-brand-500"></div>
               <span className="text-[8px] font-bold text-slate-400 uppercase">Total</span>
             </div>
             <div className="flex items-center gap-1">
@@ -194,7 +194,7 @@ export function DepositAnalytics() {
                 width={70}
               />
               <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
-              <Bar dataKey="total" fill="#3b82f6" radius={[0, 4, 4, 0]} barSize={12} animationDuration={1500} />
+              <Bar dataKey="total" fill="var(--brand-500)" radius={[0, 4, 4, 0]} barSize={12} animationDuration={1500} />
               <Bar dataKey="verified" fill="#10b981" radius={[0, 4, 4, 0]} barSize={12} animationDuration={1500} />
             </BarChart>
           </ResponsiveContainer>
@@ -209,8 +209,8 @@ export function DepositAnalytics() {
             <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.1}/>
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="var(--brand-500)" stopOpacity={0.1}/>
+                  <stop offset="95%" stopColor="var(--brand-500)" stopOpacity={0}/>
                 </linearGradient>
                 <linearGradient id="colorVerified" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#10b981" stopOpacity={0.1}/>
@@ -230,7 +230,7 @@ export function DepositAnalytics() {
               <Area 
                 type="monotone" 
                 dataKey="total" 
-                stroke="#3b82f6" 
+                stroke="var(--brand-500)" 
                 strokeWidth={2}
                 fillOpacity={1} 
                 fill="url(#colorTotal)" 

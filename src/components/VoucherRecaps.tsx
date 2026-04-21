@@ -292,7 +292,7 @@ export function VoucherRecaps() {
 
         {/* Global Summary Cards */}
         <div className="grid grid-cols-1 gap-4">
-          <div className="bg-gradient-to-br from-indigo-600 via-blue-600 to-blue-700 rounded-[2.5rem] p-8 text-white shadow-2xl shadow-blue-200 relative overflow-hidden">
+          <div className="bg-gradient-to-br from-indigo-600 via-brand-600 to-brand-700 rounded-[2.5rem] p-8 text-white shadow-2xl shadow-brand-200 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-2 opacity-80">
@@ -305,11 +305,11 @@ export function VoucherRecaps() {
               
               <div className="grid grid-cols-2 gap-6 pt-6 border-t border-white/20">
                 <div>
-                  <p className="text-[9px] text-blue-100 font-bold uppercase tracking-wider mb-1">Total Laba</p>
+                  <p className="text-[9px] text-brand-100 font-bold uppercase tracking-wider mb-1">Total Laba</p>
                   <p className="text-lg font-black">{formatRupiah(globalTotalAdm + globalTotalVou)}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[9px] text-blue-100 font-bold uppercase tracking-wider mb-1">Total Pengeluaran</p>
+                  <p className="text-[9px] text-brand-100 font-bold uppercase tracking-wider mb-1">Total Pengeluaran</p>
                   <p className="text-lg font-black text-rose-200">-{formatRupiah(globalTotalExp)}</p>
                 </div>
               </div>
@@ -321,18 +321,18 @@ export function VoucherRecaps() {
         <div className="space-y-3">
           <div className="flex items-center justify-between px-2">
             <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider">Performa Cabang (Batch Terbaru)</h3>
-            <span className="text-[9px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg">Top Performer</span>
+            <span className="text-[9px] font-bold text-brand-600 bg-brand-50 px-2 py-1 rounded-lg">Top Performer</span>
           </div>
           
           <div className="grid grid-cols-1 gap-3">
             {topBranches.map((branch, index) => {
               const gradients = [
-                'from-blue-600 to-indigo-700',
+                'from-brand-600 to-indigo-700',
                 'from-emerald-500 to-teal-700',
                 'from-rose-500 to-pink-700',
                 'from-amber-500 to-orange-700',
                 'from-violet-600 to-purple-800',
-                'from-cyan-500 to-blue-700'
+                'from-cyan-500 to-brand-700'
               ];
               const gradient = gradients[index % gradients.length];
 
@@ -340,7 +340,7 @@ export function VoucherRecaps() {
                 <button
                   key={branch.id}
                   onClick={() => setSelectedBranchId(branch.id)}
-                  className="group relative bg-white rounded-[2rem] p-4 flex items-center justify-between shadow-sm border border-slate-100 hover:shadow-xl hover:border-blue-100 transition-all duration-300 active:scale-[0.98]"
+                  className="group relative bg-white rounded-[2rem] p-4 flex items-center justify-between shadow-sm border border-slate-100 hover:shadow-xl hover:border-brand-100 transition-all duration-300 active:scale-[0.98]"
                 >
                   <div className="flex items-center gap-4">
                     <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-500`}>
@@ -361,7 +361,7 @@ export function VoucherRecaps() {
                   
                   <div className="text-right">
                     <p className="text-sm font-black text-slate-900">{formatRupiah(branch.batchTotal)}</p>
-                    <p className="text-[9px] text-blue-600 font-bold uppercase tracking-tighter">Batch Ini</p>
+                    <p className="text-[9px] text-brand-600 font-bold uppercase tracking-tighter">Batch Ini</p>
                   </div>
                 </button>
               );
@@ -382,7 +382,7 @@ export function VoucherRecaps() {
             </div>
             <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
               <p className="text-[8px] font-bold text-slate-400 uppercase mb-1">Total Laporan</p>
-              <p className="text-xl font-black text-blue-600">{reportedRecaps.length}</p>
+              <p className="text-xl font-black text-brand-600">{reportedRecaps.length}</p>
             </div>
           </div>
         </div>
@@ -395,7 +395,7 @@ export function VoucherRecaps() {
   return (
     <div className="p-2 space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-br from-blue-600 to-indigo-800 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
+      <div className="bg-gradient-to-br from-brand-600 to-indigo-800 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-10 -mt-10 blur-2xl"></div>
         <div className="relative z-10">
             <div className="flex items-center justify-between mb-4">
@@ -428,7 +428,7 @@ export function VoucherRecaps() {
           <p className="text-2xl font-bold tracking-tight">
             {formatRupiah(grandTotal)}
           </p>
-          <p className="text-[10px] text-blue-200 uppercase font-bold tracking-wider mt-1">Total Laba</p>
+          <p className="text-[10px] text-brand-200 uppercase font-bold tracking-wider mt-1">Total Laba</p>
         </div>
       </div>
 
@@ -437,7 +437,7 @@ export function VoucherRecaps() {
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
             <div className="p-4 border-b border-gray-50 flex items-center justify-between bg-gray-50/50">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+              <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-brand-600">
                 <Calculator className="w-4 h-4" />
               </div>
               <h3 className="text-sm font-bold text-gray-900">{editingId ? 'Edit Rekap' : 'Input Rekap Baru'}</h3>
@@ -463,7 +463,7 @@ export function VoucherRecaps() {
                 <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="date"
-                  className="w-full pl-9 pr-3 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-medium"
+                  className="w-full pl-9 pr-3 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none bg-gray-50 font-medium"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                   required
@@ -478,7 +478,7 @@ export function VoucherRecaps() {
                   type="text"
                   placeholder="Rp 0"
                   inputMode="numeric"
-                  className="w-full px-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold"
+                  className="w-full px-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none bg-gray-50 font-bold"
                   value={formatNumberInput(adminSiang)}
                   onChange={(e) => handleNumericInput(e, setAdminSiang)}
                   required
@@ -490,7 +490,7 @@ export function VoucherRecaps() {
                   type="text"
                   placeholder="Rp 0"
                   inputMode="numeric"
-                  className="w-full px-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold"
+                  className="w-full px-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none bg-gray-50 font-bold"
                   value={formatNumberInput(adminMalam)}
                   onChange={(e) => handleNumericInput(e, setAdminMalam)}
                   required
@@ -505,7 +505,7 @@ export function VoucherRecaps() {
                   type="text"
                   placeholder="Rp 0"
                   inputMode="numeric"
-                  className="w-full px-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold"
+                  className="w-full px-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none bg-gray-50 font-bold"
                   value={formatNumberInput(voucherSiang)}
                   onChange={(e) => handleNumericInput(e, setVoucherSiang)}
                   required
@@ -517,7 +517,7 @@ export function VoucherRecaps() {
                   type="text"
                   placeholder="Rp 0"
                   inputMode="numeric"
-                  className="w-full px-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold"
+                  className="w-full px-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none bg-gray-50 font-bold"
                   value={formatNumberInput(voucherMalam)}
                   onChange={(e) => handleNumericInput(e, setVoucherMalam)}
                   required
@@ -542,7 +542,7 @@ export function VoucherRecaps() {
                 <input
                   type="text"
                   placeholder="Contoh: Bayar Listrik"
-                  className="w-full px-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-medium"
+                  className="w-full px-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none bg-gray-50 font-medium"
                   value={expenseDescription}
                   onChange={(e) => setExpenseDescription(e.target.value)}
                 />
@@ -553,7 +553,7 @@ export function VoucherRecaps() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-blue-600 text-white py-4 rounded-2xl text-sm font-black hover:bg-blue-700 active:scale-[0.98] transition-all shadow-lg shadow-blue-100 disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full bg-brand-600 text-white py-4 rounded-2xl text-sm font-black hover:bg-brand-700 active:scale-[0.98] transition-all shadow-lg shadow-brand-100 disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {editingId ? <Edit2 className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                 {isSubmitting ? 'Menyimpan...' : (editingId ? 'Update Rekap' : 'Simpan ke Daftar')}
@@ -579,7 +579,7 @@ export function VoucherRecaps() {
             className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter transition-all ${
               showHistory 
                 ? 'bg-slate-800 text-white' 
-                : 'bg-blue-50 text-blue-600 border border-blue-100'
+                : 'bg-brand-50 text-brand-600 border border-brand-100'
             }`}
           >
             {showHistory ? 'Lihat Aktif' : 'Lihat Semua'}
@@ -607,7 +607,7 @@ export function VoucherRecaps() {
                 </tr>
               ) : (
                 displayRecaps.map((recap) => (
-                  <tr key={recap.id} className={`hover:bg-blue-50/30 transition-colors group ${recap.status === 'draft' ? 'bg-amber-50/30' : ''}`}>
+                  <tr key={recap.id} className={`hover:bg-brand-50/30 transition-colors group ${recap.status === 'draft' ? 'bg-amber-50/30' : ''}`}>
                     <td className="px-2 py-3 border-r border-gray-50">
                       <div className="flex flex-col">
                         <div className="flex items-center gap-1">
@@ -618,7 +618,7 @@ export function VoucherRecaps() {
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" title="Draft"></span>
                           )}
                         </div>
-                        <p className="text-[7px] text-blue-500 font-bold mt-1 truncate max-w-[45px]">
+                        <p className="text-[7px] text-brand-500 font-bold mt-1 truncate max-w-[45px]">
                           {recap.createdByName || 'Admin'}
                         </p>
                       </div>
@@ -641,7 +641,7 @@ export function VoucherRecaps() {
                           <>
                             <button 
                               onClick={() => handleEdit(recap)}
-                              className="p-1 text-blue-400 hover:text-blue-600 transition-all"
+                              className="p-1 text-brand-400 hover:text-brand-600 transition-all"
                             >
                               <Edit2 className="w-3 h-3" />
                             </button>
@@ -752,11 +752,11 @@ export function VoucherRecaps() {
       {/* Fixed Bottom Action Button (As per Screenshot) */}
       {role === 'karyawan' && hasDrafts && (
         <div className="mt-8 mb-4">
-          <div className="bg-blue-600 rounded-[2rem] p-1 shadow-2xl shadow-blue-200">
+          <div className="bg-brand-600 rounded-[2rem] p-1 shadow-2xl shadow-brand-200">
             <button
               onClick={() => setIsConfirmingReport(true)}
               disabled={isSubmitting}
-              className="w-full bg-white text-blue-600 py-5 rounded-[1.8rem] text-sm font-black hover:bg-blue-50 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+              className="w-full bg-white text-brand-600 py-5 rounded-[1.8rem] text-sm font-black hover:bg-brand-50 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
             >
               <Plus className="w-5 h-5" />
               {isSubmitting ? 'Sedang Mengirim...' : 'Save & Laporkan ke Bos'}

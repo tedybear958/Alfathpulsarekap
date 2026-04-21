@@ -147,7 +147,7 @@ export function Debts() {
                 <form onSubmit={handleAddDetail} className="space-y-3">
                   <div className="flex gap-2">
                     <select
-                      className="w-1/3 px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium"
+                      className="w-1/3 px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none bg-white font-medium"
                       value={typeInput}
                       onChange={(e) => setTypeInput(e.target.value as 'add' | 'pay')}
                     >
@@ -160,7 +160,7 @@ export function Debts() {
                         type="text"
                         placeholder="0"
                         inputMode="numeric"
-                        className="w-full pl-8 pr-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium"
+                        className="w-full pl-8 pr-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none bg-white font-medium"
                         value={formatNumberInput(amountInput)}
                         onChange={(e) => handleNumericInput(e, setAmountInput)}
                         required
@@ -171,7 +171,7 @@ export function Debts() {
                     <input
                       type="text"
                       placeholder="Keterangan (ex: Rokok, Pulsa)"
-                      className="flex-1 px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                      className="flex-1 px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none bg-white"
                       value={descInput}
                       onChange={(e) => setDescInput(e.target.value)}
                       required
@@ -325,16 +325,16 @@ export function Debts() {
         <div className="space-y-4">
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-2">
-              <div className="w-1.5 h-4 bg-blue-600 rounded-full"></div>
+              <div className="w-1.5 h-4 bg-brand-600 rounded-full"></div>
               <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight">Total Bon Antar Cabang</h3>
             </div>
           </div>
           <div className="grid grid-cols-1 gap-3">
             {branchDebtData.map(branch => {
               return (
-                <div key={branch.id} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center hover:border-blue-200 transition-colors group">
+                <div key={branch.id} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center hover:border-brand-200 transition-colors group">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+                    <div className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-brand-50 group-hover:text-brand-600 transition-colors">
                       <Users className="w-4 h-4" />
                     </div>
                     <h4 className="text-xs font-black text-gray-700 uppercase">{branch.name}</h4>
@@ -375,7 +375,7 @@ export function Debts() {
                   <input
                     type="text"
                     placeholder="Nama Pelanggan Baru"
-                    className="w-full pl-11 pr-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none bg-white font-bold shadow-sm placeholder:font-medium"
+                    className="w-full pl-11 pr-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none bg-white font-bold shadow-sm placeholder:font-medium"
                     value={newPersonName}
                     onChange={(e) => setNewPersonName(e.target.value)}
                     required
@@ -384,7 +384,7 @@ export function Debts() {
                 <button 
                   type="submit" 
                   disabled={isAddingPerson}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-2xl text-sm font-black hover:bg-blue-700 active:scale-95 transition-all disabled:opacity-50 shadow-lg shadow-blue-200 flex items-center justify-center min-w-[100px]"
+                  className="px-6 py-3 bg-brand-600 text-white rounded-2xl text-sm font-black hover:bg-brand-700 active:scale-95 transition-all disabled:opacity-50 shadow-lg shadow-brand-200 flex items-center justify-center min-w-[100px]"
                 >
                   {isAddingPerson ? (
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -440,7 +440,7 @@ export function Debts() {
                 
                 // Varied colors for avatars
                 const colors = [
-                  'from-blue-500 to-blue-600',
+                  'from-brand-500 to-brand-600',
                   'from-rose-500 to-rose-600',
                   'from-emerald-500 to-emerald-600',
                   'from-amber-500 to-amber-600',
@@ -463,7 +463,7 @@ export function Debts() {
                         <div className="flex items-center gap-2 mb-0.5">
                           <h3 className="text-sm font-black text-gray-900 leading-tight truncate">{person.personName}</h3>
                           {(role === 'bos' || role === 'mandor') && (
-                            <span className="text-[8px] font-black px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded-md uppercase tracking-wider border border-blue-100">
+                            <span className="text-[8px] font-black px-1.5 py-0.5 bg-brand-50 text-brand-600 rounded-md uppercase tracking-wider border border-brand-100">
                               {store.branches.find(b => b.id === person.branchId)?.name || 'Tanpa Cabang'}
                             </span>
                           )}

@@ -149,7 +149,7 @@ export function Team() {
   if (isLoading) {
     return (
       <div className="p-8 flex justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600"></div>
       </div>
     );
   }
@@ -157,7 +157,7 @@ export function Team() {
   return (
     <div className="p-4 space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-br from-blue-700 to-blue-900 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
+      <div className="bg-gradient-to-br from-brand-700 to-brand-900 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-10 -mt-10 blur-2xl"></div>
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-1 opacity-90">
@@ -167,7 +167,7 @@ export function Team() {
           <p className="text-2xl font-bold tracking-tight mt-2">
             {users.length} Anggota | {branches.length} Cabang
           </p>
-          <p className="text-xs text-blue-200 mt-1">
+          <p className="text-xs text-brand-200 mt-1">
             Atur jabatan, penempatan cabang, dan daftar cabang toko.
           </p>
         </div>
@@ -215,7 +215,7 @@ export function Team() {
       {/* Branch Management Section */}
       <div className="space-y-3">
         <div className="flex items-center gap-2 px-1">
-          <Store className="w-4 h-4 text-blue-600" />
+          <Store className="w-4 h-4 text-brand-600" />
           <h3 className="text-sm font-bold text-gray-900">Daftar Cabang</h3>
         </div>
         
@@ -225,12 +225,12 @@ export function Team() {
               <input
                 type="text"
                 placeholder="Nama Cabang Baru"
-                className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50"
+                className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none bg-gray-50"
                 value={newBranchName}
                 onChange={(e) => setNewBranchName(e.target.value)}
                 required
               />
-              <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-colors flex items-center gap-1">
+              <button type="submit" className="px-4 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold hover:bg-brand-700 transition-colors flex items-center gap-1">
                 <Plus className="w-4 h-4" />
                 <span>Tambah</span>
               </button>
@@ -245,7 +245,7 @@ export function Team() {
                 <div key={branch.id} className="p-3 flex flex-col gap-2 hover:bg-gray-50">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 text-[10px] font-bold">
+                      <div className="w-7 h-7 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 text-[10px] font-bold">
                         {branch.name.substring(0, 2).toUpperCase()}
                       </div>
                       <span className="text-xs font-bold text-gray-700">{branch.name}</span>
@@ -257,7 +257,7 @@ export function Team() {
                           capital: (branch.capital || 0).toString(),
                           physicalCapital: (branch.physicalCapital || 0).toString()
                         })}
-                        className="p-1.5 text-blue-400 hover:text-blue-600 transition-colors"
+                        className="p-1.5 text-brand-400 hover:text-brand-600 transition-colors"
                       >
                         <Shield className="w-3.5 h-3.5" />
                       </button>
@@ -284,7 +284,7 @@ export function Team() {
                           />
                         </div>
                       ) : (
-                        <p className="text-[10px] font-bold text-blue-600">
+                        <p className="text-[10px] font-bold text-brand-600">
                           {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(branch.capital || 0)}
                         </p>
                       )}
@@ -302,7 +302,7 @@ export function Team() {
                           />
                           <button 
                             onClick={() => handleUpdateBranchCapital(branch.id, editingBranch.capital, editingBranch.physicalCapital)} 
-                            className="p-1 bg-blue-600 text-white rounded"
+                            className="p-1 bg-brand-600 text-white rounded"
                           >
                             <Plus className="w-2.5 h-2.5" />
                           </button>
@@ -324,7 +324,7 @@ export function Team() {
       {/* User Management Section */}
       <div className="space-y-3">
         <div className="flex items-center gap-2 px-1">
-          <UserIcon className="w-4 h-4 text-blue-600" />
+          <UserIcon className="w-4 h-4 text-brand-600" />
           <h3 className="text-sm font-bold text-gray-900">Anggota Tim</h3>
         </div>
 
@@ -336,7 +336,7 @@ export function Team() {
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
                     user.role === 'bos' ? 'bg-purple-100 text-purple-600' :
                     user.role === 'mandor' ? 'bg-orange-100 text-orange-600' :
-                    'bg-blue-100 text-blue-600'
+                    'bg-brand-100 text-brand-600'
                   }`}>
                     {user.role === 'bos' ? <Shield className="w-5 h-5" /> : <UserIcon className="w-5 h-5" />}
                   </div>
@@ -354,7 +354,7 @@ export function Team() {
                       className={`text-xs font-bold rounded-lg px-2 py-1.5 border-0 outline-none cursor-pointer ${
                         user.role === 'bos' ? 'bg-purple-50 text-purple-700' :
                         user.role === 'mandor' ? 'bg-orange-50 text-orange-700' :
-                        'bg-blue-50 text-blue-700'
+                        'bg-brand-50 text-brand-700'
                       }`}
                     >
                       <option value="karyawan">Karyawan</option>
@@ -382,7 +382,7 @@ export function Team() {
                           value={pendingBranchChanges[user.uid] !== undefined ? pendingBranchChanges[user.uid] : (user.branchId || '')}
                           onChange={(e) => handleBranchChange(user.uid, e.target.value)}
                           className={`text-xs rounded-lg px-2 py-1.5 border-0 outline-none flex-1 transition-all ${
-                            pendingBranchChanges[user.uid] !== undefined ? 'bg-blue-50 ring-2 ring-blue-100' : 'bg-gray-100'
+                            pendingBranchChanges[user.uid] !== undefined ? 'bg-brand-50 ring-2 ring-brand-100' : 'bg-gray-100'
                           }`}
                         >
                           <option value="">-- {user.role === 'bos' ? 'Pusat (Global)' : 'Belum Ditempatkan'} --</option>
@@ -409,7 +409,7 @@ export function Team() {
                             <input
                               type="text"
                               placeholder="62812345678"
-                              className="flex-1 px-2 py-1.5 text-xs bg-white border border-blue-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100"
+                              className="flex-1 px-2 py-1.5 text-xs bg-white border border-brand-200 rounded-lg outline-none focus:ring-2 focus:ring-brand-100"
                               value={editingPhone.phone}
                               onChange={(e) => setEditingPhone({ ...editingPhone, phone: e.target.value.replace(/\D/g, '') })}
                               autoFocus
@@ -429,7 +429,7 @@ export function Team() {
                             <span className={user.phone ? 'font-medium' : 'text-gray-400 italic'}>
                               {user.phone || 'Belum diatur'}
                             </span>
-                            <Phone className="w-3 h-3 text-gray-400 group-hover:text-blue-500" />
+                            <Phone className="w-3 h-3 text-gray-400 group-hover:text-brand-500" />
                           </button>
                         )}
                       </div>

@@ -312,13 +312,13 @@ export function Deposits() {
           <div className="flex bg-gray-100 p-1 rounded-xl">
             <button
               onClick={() => handleTabChange('active')}
-              className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${activeTab === 'active' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500'}`}
+              className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${activeTab === 'active' ? 'bg-white text-brand-600 shadow-sm' : 'text-gray-500'}`}
             >
               AKTIF
             </button>
             <button
               onClick={() => handleTabChange('history')}
-              className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${activeTab === 'history' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500'}`}
+              className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${activeTab === 'history' ? 'bg-white text-brand-600 shadow-sm' : 'text-gray-500'}`}
             >
               RIWAYAT
             </button>
@@ -359,7 +359,7 @@ export function Deposits() {
               </button>
               <button
                 onClick={() => setFilterStatus('received')}
-                className={`px-5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${filterStatus === 'received' ? 'bg-blue-500 text-white shadow-md shadow-blue-100' : 'bg-white text-gray-500 border border-gray-100'}`}
+                className={`px-5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${filterStatus === 'received' ? 'bg-brand-500 text-white shadow-md shadow-brand-100' : 'bg-white text-gray-500 border border-gray-100'}`}
               >
                 Diterima Mandor
               </button>
@@ -399,7 +399,7 @@ export function Deposits() {
                 {/* Status Indicator Bar */}
                 <div className={`absolute top-0 left-0 w-1.5 h-full ${
                   deposit.status === 'pending' ? 'bg-orange-400' : 
-                  deposit.status === 'received' ? 'bg-blue-400' : 'bg-emerald-500'
+                  deposit.status === 'received' ? 'bg-brand-400' : 'bg-emerald-500'
                 }`}></div>
 
                 <div className="p-5">
@@ -408,7 +408,7 @@ export function Deposits() {
                     <div className="flex items-center gap-3">
                       <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm ${
                         deposit.status === 'pending' ? 'bg-orange-50 text-orange-600' : 
-                        deposit.status === 'received' ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600'
+                        deposit.status === 'received' ? 'bg-brand-50 text-brand-600' : 'bg-emerald-50 text-emerald-600'
                       }`}>
                         <Send className="w-6 h-6" />
                       </div>
@@ -429,7 +429,7 @@ export function Deposits() {
                           MENUNGGU MANDOR
                         </span>
                       ) : deposit.status === 'received' ? (
-                        <span className="inline-flex items-center gap-1 text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100 uppercase tracking-tighter">
+                        <span className="inline-flex items-center gap-1 text-[9px] font-black text-brand-600 bg-brand-50 px-2 py-0.5 rounded-md border border-brand-100 uppercase tracking-tighter">
                           DITERIMA MANDOR
                         </span>
                       ) : (
@@ -487,7 +487,7 @@ export function Deposits() {
                           <span className="font-bold text-slate-700">{deposit.destination || 'Mandor'}</span>
                         </div>
                         {deposit.status !== 'pending' && (
-                          <div className="text-[10px] text-blue-600 font-bold flex items-center gap-1">
+                          <div className="text-[10px] text-brand-600 font-bold flex items-center gap-1">
                             <CheckCircle2 className="w-3 h-3" />
                             Diterima: {deposit.receivedByName}
                           </div>
@@ -530,7 +530,7 @@ export function Deposits() {
                       {deposit.status === 'pending' && (
                         <button
                           onClick={() => store.receiveBranchDeposit(deposit.branchId, deposit.id)}
-                          className="w-full bg-blue-600 text-white py-3.5 rounded-2xl text-xs font-bold hover:bg-blue-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-100"
+                          className="w-full bg-brand-600 text-white py-3.5 rounded-2xl text-xs font-bold hover:bg-brand-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand-100"
                         >
                           <CheckCircle2 className="w-4 h-4" />
                           Terima Uang Fisik
@@ -688,15 +688,15 @@ export function Deposits() {
 
                 {/* Inline Edit Form */}
                 {editingDeposit?.depositId === deposit.id && (
-                  <div className="p-5 bg-blue-50 border-t border-blue-100 animate-in fade-in slide-in-from-top-2">
-                    <p className="text-[10px] font-bold text-blue-700 mb-3 uppercase tracking-wider">Update Nominal Masuk Rekening:</p>
+                  <div className="p-5 bg-brand-50 border-t border-brand-100 animate-in fade-in slide-in-from-top-2">
+                    <p className="text-[10px] font-bold text-brand-700 mb-3 uppercase tracking-wider">Update Nominal Masuk Rekening:</p>
                     <div className="flex gap-2">
                       <div className="relative flex-1">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-400 text-xs font-bold">Rp</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-400 text-xs font-bold">Rp</span>
                         <input
                           type="text"
                           inputMode="numeric"
-                          className="w-full pl-8 pr-3 py-3 bg-white border border-blue-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+                          className="w-full pl-8 pr-3 py-3 bg-white border border-brand-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-sm"
                           value={formatNumberInput(editingDeposit.amount)}
                           onChange={(e) => setEditingDeposit({ ...editingDeposit, amount: e.target.value.replace(/\D/g, '') })}
                           autoFocus
@@ -712,7 +712,7 @@ export function Deposits() {
                           }
                           setEditingDeposit(null);
                         }}
-                        className="bg-blue-600 text-white px-5 py-3 rounded-xl text-xs font-bold shadow-md shadow-blue-100"
+                        className="bg-brand-600 text-white px-5 py-3 rounded-xl text-xs font-bold shadow-md shadow-brand-100"
                       >
                         Simpan
                       </button>
@@ -732,7 +732,7 @@ export function Deposits() {
           {activeTab === 'history' && filteredDeposits.length > historyLimit && (
             <button
               onClick={() => setHistoryLimit(prev => prev + 10)}
-              className="w-full py-4 bg-white border border-gray-100 rounded-2xl text-xs font-bold text-blue-600 hover:bg-gray-50 transition-all shadow-sm"
+              className="w-full py-4 bg-white border border-gray-100 rounded-2xl text-xs font-bold text-brand-600 hover:bg-gray-50 transition-all shadow-sm"
             >
               Tampilkan Lebih Banyak ({filteredDeposits.length - historyLimit} lagi)
             </button>
