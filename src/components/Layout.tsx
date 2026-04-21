@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Users, Store, Download, LogOut, UserCog, PiggyBank, Ticket, ShoppingBag, AlertCircle, X, Palette, Check } from 'lucide-react';
+import { LayoutDashboard, Users, Store, Download, LogOut, UserCog, PiggyBank, Ticket, ShoppingBag, AlertCircle, X, Palette, Check, BookOpen } from 'lucide-react';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 import { logout } from '../firebase';
 
@@ -9,8 +9,8 @@ import { useThemeStore, ThemeColor } from '../store/themeStore';
 
 interface LayoutProps {
   children: React.ReactNode;
-  activeTab: 'dashboard' | 'debts' | 'savings' | 'deposits' | 'team' | 'vouchers';
-  setActiveTab: (tab: 'dashboard' | 'debts' | 'savings' | 'deposits' | 'team' | 'vouchers') => void;
+  activeTab: 'dashboard' | 'debts' | 'savings' | 'deposits' | 'team' | 'vouchers' | 'sop';
+  setActiveTab: (tab: 'dashboard' | 'debts' | 'savings' | 'deposits' | 'team' | 'vouchers' | 'sop') => void;
   role?: 'bos' | 'mandor' | 'karyawan' | null;
 }
 
@@ -71,8 +71,15 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowThemePicker(!showThemePicker)}
+              <button
+                onClick={() => setActiveTab('sop')}
+                className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+                title="Panduan SOP"
+              >
+                <BookOpen className="w-4 h-4 text-white" />
+              </button>
+              <button
+                onClick={() => setShowThemePicker(!showThemePicker)}
               className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
               title="Ganti Tema"
             >

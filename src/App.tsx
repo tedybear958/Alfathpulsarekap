@@ -12,13 +12,14 @@ import { Deposits } from './components/Deposits';
 import { VoucherRecaps } from './components/VoucherRecaps';
 import { Login } from './components/Login';
 import { Team } from './components/Team';
+import { SOPPage } from './components/SOPPage';
 import { NotificationManager } from './components/NotificationManager';
 import { useAuthStore } from './store/authStore';
 import { initFinanceStoreListeners } from './hooks/useFinanceStore';
 
 export default function App() {
   const { user, isAuthLoaded, role } = useAuthStore();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'debts' | 'savings' | 'deposits' | 'team' | 'vouchers'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'debts' | 'savings' | 'deposits' | 'team' | 'vouchers' | 'sop'>('dashboard');
 
   useEffect(() => {
     if (user && role) {
@@ -48,6 +49,7 @@ export default function App() {
       {activeTab === 'deposits' && <Deposits />}
       {activeTab === 'vouchers' && <VoucherRecaps />}
       {activeTab === 'team' && role === 'bos' && <Team />}
+      {activeTab === 'sop' && <SOPPage />}
     </Layout>
   );
 }
