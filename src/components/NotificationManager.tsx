@@ -21,7 +21,12 @@ export const NotificationManager: React.FC = () => {
     if (!isInitializedRef.current) return;
     
     const audio = new Audio(url);
-    audio.play().catch(err => console.error('Error playing sound:', err));
+    audio.play().catch(err => {
+      // Ignore NotAllowedError as it is expected if user hasn't interacted with page yet
+      if (err.name !== 'NotAllowedError') {
+        console.error('Error playing sound:', err);
+      }
+    });
   };
 
   useEffect(() => {

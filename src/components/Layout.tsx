@@ -16,7 +16,7 @@ interface LayoutProps {
 export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps) {
   const { isInstallable, installApp } = usePWAInstall();
   const { branchId, user } = useAuthStore();
-  const { branches, error, setError } = useFinanceStore();
+  const { branches, error, setError, announcement } = useFinanceStore();
   const branchName = branchId ? branches.find(b => b.id === branchId)?.name : null;
 
   return (
@@ -72,6 +72,24 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
             </button>
           </div>
         </header>
+        
+        {/* Running Text / Announcement */}
+        {announcement && (
+          <div className="bg-amber-100 border-b border-amber-200 py-1.5 overflow-hidden">
+            <div className="flex whitespace-nowrap animate-marquee">
+              <span className="text-[11px] font-bold text-amber-800 px-4">
+                {announcement}
+              </span>
+              {/* Duplicate for seamless loop */}
+              <span className="text-[11px] font-bold text-amber-800 px-4">
+                {announcement}
+              </span>
+              <span className="text-[11px] font-bold text-amber-800 px-4">
+                {announcement}
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto pb-24 scroll-smooth">

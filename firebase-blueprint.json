@@ -16,10 +16,11 @@
     },
     "Settings": {
       "title": "Settings",
-      "description": "Global settings like fixed balance",
+      "description": "Global settings like fixed balance and running text",
       "type": "object",
       "properties": {
         "fixedBalance": { "type": "number" },
+        "announcement": { "type": "string" },
         "updatedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["fixedBalance"]

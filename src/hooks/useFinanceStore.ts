@@ -13,11 +13,13 @@ interface FinanceState {
   savings: SavingCustomer[];
   branches: Branch[];
   voucherRecaps: VoucherRecap[];
+  announcement: string;
   isLoaded: boolean;
   error: string | null;
   
   setError: (error: string | null) => void;
   updateFixedBalance: (amount: number) => Promise<void>;
+  updateAnnouncement: (text: string) => Promise<void>;
   updateBranchCapital: (branchId: string, amount: number) => Promise<void>;
   updateBranchPhysicalCapital: (branchId: string, amount: number) => Promise<void>;
   addBankBalance: (bankName: string, balance: number) => Promise<void>;
@@ -64,6 +66,7 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
   savings: [],
   branches: [],
   voucherRecaps: [],
+  announcement: '',
   isLoaded: false,
   error: null,
 
@@ -73,6 +76,15 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
       // Optimistic update
       set({ fixedBalance: amount });
       await setDoc(doc(db, 'settings', 'general'), { fixedBalance: amount, updatedAt: new Date().toISOString() }, { merge: true });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, 'settings/general');
+    }
+  },
+  updateAnnouncement: async (text: string) => {
+    try {
+      // Optimistic update
+      set({ announcement: text });
+      await setDoc(doc(db, 'settings', 'general'), { announcement: text, updatedAt: new Date().toISOString() }, { merge: true });
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, 'settings/general');
     }
@@ -528,7 +540,11 @@ export const initFinanceStoreListeners = () => {
   unsubscribers.push(
     onSnapshot(doc(db, 'settings', 'general'), (docSnap) => {
       if (docSnap.exists()) {
-        useFinanceStore.setState({ fixedBalance: docSnap.data().fixedBalance || 0 });
+        const data = docSnap.data();
+        useFinanceStore.setState({ 
+          fixedBalance: data.fixedBalance || 0,
+          announcement: data.announcement || ''
+        });
       }
     }, (error) => handleFirestoreError(error, OperationType.GET, 'settings/general'))
   );

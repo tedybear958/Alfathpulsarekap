@@ -50,7 +50,7 @@ export function VoucherRecaps() {
     if (!selectedBranchId) return [];
     const recaps = [...voucherRecaps].filter(r => r.branchId === selectedBranchId);
     
-    // Sort by date descending (newest first)
+    // Sort by date descending (newest first/at top, oldest at bottom)
     recaps.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     // Boss only sees reported recaps
@@ -268,7 +268,7 @@ export function VoucherRecaps() {
         batchTotal,
         lastReportDate,
         totalRecaps: bRecaps.length,
-        isRecentlyActive: lastReportDate ? (new Date().getTime() - new Date(lastReportDate).getTime()) < (5 * 24 * 60 * 60 * 1000) : false
+        isRecentlyActive: lastReportDate ? (new Date().getTime() - new Date(lastReportDate.replace(/ /g, 'T')).getTime()) < (5 * 24 * 60 * 60 * 1000) : false
       };
     });
 
@@ -354,7 +354,7 @@ export function VoucherRecaps() {
                         )}
                       </div>
                       <p className="text-[10px] text-slate-400 font-bold uppercase">
-                        {branch.lastReportDate ? `Laporan Terakhir: ${new Date(branch.lastReportDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })}` : 'Belum ada laporan'}
+                        {branch.lastReportDate ? `Rekap Tanggal: ${new Date(branch.lastReportDate.replace(/ /g, 'T')).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}` : 'Belum ada laporan'}
                       </p>
                     </div>
                   </div>
@@ -612,7 +612,7 @@ export function VoucherRecaps() {
                       <div className="flex flex-col">
                         <div className="flex items-center gap-1">
                           <p className="text-[10px] font-black text-gray-800 leading-none">
-                            {new Date(recap.date).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })}
+                            {new Date(recap.date.replace(/ /g, 'T')).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })}
                           </p>
                           {recap.status === 'draft' && (
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" title="Draft"></span>
@@ -705,7 +705,7 @@ export function VoucherRecaps() {
                   <div>
                     <p className="text-[11px] font-bold text-gray-700">{recap.expenseDescription || 'Pengeluaran'}</p>
                     <div className="flex items-center gap-2">
-                      <p className="text-[9px] text-gray-400">{new Date(recap.date).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })}</p>
+                      <p className="text-[9px] text-gray-400">{new Date(recap.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })}</p>
                       <span className="text-[8px] text-gray-300">•</span>
                       <p className="text-[9px] text-gray-400 italic">Oleh: {recap.createdByName}</p>
                     </div>
@@ -791,7 +791,7 @@ export function VoucherRecaps() {
       <ConfirmModal
         isOpen={deleteConfirm.isOpen}
         title="Hapus Rekap"
-        message={`Apakah Anda yakin ingin menghapus rekap tanggal ${new Date(deleteConfirm.date).toLocaleDateString('id-ID')}?`}
+        message={`Apakah Anda yakin ingin menghapus rekap tanggal ${new Date(deleteConfirm.date || new Date().toISOString()).toLocaleDateString('id-ID')}?`}
         confirmText="Hapus"
         confirmVariant="danger"
         onConfirm={async () => {

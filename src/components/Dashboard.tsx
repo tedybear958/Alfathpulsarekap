@@ -11,6 +11,10 @@ export function Dashboard() {
   const [isEditingFixed, setIsEditingFixed] = useState(false);
   const [fixedInput, setFixedInput] = useState('');
   
+  const [isEditingAnnouncement, setIsEditingAnnouncement] = useState(false);
+  const [announcementInput, setAnnouncementInput] = useState(store.announcement);
+  const [isSavingAnnouncement, setIsSavingAnnouncement] = useState(false);
+  
   const [isSavingFixed, setIsSavingFixed] = useState(false);
   
   const [newBankName, setNewBankName] = useState('');
@@ -127,6 +131,19 @@ export function Dashboard() {
     }
   };
 
+  const handleSaveAnnouncement = async () => {
+    setIsSavingAnnouncement(true);
+    try {
+      await store.updateAnnouncement(announcementInput);
+      setIsEditingAnnouncement(false);
+    } catch (error) {
+      console.error("Failed to save announcement", error);
+      store.setError("Gagal menyimpan pengumuman.");
+    } finally {
+      setIsSavingAnnouncement(false);
+    }
+  };
+
   const handleAddBank = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newBankName.trim() || isAddingBank) return;
@@ -173,6 +190,57 @@ export function Dashboard() {
 
   return (
     <div className="p-4 space-y-5">
+      {/* Announcement Editor for Bos */}
+      {isBosGlobal && (
+        <div className="bg-white rounded-3xl p-4 shadow-sm border border-amber-100 flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Edit3 className="w-4 h-4 text-amber-600" />
+              <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wider">Pesan Running Text</h3>
+            </div>
+            {!isEditingAnnouncement ? (
+              <button 
+                onClick={() => { setAnnouncementInput(store.announcement); setIsEditingAnnouncement(true); }}
+                className="text-[10px] font-bold text-blue-600 px-3 py-1 bg-blue-50 rounded-full hover:bg-blue-100"
+              >
+                Ubah Pesan
+              </button>
+            ) : (
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => setIsEditingAnnouncement(false)}
+                  className="text-[10px] font-bold text-gray-400 px-3 py-1"
+                >
+                  Batal
+                </button>
+                <button 
+                  onClick={handleSaveAnnouncement}
+                  disabled={isSavingAnnouncement}
+                  className="text-[10px] font-bold text-white px-3 py-1 bg-blue-600 rounded-full shadow-sm disabled:opacity-50"
+                >
+                  {isSavingAnnouncement ? '...' : 'Simpan'}
+                </button>
+              </div>
+            )}
+          </div>
+          
+          {isEditingAnnouncement ? (
+            <textarea
+              className="w-full p-3 text-sm bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none resize-none min-h-[80px]"
+              placeholder="Masukkan pesan untuk karyawan (misal: INFO: Pastikan teliti sebelum klik!...)"
+              value={announcementInput}
+              onChange={(e) => setAnnouncementInput(e.target.value)}
+            />
+          ) : (
+            <div className="bg-amber-50/50 p-3 rounded-2xl border border-dashed border-amber-200">
+              <p className="text-sm italic text-gray-600 leading-relaxed">
+                {store.announcement || 'Belum ada pesan running text. Tambahkan pesan untuk memotivasi atau mengingatkan karyawan.'}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Main Balance Card (Banking Style) */}
       <div className="bg-gradient-to-br from-blue-700 to-blue-900 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-10 -mt-10 blur-2xl"></div>
