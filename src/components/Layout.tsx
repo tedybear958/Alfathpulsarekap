@@ -75,18 +75,24 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
         
         {/* Running Text / Announcement */}
         {announcement && (
-          <div className="bg-amber-100 border-b border-amber-200 py-1.5 overflow-hidden">
-            <div className="flex whitespace-nowrap animate-marquee">
-              <span className="text-[11px] font-bold text-amber-800 px-4">
-                {announcement}
-              </span>
-              {/* Duplicate for seamless loop */}
-              <span className="text-[11px] font-bold text-amber-800 px-4">
-                {announcement}
-              </span>
-              <span className="text-[11px] font-bold text-amber-800 px-4">
-                {announcement}
-              </span>
+          <div className="bg-white border-b border-gray-100 flex items-center overflow-hidden h-9 shadow-sm">
+            <div className="bg-blue-600 self-stretch px-3 flex items-center z-10 shadow-[4px_0_8px_rgba(0,0,0,0.1)]">
+              <AlertCircle className="w-3.5 h-3.5 text-white animate-pulse" />
+              <span className="ml-1.5 text-[9px] font-black text-white uppercase tracking-tighter">INFO</span>
+            </div>
+            <div className="flex-1 overflow-hidden relative flex items-center h-full bg-blue-50/50">
+              <div className="flex whitespace-nowrap animate-marquee py-1">
+                <span className="text-[11px] font-bold text-blue-900 px-8">
+                  {announcement}
+                </span>
+                {/* Duplicate for seamless loop */}
+                <span className="text-[11px] font-bold text-blue-900 px-8">
+                  {announcement}
+                </span>
+                <span className="text-[11px] font-bold text-blue-900 px-8">
+                  {announcement}
+                </span>
+              </div>
             </div>
           </div>
         )}
