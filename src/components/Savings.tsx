@@ -38,6 +38,8 @@ export function Savings() {
     name: ''
   });
 
+  const [activeMainTab, setActiveMainTab] = useState<'savers' | 'history'>('savers');
+
   // Optimize calculations with useMemo
   const savingsWithTotals = useMemo(() => {
     return store.savings.map(person => ({
@@ -45,6 +47,18 @@ export function Savings() {
       totalSavings: store.getPersonTotalSavings(person)
     }));
   }, [store.savings, store.getPersonTotalSavings]);
+
+  const globalTransactionHistory = useMemo(() => {
+    const allTxs = store.savings.flatMap(person => 
+      person.transactions.map(tx => ({
+        ...tx,
+        personId: person.id,
+        personName: person.personName,
+        branchId: person.branchId
+      }))
+    );
+    return allTxs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [store.savings]);
 
   const filteredSavings = useMemo(() => {
     return savingsWithTotals
@@ -376,174 +390,207 @@ export function Savings() {
 
       <div className="space-y-4">
         <div className="flex items-center justify-between px-1">
-          <div className="flex items-center gap-2">
-            <div className="w-1.5 h-4 bg-emerald-600 rounded-full"></div>
-            <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight">Daftar Penabung</h3>
+          <div className="flex bg-gray-100 p-1 rounded-xl">
+            <button
+              onClick={() => setActiveMainTab('savers')}
+              className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${activeMainTab === 'savers' ? 'bg-white text-emerald-600 shadow-sm' : 'text-gray-500'}`}
+            >
+              NASABAH
+            </button>
+            <button
+              onClick={() => setActiveMainTab('history')}
+              className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${activeMainTab === 'history' ? 'bg-white text-emerald-600 shadow-sm' : 'text-gray-500'}`}
+            >
+              RIWAYAT
+            </button>
           </div>
           <div className="flex items-center gap-2">
-            <select 
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              className="text-[10px] font-bold text-gray-500 bg-gray-100 border-none rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-emerald-500"
-            >
-              <option value="latest">Terbaru</option>
-              <option value="name">Nama A-Z</option>
-              <option value="amount">Saldo Terbesar</option>
-            </select>
+            {activeMainTab === 'savers' && (
+              <select 
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="text-[10px] font-bold text-gray-500 bg-gray-100 border-none rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-emerald-500"
+              >
+                <option value="latest">Terbaru</option>
+                <option value="name">Nama A-Z</option>
+                <option value="amount">Saldo Terbesar</option>
+              </select>
+            )}
           </div>
         </div>
 
         <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
-          {canEdit && (
-            <div className="p-5 border-b border-gray-50 space-y-4 bg-gray-50/30">
-              <form onSubmit={handleAddPerson} className="space-y-3">
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <PiggyBank className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Nama Penabung Baru"
-                      className="w-full pl-11 pr-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white font-bold shadow-sm placeholder:font-medium"
-                      value={newPersonName}
-                      onChange={(e) => setNewPersonName(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="relative flex-1">
-                    <input
-                      type="tel"
-                      placeholder="Nomor Telepon"
-                      inputMode="numeric"
-                      className="w-full px-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white font-bold shadow-sm placeholder:font-medium"
-                      value={newPersonPhone}
-                      onChange={(e) => setNewPersonPhone(e.target.value)}
-                    />
-                  </div>
-                </div>
-                <button 
-                  type="submit" 
-                  disabled={isAddingPerson}
-                  className="w-full py-3.5 bg-emerald-600 text-white rounded-2xl text-sm font-black hover:bg-emerald-700 active:scale-[0.98] transition-all disabled:opacity-50 shadow-lg shadow-emerald-200 flex items-center justify-center gap-2"
-                >
-                  {isAddingPerson ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  ) : (
-                    <>
-                      <Plus className="w-5 h-5" />
-                      <span>TAMBAH PENABUNG</span>
-                    </>
-                  )}
-                </button>
-              </form>
-
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Cari nama penabung..."
-                  className="w-full pl-11 pr-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white font-medium shadow-sm"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-            </div>
-          )}
-
-          {!canEdit && (
-            <div className="p-5 border-b border-gray-50 bg-gray-50/30">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Cari nama penabung..."
-                  className="w-full pl-11 pr-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white font-medium shadow-sm"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-            </div>
-          )}
-
-          <div className="divide-y divide-gray-50">
-            {filteredSavings.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <PiggyBank className="w-8 h-8 text-gray-200" />
-                </div>
-                <p className="text-sm font-bold text-gray-400">Tidak ada data penabung.</p>
-                {role === 'karyawan' && !branchId && (
-                  <p className="text-xs text-rose-500 mt-2 font-medium px-10">Anda belum ditempatkan di cabang mana pun. Hubungi Bos.</p>
-                )}
-              </div>
-            ) : (
-              filteredSavings.map((person) => {
-                const total = person.totalSavings;
-                const initials = person.personName.substring(0, 2).toUpperCase();
-                
-                // Varied colors for avatars
-                const colors = [
-                  'from-emerald-500 to-emerald-600',
-                  'from-brand-500 to-brand-600',
-                  'from-teal-500 to-teal-600',
-                  'from-cyan-500 to-cyan-600',
-                  'from-indigo-500 to-indigo-600',
-                  'from-violet-500 to-violet-600'
-                ];
-                const colorIndex = person.personName.length % colors.length;
-                const avatarColor = colors[colorIndex];
-
-                return (
-                  <div key={person.id} className="flex items-center p-4 hover:bg-gray-50/80 transition-all group active:bg-gray-100">
-                    <div 
-                      className="flex-1 flex items-center gap-4 cursor-pointer min-w-0"
-                      onClick={() => setSelectedPersonId(person.id)}
-                    >
-                      <div className={`w-11 h-11 rounded-2xl bg-gradient-to-br ${avatarColor} flex items-center justify-center text-white font-black text-sm shrink-0 shadow-sm group-hover:scale-105 transition-transform`}>
-                        {initials}
+          {activeMainTab === 'savers' ? (
+            <>
+              {canEdit && (
+                <div className="p-5 border-b border-gray-50 space-y-4 bg-gray-50/30">
+                  <form onSubmit={handleAddPerson} className="space-y-3">
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <PiggyBank className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                          type="text"
+                          placeholder="Nama Penabung Baru"
+                          className="w-full pl-11 pr-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white font-bold shadow-sm placeholder:font-medium"
+                          value={newPersonName}
+                          onChange={(e) => setNewPersonName(e.target.value)}
+                          required
+                        />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-col">
-                          <div className="flex items-center gap-2 mb-0.5">
-                            <h3 className="text-sm font-black text-gray-900 leading-tight truncate">{person.personName}</h3>
-                            {(role === 'bos' || role === 'mandor') && (
-                              <span className="text-[8px] font-black px-1.5 py-0.5 bg-emerald-50 text-emerald-600 rounded-md uppercase tracking-wider border border-emerald-100">
-                                {store.branches.find(b => b.id === person.branchId)?.name || 'Tanpa Cabang'}
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {person.phone && (
-                              <p className="text-[10px] text-gray-400 font-bold">{person.phone}</p>
-                            )}
-                            {person.phone && <span className="w-1 h-1 bg-gray-300 rounded-full"></span>}
-                            <p className="text-[10px] text-gray-400 font-bold">
-                              {person.transactions.length} Transaksi
-                            </p>
-                          </div>
-                        </div>
+                      <div className="relative flex-1">
+                        <input
+                          type="tel"
+                          placeholder="Nomor Telepon"
+                          inputMode="numeric"
+                          className="w-full px-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white font-bold shadow-sm placeholder:font-medium"
+                          value={newPersonPhone}
+                          onChange={(e) => setNewPersonPhone(e.target.value)}
+                        />
                       </div>
                     </div>
-                    <div className="flex items-center gap-4 shrink-0">
-                      <div className="text-right">
-                        <p className={`text-sm font-black ${total > 0 ? 'text-emerald-600' : 'text-gray-900'}`}>
-                          {formatRupiah(total)}
+                    <button 
+                      type="submit" 
+                      disabled={isAddingPerson}
+                      className="w-full py-3.5 bg-emerald-600 text-white rounded-2xl text-sm font-black hover:bg-emerald-700 active:scale-[0.98] transition-all disabled:opacity-50 shadow-lg shadow-emerald-200 flex items-center justify-center gap-2"
+                    >
+                      {isAddingPerson ? (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <>
+                          <Plus className="w-5 h-5" />
+                          <span>TAMBAH NASABAH</span>
+                        </>
+                      )}
+                    </button>
+                  </form>
+
+                  <div className="relative">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Cari nama penabung..."
+                      className="w-full pl-11 pr-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white font-medium shadow-sm"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {!canEdit && (
+                <div className="p-5 border-b border-gray-50 bg-gray-50/30">
+                  <div className="relative">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Cari nama penabung..."
+                      className="w-full pl-11 pr-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white font-medium shadow-sm"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="divide-y divide-gray-50">
+                {filteredSavings.length === 0 ? (
+                  <div className="text-center py-16">
+                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <PiggyBank className="w-8 h-8 text-gray-200" />
+                    </div>
+                    <p className="text-sm font-bold text-gray-400">Tidak ada data penabung.</p>
+                  </div>
+                ) : (
+                  filteredSavings.map((person) => {
+                    const total = person.totalSavings;
+                    const initials = person.personName.substring(0, 2).toUpperCase();
+                    const colors = ['from-emerald-500 to-emerald-600', 'from-brand-500 to-brand-600', 'from-teal-500 to-teal-600', 'from-cyan-500 to-cyan-600', 'from-indigo-500 to-indigo-600', 'from-violet-500 to-violet-600'];
+                    const colorIndex = person.personName.length % colors.length;
+                    const avatarColor = colors[colorIndex];
+
+                    return (
+                      <div key={person.id} className="flex items-center p-4 hover:bg-gray-50/80 transition-all group active:bg-gray-100">
+                        <div className="flex-1 flex items-center gap-4 cursor-pointer min-w-0" onClick={() => setSelectedPersonId(person.id)}>
+                          <div className={`w-11 h-11 rounded-2xl bg-gradient-to-br ${avatarColor} flex items-center justify-center text-white font-black text-sm shrink-0 shadow-sm group-hover:scale-105 transition-transform`}>
+                            {initials}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col">
+                              <div className="flex items-center gap-2 mb-0.5">
+                                <h3 className="text-sm font-black text-gray-900 leading-tight truncate">{person.personName}</h3>
+                                {(role === 'bos' || role === 'mandor') && (
+                                  <span className="text-[8px] font-black px-1.5 py-0.5 bg-emerald-50 text-emerald-600 rounded-md uppercase tracking-wider border border-emerald-100">
+                                    {store.branches.find(b => b.id === person.branchId)?.name || 'Tanpa Cabang'}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                {person.phone && <p className="text-[10px] text-gray-400 font-bold">{person.phone}</p>}
+                                {person.phone && <span className="w-1 h-1 bg-gray-300 rounded-full"></span>}
+                                <p className="text-[10px] text-gray-400 font-bold">{person.transactions.length} Transaksi</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 shrink-0">
+                          <div className="text-right">
+                            <p className={`text-sm font-black ${total > 0 ? 'text-emerald-600' : 'text-gray-900'}`}>
+                              {formatRupiah(total)}
+                            </p>
+                          </div>
+                          {canEdit && (
+                            <button onClick={() => setDeleteConfirm({ isOpen: true, type: 'person', personId: person.id, name: person.personName })} className="p-2 text-rose-300 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="divide-y divide-gray-50">
+              {globalTransactionHistory.length === 0 ? (
+                <div className="text-center py-16">
+                  <p className="text-sm font-bold text-gray-400">Belum ada riwayat transaksi.</p>
+                </div>
+              ) : (
+                globalTransactionHistory.map((tx) => (
+                  <div key={tx.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tx.type === 'deposit' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+                        {tx.type === 'deposit' ? <ArrowDownToLine className="w-5 h-5" /> : <ArrowUpFromLine className="w-5 h-5" />}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-sm font-black text-gray-900">{tx.personName}</h4>
+                          <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-wider ${tx.type === 'deposit' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                            {tx.type === 'deposit' ? 'NABUNG' : 'TARIK'}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-gray-500 font-medium">{tx.description}</p>
+                        <p className="text-[9px] text-gray-400 mt-0.5">
+                          {formatDate(tx.date)} • Oleh: {tx.createdByName || 'Sistem'}
                         </p>
                       </div>
-                      {canEdit && (
-                        <button
-                          onClick={() => setDeleteConfirm({ isOpen: true, type: 'person', personId: person.id, name: person.personName })}
-                          className="p-2 text-rose-300 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
-                          title="Hapus"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                    </div>
+                    <div className="text-right">
+                      <p className={`text-sm font-black ${tx.type === 'deposit' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        {tx.type === 'deposit' ? '+' : '-'}{formatRupiah(tx.amount)}
+                      </p>
+                      {(role === 'bos' || role === 'mandor') && tx.branchId && (
+                        <p className="text-[8px] font-black text-gray-400 uppercase tracking-tighter">
+                          {store.branches.find(b => b.id === tx.branchId)?.name || 'Pusat'}
+                        </p>
                       )}
                     </div>
                   </div>
-                );
-              })
-            )}
-          </div>
+                ))
+              )}
+            </div>
+          )}
         </div>
       </div>
 

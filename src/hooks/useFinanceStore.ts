@@ -368,9 +368,30 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
     }
   },
 
-  updateBranchDepositAmount: async (branchId: string, depositId: string, berhasilDisetor: number) => {
+  updateBranchDepositAmount: async (branchId: string, depositId: string, newAmount: number) => {
     try {
-      await updateDoc(doc(db, 'branches', branchId, 'deposits', depositId), { berhasilDisetor, totalSetor: berhasilDisetor, sisaSetor: 0 });
+      const user = useAuthStore.getState().user;
+      const branch = get().branches.find(b => b.id === branchId);
+      const deposit = branch?.deposits.find(d => d.id === depositId);
+      if (!deposit) return;
+
+      const editHistory = deposit.editHistory || [];
+      const updatedHistory = [
+        ...editHistory,
+        {
+          previousAmount: deposit.berhasilDisetor,
+          editedAt: new Date().toISOString(),
+          editedBy: user?.uid || 'unknown',
+          editedByName: user?.displayName || 'Mandor'
+        }
+      ];
+
+      await updateDoc(doc(db, 'branches', branchId, 'deposits', depositId), {
+        berhasilDisetor: newAmount,
+        totalSetor: newAmount,
+        sisaSetor: 0,
+        editHistory: updatedHistory
+      });
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `branches/${branchId}/deposits/${depositId}`);
     }

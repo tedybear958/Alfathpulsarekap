@@ -66,6 +66,7 @@ export interface BranchDeposit {
   completedBy?: string;
   completedByName?: string;
   completedAt?: string;
+  editHistory?: { previousAmount: number; editedAt: string; editedBy: string; editedByName: string }[];
 }
 
 export interface Branch {

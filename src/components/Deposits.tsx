@@ -524,6 +524,21 @@ export function Deposits() {
                     </div>
                   )}
 
+                  {/* Edit History */}
+                  {deposit.editHistory && deposit.editHistory.length > 0 && (
+                    <div className="bg-amber-50 rounded-2xl p-4 mb-4 border border-amber-100">
+                      <p className="text-[10px] font-black text-amber-800 mb-2 uppercase tracking-wider">Riwayat Perubahan Nominal:</p>
+                      <div className="space-y-1.5">
+                        {deposit.editHistory.map((history, idx) => (
+                          <div key={idx} className="flex justify-between text-[10px] border-b border-amber-100/50 pb-1">
+                            <span className="text-amber-700 font-bold">{formatRupiah(history.previousAmount)}</span>
+                            <span className="text-amber-500 font-medium">oleh {history.editedByName} ({formatDate(history.editedAt)})</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Actions */}
                   {(role === 'bos' || role === 'mandor') && (
                     <div className="space-y-3 pt-2">
