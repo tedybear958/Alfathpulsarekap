@@ -122,11 +122,17 @@ export function DepositAnalytics() {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-3 border border-gray-100 shadow-xl rounded-2xl text-xs">
-          <p className="font-bold text-gray-900 mb-1">{payload[0].payload.fullDate}</p>
-          <div className="space-y-1">
-            <p className="text-brand-600">Total Setor: {formatRupiah(payload[0].value)}</p>
-            <p className="text-emerald-600">Masuk Bank: {formatRupiah(payload[1].value)}</p>
+        <div className="bg-asphalt-800 p-4 border border-asphalt-700 shadow-2xl rounded-2xl text-[10px] backdrop-blur-md">
+          <p className="font-black text-white mb-2 uppercase tracking-tight">{payload[0].payload.fullDate}</p>
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between gap-4 border-b border-asphalt-700 pb-1.5">
+              <span className="text-asphalt-text-400 font-black uppercase">Total Setor</span>
+              <span className="text-brand-400 font-bold">{formatRupiah(payload[0].value)}</span>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-asphalt-text-400 font-black uppercase">Masuk Bank</span>
+              <span className="text-emerald-400 font-bold">{formatRupiah(payload[1].value)}</span>
+            </div>
           </div>
         </div>
       );
@@ -135,47 +141,47 @@ export function DepositAnalytics() {
   };
 
   return (
-    <div className="bg-white rounded-[2.5rem] p-6 border border-gray-100 shadow-sm space-y-8">
+    <div className="bg-asphalt-800 rounded-[2.5rem] p-7 border border-asphalt-700/50 shadow-2xl space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-brand-50 text-brand-600 rounded-2xl flex items-center justify-center shadow-sm">
-            <TrendingUp className="w-5 h-5" />
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-asphalt-900 text-brand-500 rounded-2xl flex items-center justify-center shadow-lg border border-asphalt-700">
+            <TrendingUp className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-sm font-black text-gray-900 tracking-tight">Analisa Setoran</h3>
-            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Perputaran Dana Cabang</p>
+            <h3 className="text-sm font-black text-white tracking-tight uppercase">Analisa Setoran</h3>
+            <p className="text-[10px] text-asphalt-text-400 font-black uppercase tracking-[0.2em] leading-none mt-1">Perputaran Dana Cabang</p>
           </div>
         </div>
-        <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
+        <div className="flex bg-asphalt-900 p-1.5 rounded-2xl border border-asphalt-700 shadow-inner">
           {(['daily', 'weekly', 'monthly'] as const).map((range) => (
             <button
               key={range}
               onClick={() => setTimeRange(range)}
-              className={`px-3 py-1.5 text-[9px] font-black rounded-lg transition-all uppercase tracking-tighter ${
+              className={`px-4 py-2 text-[9px] font-black rounded-xl transition-all uppercase tracking-widest ${
                 timeRange === range 
-                  ? 'bg-white text-brand-600 shadow-sm border border-brand-50' 
-                  : 'text-gray-400 hover:text-gray-600'
+                  ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20' 
+                  : 'text-asphalt-text-400 hover:text-white'
               }`}
             >
-              {range === 'daily' ? 'Harian' : range === 'weekly' ? 'Mgg' : 'Bln'}
+              {range === 'daily' ? 'Hari' : range === 'weekly' ? 'Mgg' : 'Bln'}
             </button>
           ))}
         </div>
       </div>
 
       {/* Branch Comparison - Main Focus */}
-      <div className="space-y-4">
+      <div className="space-y-5">
         <div className="flex items-center justify-between px-1">
-          <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Omset Setoran Per Cabang</h4>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full bg-brand-500"></div>
-              <span className="text-[8px] font-bold text-slate-400 uppercase">Total</span>
+          <h4 className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest">Omset Setoran Cabang</h4>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-2.5 h-2.5 rounded-full bg-brand-500 shadow-[0_0_8px_rgba(0,132,255,0.4)]"></div>
+              <span className="text-[9px] font-black text-asphalt-text-400 uppercase">Total</span>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-              <span className="text-[8px] font-bold text-slate-400 uppercase">ATM</span>
+            <div className="flex items-center gap-2">
+              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]"></div>
+              <span className="text-[9px] font-black text-asphalt-text-400 uppercase">Bank</span>
             </div>
           </div>
         </div>
@@ -183,55 +189,55 @@ export function DepositAnalytics() {
         <div className="h-[240px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={branchComparisonData} layout="vertical" margin={{ left: -10, right: 30, top: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f8fafc" />
+              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#1e293b" />
               <XAxis type="number" hide />
               <YAxis 
                 dataKey="name" 
                 type="category" 
                 axisLine={false} 
                 tickLine={false} 
-                tick={{ fontSize: 10, fill: '#475569', fontWeight: 800 }}
+                tick={{ fontSize: 9, fill: '#94a3b8', fontWeight: 800 }}
                 width={70}
               />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
-              <Bar dataKey="total" fill="var(--brand-500)" radius={[0, 4, 4, 0]} barSize={12} animationDuration={1500} />
-              <Bar dataKey="verified" fill="#10b981" radius={[0, 4, 4, 0]} barSize={12} animationDuration={1500} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: '#0f172a' }} />
+              <Bar dataKey="total" fill="var(--brand-500)" radius={[0, 6, 6, 0]} barSize={14} animationDuration={1500} />
+              <Bar dataKey="verified" fill="#10b981" radius={[0, 6, 6, 0]} barSize={14} animationDuration={1500} />
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
 
       {/* Trend Area Chart - Secondary Focus */}
-      <div className="pt-6 border-t border-gray-50 space-y-4">
-        <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Trend Perputaran Dana</h4>
-        <div className="h-[160px] w-full">
+      <div className="pt-8 border-t border-asphalt-700/50 space-y-5">
+        <h4 className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest px-1">Trend Perputaran Dana</h4>
+        <div className="h-[180px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--brand-500)" stopOpacity={0.1}/>
+                  <stop offset="5%" stopColor="var(--brand-500)" stopOpacity={0.2}/>
                   <stop offset="95%" stopColor="var(--brand-500)" stopOpacity={0}/>
                 </linearGradient>
                 <linearGradient id="colorVerified" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.1}/>
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.2}/>
                   <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f8fafc" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
               <XAxis 
                 dataKey="name" 
                 axisLine={false} 
                 tickLine={false} 
-                tick={{ fontSize: 9, fill: '#94a3b8', fontWeight: 700 }}
-                dy={10}
+                tick={{ fontSize: 9, fill: '#64748b', fontWeight: 800 }}
+                dy={15}
               />
               <YAxis hide />
-              <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#e2e8f0', strokeWidth: 1 }} />
+              <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#334155', strokeWidth: 1 }} />
               <Area 
                 type="monotone" 
                 dataKey="total" 
                 stroke="var(--brand-500)" 
-                strokeWidth={2}
+                strokeWidth={3}
                 fillOpacity={1} 
                 fill="url(#colorTotal)" 
                 animationDuration={1500}
@@ -240,7 +246,7 @@ export function DepositAnalytics() {
                 type="monotone" 
                 dataKey="verified" 
                 stroke="#10b981" 
-                strokeWidth={2}
+                strokeWidth={3}
                 fillOpacity={1} 
                 fill="url(#colorVerified)" 
                 animationDuration={1500}

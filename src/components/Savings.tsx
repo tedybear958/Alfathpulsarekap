@@ -120,62 +120,62 @@ export function Savings() {
     const totalSavings = store.getPersonTotalSavings(selectedPerson);
     
     return (
-      <div className="flex flex-col h-full bg-slate-50">
-        <header className="bg-white px-4 py-3 flex items-center gap-3 shadow-sm sticky top-0 z-10">
+      <div className="flex flex-col h-full bg-asphalt-900">
+        <header className="bg-asphalt-800 px-5 py-4 flex items-center gap-4 shadow-xl border-b border-asphalt-700/50 sticky top-0 z-20">
           <button 
             onClick={() => setSelectedPersonId(null)}
-            className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2.5 -ml-2 bg-asphalt-700/50 hover:bg-asphalt-700 rounded-2xl transition-all text-asphalt-text-100"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-700" />
+            <ArrowLeft className="w-5 h-5 stroke-[2.5px]" />
           </button>
           <div className="flex-1">
-            <h2 className="text-base font-bold text-gray-900">{selectedPerson.personName}</h2>
-            <p className="text-[10px] text-gray-500">{selectedPerson.phone || 'Tidak ada nomor telepon'}</p>
+            <h2 className="text-sm font-black text-white uppercase tracking-tight">{selectedPerson.personName}</h2>
+            <p className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest leading-none mt-0.5">{selectedPerson.phone || 'GOPAY USER'}</p>
           </div>
         </header>
 
-        <div className="p-4 space-y-4">
-          <div className="bg-gradient-to-br from-emerald-600 to-emerald-800 p-6 rounded-3xl shadow-lg border border-emerald-500 text-center text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+        <div className="p-5 space-y-6">
+          <div className="bg-gradient-to-br from-emerald-500 to-emerald-700 p-8 rounded-[2.5rem] shadow-2xl shadow-emerald-500/20 text-center text-white relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-24 -mt-24 blur-3xl group-hover:scale-125 transition-transform duration-1000"></div>
             <div className="relative z-10">
-              <p className="text-xs text-emerald-100 mb-1">Total Tabungan Saat Ini</p>
-              <p className="text-3xl font-bold tracking-tight">
+              <p className="text-[10px] font-black text-emerald-100/80 uppercase tracking-[0.25em] mb-2">Total Tabungan</p>
+              <p className="text-4xl font-black tracking-tighter">
                 {formatRupiah(totalSavings)}
               </p>
             </div>
           </div>
 
           {canEdit && (
-            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="p-4 border-b border-gray-50 bg-gray-50/50">
-                <form onSubmit={handleAddTransaction} className="space-y-3">
-                  <div className="flex gap-2">
+            <div className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden">
+              <div className="p-6 bg-asphalt-900/40 border-b border-asphalt-700/50">
+                <form onSubmit={handleAddTransaction} className="space-y-4">
+                  <div className="grid grid-cols-3 gap-3">
                     <select
-                      className="w-1/3 px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white font-medium"
+                      className="px-4 py-3.5 text-xs bg-asphalt-800 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-white font-black uppercase tracking-widest"
                       value={typeInput}
                       onChange={(e) => setTypeInput(e.target.value as 'deposit' | 'withdraw')}
                     >
-                      <option value="deposit">Nabung</option>
-                      <option value="withdraw">Tarik</option>
+                      <option value="deposit">NABUNG</option>
+                      <option value="withdraw">TARIK</option>
                     </select>
-                    <div className="relative flex-1">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">Rp</span>
+                    <div className="relative col-span-2">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-asphalt-text-400 text-xs font-black">Rp</span>
                       <input
                         type="text"
                         placeholder="0"
                         inputMode="numeric"
-                        className="w-full pl-8 pr-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white font-medium"
+                        className="w-full pl-10 pr-4 py-3.5 text-sm bg-asphalt-800 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-white font-black"
                         value={formatNumberInput(amountInput)}
                         onChange={(e) => handleNumericInput(e, setAmountInput)}
                         required
                       />
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <input
                       type="text"
                       placeholder="Keterangan (ex: Tabungan Lebaran)"
-                      className="flex-1 px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white"
+                      className="flex-1 px-5 py-3.5 text-sm bg-asphalt-800 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-white font-medium"
                       value={descInput}
                       onChange={(e) => setDescInput(e.target.value)}
                       required
@@ -183,12 +183,12 @@ export function Savings() {
                     <button 
                       type="submit" 
                       disabled={isAddingTransaction}
-                      className={`px-4 py-2.5 text-white rounded-xl font-medium flex items-center justify-center transition-colors disabled:opacity-50 ${typeInput === 'deposit' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'}`}
+                      className={`w-14 h-14 rounded-2xl font-bold flex items-center justify-center transition-all shadow-lg active:scale-95 disabled:opacity-50 ${typeInput === 'deposit' ? 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20' : 'bg-rose-500 hover:bg-rose-600 shadow-rose-500/20'}`}
                     >
                       {isAddingTransaction ? (
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       ) : (
-                        <Plus className="w-5 h-5" />
+                        <Plus className="w-6 h-6 text-white stroke-[3px]" />
                       )}
                     </button>
                   </div>
@@ -197,57 +197,53 @@ export function Savings() {
 
               <div className="overflow-x-auto">
                 {selectedPerson.transactions.length === 0 ? (
-                  <p className="text-center text-xs text-gray-400 py-8">Belum ada transaksi.</p>
+                  <div className="py-20 flex flex-col items-center justify-center opacity-20">
+                    <PiggyBank className="w-12 h-12 text-asphalt-text-400 mb-2" />
+                    <p className="text-[10px] font-black uppercase tracking-widest text-asphalt-text-400">Belum ada transaksi</p>
+                  </div>
                 ) : (
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-gray-50 border-b border-gray-100 text-[10px] text-gray-500 uppercase tracking-wider">
-                        <th className="p-3 font-medium whitespace-nowrap">Tanggal</th>
-                        <th className="p-3 font-medium">Keterangan</th>
-                        <th className="p-3 font-medium text-right">Masuk</th>
-                        <th className="p-3 font-medium text-right">Keluar</th>
-                        <th className="p-3 font-medium text-right">Saldo</th>
-                        <th className="p-3 font-medium text-center">Aksi</th>
+                      <tr className="bg-asphalt-900/40 border-b border-asphalt-700/50 text-[9px] font-black text-asphalt-text-400 uppercase tracking-widest">
+                        <th className="p-4 whitespace-nowrap">Tanggal</th>
+                        <th className="p-4">Keterangan</th>
+                        <th className="p-4 text-right">In/Out</th>
+                        <th className="p-4 text-right">Saldo</th>
+                        <th className="p-1"></th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-50 text-xs">
+                    <tbody className="divide-y divide-asphalt-700/50 text-xs">
                       {(() => {
                         let runningBalance = 0;
-                        // Calculate running balance from oldest to newest
                         const txsWithBalance = [...selectedPerson.transactions].map(tx => {
                           if (tx.type === 'deposit') runningBalance += tx.amount;
                           else runningBalance -= tx.amount;
                           return { ...tx, balance: runningBalance };
                         });
                         
-                        // Reverse for display (newest first)
                         return txsWithBalance.reverse().map((transaction) => (
-                          <tr key={transaction.id} className="hover:bg-gray-50 transition-colors">
-                            <td className="p-3 text-gray-500 whitespace-nowrap">
-                              {formatDate(transaction.date).split(' ')[0]}
-                              <div className="text-[9px] text-gray-400">{formatDate(transaction.date).split(' ')[1]}</div>
+                          <tr key={transaction.id} className="hover:bg-asphalt-700/20 transition-all group">
+                            <td className="p-4 whitespace-nowrap">
+                              <p className="text-white font-bold">{formatDate(transaction.date).split(' ')[0]}</p>
+                              <p className="text-[9px] text-asphalt-text-400">{formatDate(transaction.date).split(' ')[1]}</p>
                             </td>
-                            <td className="p-3">
-                              <p className="font-medium text-gray-900">{transaction.description}</p>
+                            <td className="p-4">
+                              <p className="font-black text-white uppercase tracking-tight line-clamp-1">{transaction.description}</p>
                               {transaction.createdByName && (
-                                <p className="text-[9px] text-gray-400 mt-0.5">Oleh: {transaction.createdByName}</p>
+                                <p className="text-[8px] text-brand-500 font-black uppercase tracking-widest mt-0.5">{transaction.createdByName}</p>
                               )}
                             </td>
-                            <td className="p-3 text-right font-medium text-emerald-600">
-                              {transaction.type === 'deposit' ? formatRupiah(transaction.amount) : '-'}
+                            <td className={`p-4 text-right font-black ${transaction.type === 'deposit' ? 'text-emerald-500' : 'text-rose-500'}`}>
+                              {transaction.type === 'deposit' ? '+' : '-'}{formatRupiah(transaction.amount)}
                             </td>
-                            <td className="p-3 text-right font-medium text-rose-600">
-                              {transaction.type === 'withdraw' ? formatRupiah(transaction.amount) : '-'}
-                            </td>
-                            <td className="p-3 text-right font-bold text-gray-900">
+                            <td className="p-4 text-right font-black text-white">
                               {formatRupiah(transaction.balance)}
                             </td>
-                            <td className="p-3 text-center">
+                            <td className="p-2 text-center">
                               {canEdit && (
                                 <button
                                   onClick={() => setDeleteConfirm({ isOpen: true, type: 'transaction', personId: selectedPerson.id, transactionId: transaction.id, name: transaction.description })}
-                                  className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors inline-flex"
-                                  title="Hapus"
+                                  className="p-1.5 text-asphalt-text-400 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
@@ -264,22 +260,24 @@ export function Savings() {
           )}
 
           {!canEdit && (
-            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden">
               <div className="overflow-x-auto">
                 {selectedPerson.transactions.length === 0 ? (
-                  <p className="text-center text-xs text-gray-400 py-8">Belum ada transaksi.</p>
+                  <div className="py-20 flex flex-col items-center justify-center opacity-20">
+                    <PiggyBank className="w-12 h-12 text-asphalt-text-400 mb-2" />
+                    <p className="text-[10px] font-black uppercase tracking-widest text-asphalt-text-400">Belum ada transaksi</p>
+                  </div>
                 ) : (
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-gray-50 border-b border-gray-100 text-[10px] text-gray-500 uppercase tracking-wider">
-                        <th className="p-3 font-medium whitespace-nowrap">Tanggal</th>
-                        <th className="p-3 font-medium">Keterangan</th>
-                        <th className="p-3 font-medium text-right">Masuk</th>
-                        <th className="p-3 font-medium text-right">Keluar</th>
-                        <th className="p-3 font-medium text-right">Saldo</th>
+                      <tr className="bg-asphalt-900/40 border-b border-asphalt-700/50 text-[9px] font-black text-asphalt-text-400 uppercase tracking-widest">
+                        <th className="p-4 whitespace-nowrap">Tanggal</th>
+                        <th className="p-4">Keterangan</th>
+                        <th className="p-4 text-right">In/Out</th>
+                        <th className="p-4 text-right">Saldo</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-50 text-xs">
+                    <tbody className="divide-y divide-asphalt-700/50 text-xs text-white">
                       {(() => {
                         let runningBalance = 0;
                         const txsWithBalance = [...selectedPerson.transactions].map(tx => {
@@ -288,24 +286,20 @@ export function Savings() {
                           return { ...tx, balance: runningBalance };
                         });
                         return txsWithBalance.reverse().map((transaction) => (
-                          <tr key={transaction.id} className="hover:bg-gray-50 transition-colors">
-                            <td className="p-3 text-gray-500 whitespace-nowrap">
-                              {formatDate(transaction.date).split(' ')[0]}
-                              <div className="text-[9px] text-gray-400">{formatDate(transaction.date).split(' ')[1]}</div>
+                          <tr key={transaction.id} className="hover:bg-asphalt-700/20 transition-all">
+                            <td className="p-4 whitespace-nowrap text-asphalt-text-100 font-bold">
+                              {formatDate(transaction.date)}
                             </td>
-                            <td className="p-3">
-                              <p className="font-medium text-gray-900">{transaction.description}</p>
+                            <td className="p-4">
+                              <p className="font-black uppercase tracking-tight">{transaction.description}</p>
                               {transaction.createdByName && (
-                                <p className="text-[9px] text-gray-400 mt-0.5">Oleh: {transaction.createdByName}</p>
+                                <p className="text-[8px] text-brand-500 font-black uppercase tracking-widest mt-0.5">{transaction.createdByName}</p>
                               )}
                             </td>
-                            <td className="p-3 text-right font-medium text-emerald-600">
-                              {transaction.type === 'deposit' ? formatRupiah(transaction.amount) : '-'}
+                            <td className={`p-4 text-right font-black ${transaction.type === 'deposit' ? 'text-emerald-500' : 'text-rose-500'}`}>
+                              {transaction.type === 'deposit' ? '+' : '-'}{formatRupiah(transaction.amount)}
                             </td>
-                            <td className="p-3 text-right font-medium text-rose-600">
-                              {transaction.type === 'withdraw' ? formatRupiah(transaction.amount) : '-'}
-                            </td>
-                            <td className="p-3 text-right font-bold text-gray-900">
+                            <td className="p-4 text-right font-black">
                               {formatRupiah(transaction.balance)}
                             </td>
                           </tr>
@@ -344,105 +338,109 @@ export function Savings() {
   }
 
   return (
-    <div className="p-4 space-y-6">
+    <div className="p-5 space-y-7 bg-asphalt-900 min-h-full">
       {/* Summary Header */}
-      <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900 rounded-[2rem] p-7 text-white shadow-xl shadow-emerald-200/50 relative overflow-hidden border border-emerald-500/20">
-        <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-emerald-400/20 rounded-full blur-3xl"></div>
+      <div className="bg-asphalt-800 rounded-[2.5rem] p-7 border border-asphalt-700/50 shadow-2xl relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full -mr-32 -mt-32 blur-[100px] group-hover:bg-emerald-500/20 transition-all duration-1000"></div>
         
-        <div className="relative z-10">
-          <div className="flex items-center justify-between mb-6">
-            <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-md border border-white/30">
-              <PiggyBank className="w-6 h-6 text-white" />
+        <div className="relative z-10 space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="w-12 h-12 bg-emerald-500 font-black text-white rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20 border border-white/10">
+              <PiggyBank className="w-6 h-6" />
             </div>
             <div className="text-right">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/80">Status Tabungan</p>
-              <p className="text-xs font-bold text-white">Nasabah Aktif</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-asphalt-text-400">Total Tabungan</p>
+              <div className="bg-emerald-500/10 text-emerald-500 text-[10px] font-black px-2 py-0.5 rounded-lg border border-emerald-500/20 inline-block uppercase tracking-tighter mt-1">
+                Asset: Aktif
+              </div>
             </div>
           </div>
           
           <div className="space-y-1">
-            <h3 className="text-xs font-bold text-emerald-100 uppercase tracking-wider opacity-80">
-              Total Semua Tabungan
+            <h3 className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-[0.25em]">
+              Tabungan Terkumpul
             </h3>
-            <p className="text-4xl font-black tracking-tighter">
-              {formatRupiah(totalAllSavings)}
-            </p>
-          </div>
-          
-          <div className="mt-6 pt-5 border-t border-white/10 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="flex -space-x-2">
-                {[...Array(Math.min(3, filteredSavings.length))].map((_, i) => (
-                  <div key={i} className="w-6 h-6 rounded-full border-2 border-emerald-700 bg-emerald-400/50 backdrop-blur-sm"></div>
-                ))}
-              </div>
-              <p className="text-[10px] text-emerald-100 font-bold">
-                {filteredSavings.length} Penabung Terdaftar
+            <div className="flex items-baseline gap-2">
+              <span className="text-xl font-black text-emerald-500">Rp</span>
+              <p className="text-4xl font-black tracking-tighter text-white">
+                {totalAllSavings.toLocaleString('id-ID')}
               </p>
             </div>
-            <div className="px-2 py-1 bg-emerald-500/30 rounded-lg backdrop-blur-sm border border-white/10">
-              <p className="text-[9px] font-black text-white uppercase">Aman & Terjamin</p>
+          </div>
+          
+          <div className="pt-6 border-t border-asphalt-700 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex -space-x-3">
+                {[...Array(Math.min(3, filteredSavings.length))].map((_, i) => (
+                  <div key={i} className="w-8 h-8 rounded-xl border-2 border-asphalt-800 bg-asphalt-700 flex items-center justify-center overflow-hidden">
+                    <div className="w-full h-full bg-gradient-to-br from-emerald-500 to-emerald-700"></div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[10px] text-asphalt-text-100 font-black uppercase tracking-tight">
+                {filteredSavings.length} Nasabah
+              </p>
+            </div>
+            <div className="px-2 py-1 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+              <p className="text-[8px] font-black text-emerald-500 uppercase">Terjamin</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-5">
         <div className="flex items-center justify-between px-1">
-          <div className="flex bg-gray-100 p-1 rounded-xl">
+          <div className="flex bg-asphalt-800 p-1.5 rounded-2xl border border-asphalt-700/50 shadow-lg">
             <button
               onClick={() => setActiveMainTab('savers')}
-              className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${activeMainTab === 'savers' ? 'bg-white text-emerald-600 shadow-sm' : 'text-gray-500'}`}
+              className={`px-6 py-2 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest ${activeMainTab === 'savers' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20' : 'text-asphalt-text-400 hover:text-white'}`}
             >
               NASABAH
             </button>
             <button
               onClick={() => setActiveMainTab('history')}
-              className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${activeMainTab === 'history' ? 'bg-white text-emerald-600 shadow-sm' : 'text-gray-500'}`}
+              className={`px-6 py-2 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest ${activeMainTab === 'history' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20' : 'text-asphalt-text-400 hover:text-white'}`}
             >
               RIWAYAT
             </button>
           </div>
-          <div className="flex items-center gap-2">
-            {activeMainTab === 'savers' && (
-              <select 
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                className="text-[10px] font-bold text-gray-500 bg-gray-100 border-none rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-emerald-500"
-              >
-                <option value="latest">Terbaru</option>
-                <option value="name">Nama A-Z</option>
-                <option value="amount">Saldo Terbesar</option>
-              </select>
-            )}
-          </div>
+          {activeMainTab === 'savers' && (
+            <select 
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="text-[10px] font-black text-asphalt-text-400 bg-asphalt-800 border border-asphalt-700 rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-emerald-500 uppercase tracking-widest"
+            >
+              <option value="latest">TERBARU</option>
+              <option value="name">A-Z</option>
+              <option value="amount">SALDO</option>
+            </select>
+          )}
         </div>
 
-        <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden">
           {activeMainTab === 'savers' ? (
             <>
               {canEdit && (
-                <div className="p-5 border-b border-gray-50 space-y-4 bg-gray-50/30">
-                  <form onSubmit={handleAddPerson} className="space-y-3">
-                    <div className="flex gap-2">
-                      <div className="relative flex-1">
-                        <PiggyBank className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <div className="p-6 bg-asphalt-900/40 border-b border-asphalt-700/50 space-y-5">
+                  <form onSubmit={handleAddPerson} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="relative">
+                        <PiggyBank className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-asphalt-text-400" />
                         <input
                           type="text"
-                          placeholder="Nama Penabung Baru"
-                          className="w-full pl-11 pr-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white font-bold shadow-sm placeholder:font-medium"
+                          placeholder="Nama Nasabah"
+                          className="w-full pl-10 pr-4 py-3.5 text-sm bg-asphalt-800 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-white font-black placeholder:text-asphalt-text-400/30"
                           value={newPersonName}
                           onChange={(e) => setNewPersonName(e.target.value)}
                           required
                         />
                       </div>
-                      <div className="relative flex-1">
+                      <div className="relative">
                         <input
                           type="tel"
-                          placeholder="Nomor Telepon"
+                          placeholder="No. Telepon"
                           inputMode="numeric"
-                          className="w-full px-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white font-bold shadow-sm placeholder:font-medium"
+                          className="w-full px-4 py-3.5 text-sm bg-asphalt-800 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-white font-black placeholder:text-asphalt-text-400/30"
                           value={newPersonPhone}
                           onChange={(e) => setNewPersonPhone(e.target.value)}
                         />
@@ -451,25 +449,25 @@ export function Savings() {
                     <button 
                       type="submit" 
                       disabled={isAddingPerson}
-                      className="w-full py-3.5 bg-emerald-600 text-white rounded-2xl text-sm font-black hover:bg-emerald-700 active:scale-[0.98] transition-all disabled:opacity-50 shadow-lg shadow-emerald-200 flex items-center justify-center gap-2"
+                      className="w-full py-4 bg-emerald-500 text-white rounded-2xl text-[10px] font-black hover:bg-emerald-600 active:scale-95 transition-all disabled:opacity-50 shadow-lg shadow-emerald-500/20 uppercase tracking-[0.2em] flex items-center justify-center gap-3"
                     >
                       {isAddingPerson ? (
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       ) : (
                         <>
-                          <Plus className="w-5 h-5" />
-                          <span>TAMBAH NASABAH</span>
+                          <Plus className="w-5 h-5 stroke-[3px]" />
+                          <span>NASABAH BARU</span>
                         </>
                       )}
                     </button>
                   </form>
 
                   <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-asphalt-text-400" />
                     <input
                       type="text"
-                      placeholder="Cari nama penabung..."
-                      className="w-full pl-11 pr-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white font-medium shadow-sm"
+                      placeholder="Cari nama nasabah..."
+                      className="w-full pl-11 pr-4 py-3.5 text-sm bg-asphalt-800 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-white font-medium"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -477,69 +475,52 @@ export function Savings() {
                 </div>
               )}
 
-              {!canEdit && (
-                <div className="p-5 border-b border-gray-50 bg-gray-50/30">
-                  <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Cari nama penabung..."
-                      className="w-full pl-11 pr-4 py-3 text-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none bg-white font-medium shadow-sm"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
-                </div>
-              )}
-
-              <div className="divide-y divide-gray-50">
+              <div className="divide-y divide-asphalt-700/50">
                 {filteredSavings.length === 0 ? (
-                  <div className="text-center py-16">
-                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <PiggyBank className="w-8 h-8 text-gray-200" />
+                  <div className="text-center py-20 bg-asphalt-800/50">
+                    <div className="w-20 h-20 bg-asphalt-900 rounded-[2rem] flex items-center justify-center mx-auto mb-5 border border-asphalt-700/50">
+                      <PiggyBank className="w-10 h-10 text-asphalt-700" />
                     </div>
-                    <p className="text-sm font-bold text-gray-400">Tidak ada data penabung.</p>
+                    <p className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest">Tidak ada data nasabah</p>
                   </div>
                 ) : (
                   filteredSavings.map((person) => {
                     const total = person.totalSavings;
                     const initials = person.personName.substring(0, 2).toUpperCase();
-                    const colors = ['from-emerald-500 to-emerald-600', 'from-brand-500 to-brand-600', 'from-teal-500 to-teal-600', 'from-cyan-500 to-cyan-600', 'from-indigo-500 to-indigo-600', 'from-violet-500 to-violet-600'];
+                    const colors = ['from-emerald-500 to-emerald-600', 'from-brand-500 to-brand-600', 'from-rose-500 to-rose-600'];
                     const colorIndex = person.personName.length % colors.length;
                     const avatarColor = colors[colorIndex];
 
                     return (
-                      <div key={person.id} className="flex items-center p-4 hover:bg-gray-50/80 transition-all group active:bg-gray-100">
+                      <div key={person.id} className="flex items-center p-5 hover:bg-asphalt-700/20 transition-all group active:bg-asphalt-700/40">
                         <div className="flex-1 flex items-center gap-4 cursor-pointer min-w-0" onClick={() => setSelectedPersonId(person.id)}>
-                          <div className={`w-11 h-11 rounded-2xl bg-gradient-to-br ${avatarColor} flex items-center justify-center text-white font-black text-sm shrink-0 shadow-sm group-hover:scale-105 transition-transform`}>
+                          <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${avatarColor} flex items-center justify-center text-white font-black text-sm shrink-0 shadow-lg border border-white/10 group-hover:scale-110 transition-all duration-300`}>
                             {initials}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="flex flex-col">
-                              <div className="flex items-center gap-2 mb-0.5">
-                                <h3 className="text-sm font-black text-gray-900 leading-tight truncate">{person.personName}</h3>
-                                {(role === 'bos' || role === 'mandor') && (
-                                  <span className="text-[8px] font-black px-1.5 py-0.5 bg-emerald-50 text-emerald-600 rounded-md uppercase tracking-wider border border-emerald-100">
-                                    {store.branches.find(b => b.id === person.branchId)?.name || 'Tanpa Cabang'}
-                                  </span>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-2">
-                                {person.phone && <p className="text-[10px] text-gray-400 font-bold">{person.phone}</p>}
-                                {person.phone && <span className="w-1 h-1 bg-gray-300 rounded-full"></span>}
-                                <p className="text-[10px] text-gray-400 font-bold">{person.transactions.length} Transaksi</p>
-                              </div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="text-sm font-black text-white leading-tight truncate uppercase tracking-tight">{person.personName}</h3>
+                              {(role === 'bos' || role === 'mandor') && (
+                                <span className="text-[8px] font-black px-1.5 py-0.5 bg-emerald-500/10 text-emerald-500 rounded-md uppercase tracking-wider border border-emerald-500/20">
+                                  {store.branches.find(b => b.id === person.branchId)?.name || 'Central'}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {person.phone && <p className="text-[9px] text-asphalt-text-400 font-black tracking-widest">{person.phone}</p>}
+                              {person.phone && <span className="w-1 h-1 bg-asphalt-700 rounded-full"></span>}
+                              <p className="text-[9px] text-asphalt-text-400 font-black tracking-widest uppercase">{person.transactions.length} Aktivitas</p>
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-4 shrink-0">
+                        <div className="flex items-center gap-5 shrink-0">
                           <div className="text-right">
-                            <p className={`text-sm font-black ${total > 0 ? 'text-emerald-600' : 'text-gray-900'}`}>
+                            <p className={`text-base font-black ${total > 0 ? 'text-emerald-500' : 'text-white'}`}>
                               {formatRupiah(total)}
                             </p>
                           </div>
                           {canEdit && (
-                            <button onClick={() => setDeleteConfirm({ isOpen: true, type: 'person', personId: person.id, name: person.personName })} className="p-2 text-rose-300 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all">
+                            <button onClick={() => setDeleteConfirm({ isOpen: true, type: 'person', personId: person.id, name: person.personName })} className="p-2.5 text-asphalt-text-400 hover:text-rose-500 bg-asphalt-700/30 rounded-xl transition-all opacity-0 group-hover:opacity-100">
                               <Trash2 className="w-4 h-4" />
                             </button>
                           )}
@@ -551,37 +532,37 @@ export function Savings() {
               </div>
             </>
           ) : (
-            <div className="divide-y divide-gray-50">
+            <div className="divide-y divide-asphalt-700/50">
               {globalTransactionHistory.length === 0 ? (
-                <div className="text-center py-16">
-                  <p className="text-sm font-bold text-gray-400">Belum ada riwayat transaksi.</p>
+                <div className="text-center py-20">
+                  <p className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest">Belum ada riwayat transaksi</p>
                 </div>
               ) : (
                 globalTransactionHistory.map((tx) => (
-                  <div key={tx.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tx.type === 'deposit' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+                  <div key={tx.id} className="p-5 flex items-center justify-between hover:bg-asphalt-700/20 transition-all group">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border transition-colors ${tx.type === 'deposit' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-rose-500/10 border-rose-500/20 text-rose-500'}`}>
                         {tx.type === 'deposit' ? <ArrowDownToLine className="w-5 h-5" /> : <ArrowUpFromLine className="w-5 h-5" />}
                       </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="text-sm font-black text-gray-900">{tx.personName}</h4>
-                          <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-wider ${tx.type === 'deposit' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-0.5">
+                          <h4 className="text-sm font-black text-white uppercase tracking-tight truncate">{tx.personName}</h4>
+                          <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-wider ${tx.type === 'deposit' ? 'bg-emerald-500/20 text-emerald-500' : 'bg-rose-500/20 text-rose-500'}`}>
                             {tx.type === 'deposit' ? 'NABUNG' : 'TARIK'}
                           </span>
                         </div>
-                        <p className="text-[10px] text-gray-500 font-medium">{tx.description}</p>
-                        <p className="text-[9px] text-gray-400 mt-0.5">
-                          {formatDate(tx.date)} • Oleh: {tx.createdByName || 'Sistem'}
+                        <p className="text-[10px] text-asphalt-text-400 font-medium truncate">{tx.description}</p>
+                        <p className="text-[8px] text-brand-500 font-black uppercase tracking-widest mt-1">
+                          {formatDate(tx.date)} • {tx.createdByName || 'SYSTEM'}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className={`text-sm font-black ${tx.type === 'deposit' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                      <p className={`text-base font-black ${tx.type === 'deposit' ? 'text-emerald-500' : 'text-rose-500'}`}>
                         {tx.type === 'deposit' ? '+' : '-'}{formatRupiah(tx.amount)}
                       </p>
                       {(role === 'bos' || role === 'mandor') && tx.branchId && (
-                        <p className="text-[8px] font-black text-gray-400 uppercase tracking-tighter">
+                        <p className="text-[8px] font-black text-asphalt-text-400 uppercase tracking-tighter mt-1">
                           {store.branches.find(b => b.id === tx.branchId)?.name || 'Pusat'}
                         </p>
                       )}

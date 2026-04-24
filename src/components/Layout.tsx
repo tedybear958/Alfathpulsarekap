@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Users, Store, Download, LogOut, UserCog, PiggyBank, Ticket, ShoppingBag, AlertCircle, X, Palette, Check, BookOpen } from 'lucide-react';
+import { LayoutDashboard, Users, Store, Download, LogOut, UserCog, PiggyBank, Ticket, ShoppingBag, AlertCircle, X, Palette, Check, BookOpen, FileText } from 'lucide-react';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 import { logout } from '../firebase';
 
@@ -37,8 +37,8 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
   ];
 
   return (
-    <div className="min-h-[100dvh] bg-gray-100 flex justify-center" data-theme={theme}>
-      <div className="w-full max-w-md bg-slate-50 h-[100dvh] flex flex-col relative shadow-2xl overflow-hidden">
+    <div className="min-h-[100dvh] bg-asphalt-900 flex justify-center" data-theme={theme}>
+      <div className="w-full max-w-md bg-asphalt-900 h-[100dvh] flex flex-col relative shadow-2xl overflow-hidden text-asphalt-text-100">
         {/* Global Error Display */}
         {error && (
           <div
@@ -56,71 +56,58 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
         )}
 
         {/* Top Header */}
-        <header className="bg-brand-700 text-white sticky top-0 z-20 px-5 py-4 pt-safe flex items-center justify-between shadow-md">
+        <header className="bg-asphalt-900 text-white sticky top-0 z-20 px-5 py-6 pt-safe flex items-center justify-between border-b border-asphalt-800">
           <div className="flex items-center gap-3">
-            <div className="bg-black px-3 py-1.5 rounded-lg flex items-center justify-center shrink-0 shadow-inner">
+            <div className="bg-brand-500 p-2 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-brand-500/20">
               <span className="text-[10px] font-black text-white tracking-tighter uppercase">AP</span>
             </div>
             <div>
-              <h1 className="text-base font-bold leading-none">{user?.displayName || 'AlfathPulsa'}</h1>
-              <p className="text-[10px] text-brand-200 mt-1 font-medium">
-                {role === 'bos' ? (branchId ? `Bos - ${branchName || branchId}` : 'Bos - Pusat') : 
-                 role === 'mandor' ? `Mandor - ${branchName || branchId || '...'}` : 
-                 branchId ? `Karyawan - ${branchName || branchId}` : 'Karyawan (Belum Ada Cabang)'}
-              </p>
+              <h1 className="text-lg font-black tracking-tight leading-none">{user?.displayName || 'AlfathPulsa'}</h1>
+              <div className="flex items-center gap-1.5 mt-1.5">
+                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                <p className="text-[10px] text-asphalt-text-400 font-bold uppercase tracking-wider">
+                  {role === 'bos' ? (branchId ? `Bos - ${branchName}` : 'Bos - Pusat') : 
+                   role === 'mandor' ? `Mandor - ${branchName}` : 
+                   branchId ? `Karyawan - ${branchName}` : 'Karyawan'}
+                </p>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
               <button
                 onClick={() => setActiveTab('sop')}
-                className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+                className="p-2.5 bg-asphalt-800 hover:bg-asphalt-700 rounded-2xl transition-all border border-asphalt-700/50"
                 title="Panduan SOP"
               >
-                <BookOpen className="w-4 h-4 text-white" />
+                <BookOpen className="w-5 h-5 text-asphalt-text-100" />
               </button>
-              <button
-                onClick={() => setShowThemePicker(!showThemePicker)}
-              className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
-              title="Ganti Tema"
-            >
-              <Palette className="w-4 h-4 text-white" />
-            </button>
-            {isInstallable && (
-              <button
-                onClick={installApp}
-                className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 transition-colors px-3 py-1.5 rounded-full text-xs font-medium"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Download</span>
-              </button>
-            )}
             <button
               onClick={logout}
-              className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+              className="p-2.5 bg-asphalt-800 hover:bg-asphalt-700 rounded-2xl transition-all border border-asphalt-700/50"
               title="Keluar"
             >
-              <LogOut className="w-4 h-4 text-white" />
+              <LogOut className="w-5 h-5 text-rose-500" />
             </button>
           </div>
         </header>
         
         {/* Running Text / Announcement */}
         {announcement && (
-          <div className="bg-white border-b border-gray-100 flex items-center overflow-hidden h-9 shadow-sm">
-            <div className="bg-brand-600 self-stretch px-3 flex items-center z-10 shadow-[4px_0_8px_rgba(0,0,0,0.1)]">
-              <AlertCircle className="w-3.5 h-3.5 text-white animate-pulse" />
-              <span className="ml-1.5 text-[9px] font-black text-white uppercase tracking-tighter">INFO</span>
+          <div className="bg-asphalt-800 border-b border-asphalt-700 flex items-center overflow-hidden h-10 shadow-lg">
+            <div className="bg-brand-500 self-stretch px-4 flex items-center z-10 shadow-[8px_0_15px_rgba(0,0,0,0.3)]">
+              <AlertCircle className="w-4 h-4 text-white animate-pulse" />
+              <span className="ml-2 text-[10px] font-black text-white uppercase tracking-tighter">INFO</span>
             </div>
-            <div className="flex-1 overflow-hidden relative flex items-center h-full bg-brand-50/50">
+            <div className="flex-1 overflow-hidden relative flex items-center h-full bg-asphalt-900/50">
               <div className="flex whitespace-nowrap animate-marquee py-1">
-                <span className="text-[11px] font-bold text-brand-900 px-8">
+                <span className="text-xs font-black text-white px-10 uppercase tracking-wide">
                   {announcement}
                 </span>
                 {/* Duplicate for seamless loop */}
-                <span className="text-[11px] font-bold text-brand-900 px-8">
+                <span className="text-xs font-black text-white px-10 uppercase tracking-wide">
                   {announcement}
                 </span>
-                <span className="text-[11px] font-bold text-brand-900 px-8">
+                <span className="text-xs font-black text-white px-10 uppercase tracking-wide">
                   {announcement}
                 </span>
               </div>
@@ -130,33 +117,36 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
 
         {/* Theme Picker Overlay */}
         {showThemePicker && (
-          <div className="absolute inset-0 z-40 bg-black/40 backdrop-blur-sm flex flex-col justify-end">
-            <div className="bg-white rounded-t-[32px] p-6 pb-12 shadow-2xl animate-in slide-in-from-bottom duration-300">
-              <div className="flex items-center justify-between mb-6 text-gray-900">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-brand-50 flex items-center justify-center text-brand-600">
-                    <Palette className="w-5 h-5" />
+          <div className="absolute inset-0 z-40 bg-black/60 backdrop-blur-md flex flex-col justify-end">
+            <div className="bg-asphalt-800 rounded-t-[3rem] p-8 pb-14 shadow-2xl animate-in slide-in-from-bottom duration-500 border-t border-asphalt-700">
+              <div className="flex items-center justify-between mb-8 text-white">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-brand-500/10 flex items-center justify-center text-brand-500 border border-brand-500/20">
+                    <Palette className="w-6 h-6" />
                   </div>
-                  <h3 className="text-base font-bold">Pilih Tema Aplikasi</h3>
+                  <div>
+                    <h3 className="text-lg font-black uppercase tracking-tight">Pilih Aksen Warna</h3>
+                    <p className="text-[10px] text-asphalt-text-400 font-bold uppercase tracking-widest mt-0.5">Personalisasi tampilan Anda</p>
+                  </div>
                 </div>
-                <button onClick={() => setShowThemePicker(false)} className="p-2 bg-gray-100 rounded-full">
-                  <X className="w-4 h-4" />
+                <button onClick={() => setShowThemePicker(false)} className="p-3 bg-asphalt-900 rounded-2xl border border-asphalt-700 hover:bg-asphalt-700 transition-all">
+                  <X className="w-5 h-5 text-asphalt-text-400" />
                 </button>
               </div>
               
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-4">
                 {themes.map((t) => (
                   <button
                     key={t.id}
                     onClick={() => { setTheme(t.id); setShowThemePicker(false); }}
-                    className={`flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all ${
-                      theme === t.id ? 'border-brand-600 bg-brand-50' : 'border-gray-100 hover:border-gray-200'
+                    className={`flex flex-col items-center gap-3 p-4 rounded-[2rem] border-2 transition-all ${
+                      theme === t.id ? 'border-brand-500 bg-brand-500/10 shadow-lg shadow-brand-500/10' : 'border-asphalt-700 bg-asphalt-900 hover:border-asphalt-600'
                     }`}
                   >
-                    <div className={`w-10 h-10 rounded-full ${t.color} flex items-center justify-center`}>
-                      {theme === t.id && <Check className="w-5 h-5 text-white" />}
+                    <div className={`w-12 h-12 rounded-full ${t.color} flex items-center justify-center shadow-inner relative`}>
+                      {theme === t.id && <Check className="w-6 h-6 text-white stroke-[4px]" />}
                     </div>
-                    <span className={`text-[10px] font-bold ${theme === t.id ? 'text-brand-700' : 'text-gray-500'}`}>
+                    <span className={`text-[10px] font-black uppercase tracking-widest ${theme === t.id ? 'text-brand-500' : 'text-asphalt-text-400'}`}>
                       {t.label}
                     </span>
                   </button>
@@ -167,85 +157,81 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
         )}
 
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto pb-24 scroll-smooth">
+        <main className="flex-1 overflow-y-auto pb-24 scroll-smooth no-scrollbar">
           {children}
-          <div className="px-5 py-4 text-center">
-            <p className="text-[8px] text-gray-300 font-mono">v2026.04.08.01 - AlfathPulsa</p>
+          <div className="px-5 py-6 text-center">
+            <p className="text-[9px] text-asphalt-text-400 font-black uppercase tracking-[0.4em] opacity-30">AlfathPulsa v2.0</p>
           </div>
         </main>
 
         {/* Bottom Navigation */}
-        <nav className="absolute bottom-0 left-0 w-full bg-white/90 backdrop-blur-xl border-t border-gray-200 z-30 pb-safe shadow-[0_-8px_30px_rgb(0,0,0,0.12)]">
-          <div className="flex justify-around items-center h-16 mb-safe">
+        <nav className="fixed bottom-0 max-w-md w-full bg-asphalt-900/90 backdrop-blur-xl border-t border-asphalt-800 z-30 pb-safe shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+          <div className="flex justify-around items-center h-20 px-2">
+            
+            {/* Beranda */}
             <button
               onClick={() => setActiveTab('dashboard')}
-              className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
-                activeTab === 'dashboard' ? 'text-brand-700' : 'text-gray-400 hover:text-gray-600'
+              className={`flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all active:scale-90 ${
+                activeTab === 'dashboard' ? 'text-brand-500' : 'text-asphalt-text-400 hover:text-asphalt-text-100'
               }`}
             >
-              <LayoutDashboard className={`w-6 h-6 ${activeTab === 'dashboard' ? 'fill-brand-50' : ''}`} />
-              <span className="text-[10px] font-bold">Beranda</span>
+              <div className="relative">
+                <LayoutDashboard className={`w-6 h-6 ${activeTab === 'dashboard' ? 'stroke-[2.5px]' : 'stroke-2'}`} />
+                {activeTab === 'dashboard' && (
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand-500 rounded-full"></div>
+                )}
+              </div>
+              <span className={`text-[10px] font-black tracking-tight uppercase ${activeTab === 'dashboard' ? 'text-brand-500' : 'opacity-70'}`}>Beranda</span>
             </button>
             
-            {(role === 'bos' || role === 'karyawan' || role === 'mandor') && (
-              <button
-                onClick={() => setActiveTab('debts')}
-                className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
-                  activeTab === 'debts' ? 'text-brand-700' : 'text-gray-400 hover:text-gray-600'
-                }`}
-              >
-                <Users className={`w-6 h-6 ${activeTab === 'debts' ? 'fill-brand-50' : ''}`} />
-                <span className="text-[10px] font-bold">Bon / Hutang</span>
-              </button>
-            )}
+            {/* Dompet */}
+            <button
+              onClick={() => setActiveTab('savings')}
+              className={`flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all active:scale-90 ${
+                activeTab === 'savings' || activeTab === 'debts' ? 'text-brand-500' : 'text-asphalt-text-400 hover:text-asphalt-text-100'
+              }`}
+            >
+              <div className="relative">
+                <PiggyBank className={`w-6 h-6 ${activeTab === 'savings' || activeTab === 'debts' ? 'stroke-[2.5px]' : 'stroke-2'}`} />
+                {(activeTab === 'savings' || activeTab === 'debts') && (
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand-500 rounded-full"></div>
+                )}
+              </div>
+              <span className={`text-[10px] font-black tracking-tight uppercase ${activeTab === 'savings' || activeTab === 'debts' ? 'text-brand-500' : 'opacity-70'}`}>Dompet</span>
+            </button>
 
-            {(role === 'bos' || role === 'karyawan' || role === 'mandor') && (
-              <button
-                onClick={() => setActiveTab('savings')}
-                className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
-                  activeTab === 'savings' ? 'text-brand-700' : 'text-gray-400 hover:text-gray-600'
-                }`}
-              >
-                <PiggyBank className={`w-6 h-6 ${activeTab === 'savings' ? 'fill-brand-50' : ''}`} />
-                <span className="text-[10px] font-bold">Tabungan</span>
-              </button>
-            )}
+            {/* Aktivitas (Riwayat) */}
+            <button
+              onClick={() => setActiveTab('vouchers')}
+              className={`flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all active:scale-90 ${
+                activeTab === 'vouchers' ? 'text-brand-500' : 'text-asphalt-text-400 hover:text-asphalt-text-100'
+              }`}
+            >
+              <div className="relative">
+                <Ticket className={`w-6 h-6 ${activeTab === 'vouchers' ? 'stroke-[2.5px]' : 'stroke-2'}`} />
+                {activeTab === 'vouchers' && (
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand-500 rounded-full"></div>
+                )}
+              </div>
+              <span className={`text-[10px] font-black tracking-tight uppercase ${activeTab === 'vouchers' ? 'text-brand-500' : 'opacity-70'}`}>Pesanan</span>
+            </button>
 
-            {(role === 'bos' || role === 'karyawan' || role === 'mandor') && (
-              <button
-                onClick={() => setActiveTab('deposits')}
-                className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
-                  activeTab === 'deposits' ? 'text-brand-700' : 'text-gray-400 hover:text-gray-600'
-                }`}
-              >
-                <Store className={`w-6 h-6 ${activeTab === 'deposits' ? 'fill-brand-50' : ''}`} />
-                <span className="text-[10px] font-bold">Setoran</span>
-              </button>
-            )}
-
-            {(role === 'bos' || role === 'karyawan' || role === 'mandor') && (
-              <button
-                onClick={() => setActiveTab('vouchers')}
-                className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
-                  activeTab === 'vouchers' ? 'text-brand-700' : 'text-gray-400 hover:text-gray-600'
-                }`}
-              >
-                <Ticket className={`w-6 h-6 ${activeTab === 'vouchers' ? 'fill-brand-50' : ''}`} />
-                <span className="text-[10px] font-bold">Rekap</span>
-              </button>
-            )}
-
-            {role === 'bos' && (
-              <button
-                onClick={() => setActiveTab('team')}
-                className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
-                  activeTab === 'team' ? 'text-brand-700' : 'text-gray-400 hover:text-gray-600'
-                }`}
-              >
-                <UserCog className={`w-6 h-6 ${activeTab === 'team' ? 'fill-brand-50' : ''}`} />
-                <span className="text-[10px] font-bold">Tim</span>
-              </button>
-            )}
+            {/* Akun/Tim */}
+            <button
+              onClick={() => setActiveTab('team')}
+              className={`flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all active:scale-90 ${
+                activeTab === 'team' || activeTab === 'sop' ? 'text-brand-500' : 'text-asphalt-text-400 hover:text-asphalt-text-100'
+              }`}
+            >
+              <div className="relative">
+                <Users className={`w-6 h-6 ${activeTab === 'team' || activeTab === 'sop' ? 'stroke-[2.5px]' : 'stroke-2'}`} />
+                {(activeTab === 'team' || activeTab === 'sop') && (
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand-500 rounded-full"></div>
+                )}
+              </div>
+              <span className={`text-[10px] font-black tracking-tight uppercase ${activeTab === 'team' || activeTab === 'sop' ? 'text-brand-500' : 'opacity-70'}`}>Akun</span>
+            </button>
+            
           </div>
         </nav>
       </div>

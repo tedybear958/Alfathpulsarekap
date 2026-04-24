@@ -11,6 +11,12 @@
   --color-brand-700: var(--brand-700);
   --color-brand-800: var(--brand-800);
   --color-brand-900: var(--brand-900);
+  
+  --color-asphalt-900: var(--bg-asphalt-900);
+  --color-asphalt-800: var(--bg-asphalt-800);
+  --color-asphalt-700: var(--bg-asphalt-700);
+  --color-asphalt-text-100: var(--text-asphalt-100);
+  --color-asphalt-text-400: var(--text-asphalt-400);
 
   @keyframes marquee {
     from {
@@ -23,15 +29,22 @@
 }
 
 :root {
-  /* Default Blue Theme */
-  --brand-50: #eff6ff;
-  --brand-100: #dbeafe;
-  --brand-200: #bfdbfe;
-  --brand-500: #3b82f6;
-  --brand-600: #2563eb;
-  --brand-700: #1d4ed8;
-  --brand-800: #1e40af;
-  --brand-900: #1e3a8a;
+  /* GoPay Asphalt Dark Theme */
+  --brand-50: #e0f2fe;
+  --brand-100: #bae6fd;
+  --brand-200: #7dd3fc;
+  --brand-500: #0084FF; /* GoPay Blue */
+  --brand-600: #0076E5;
+  --brand-700: #0068CC;
+  --brand-800: #0059B2;
+  --brand-900: #004B99;
+
+  /* Asphalt Colors */
+  --bg-asphalt-900: #0B111D;
+  --bg-asphalt-800: #181E2B;
+  --bg-asphalt-700: #262E3D;
+  --text-asphalt-100: #E1E7EF;
+  --text-asphalt-400: #94A3B8;
 }
 
 [data-theme='emerald'] {

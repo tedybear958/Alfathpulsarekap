@@ -213,7 +213,7 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
       handleFirestoreError(error, OperationType.DELETE, `savings/${personId}/transactions/${transactionId}`);
     }
   },
-
+  
   addBranch: async (name: string) => {
     try {
       await addDoc(collection(db, 'branches'), { name, createdAt: new Date().toISOString() });
@@ -780,5 +780,5 @@ export const stopFinanceStoreListeners = () => {
   unsubscribers.forEach(unsub => unsub());
   unsubscribers = [];
   clearSubListeners();
-  useFinanceStore.setState({ isLoaded: false, fixedBalance: 0, bankBalances: [], debts: [], savings: [], branches: [] });
+  useFinanceStore.setState({ isLoaded: false, fixedBalance: 0, bankBalances: [], debts: [], savings: [], branches: [], voucherRecaps: [] });
 };

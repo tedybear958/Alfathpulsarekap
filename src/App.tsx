@@ -43,12 +43,16 @@ export default function App() {
   return (
     <Layout activeTab={activeTab} setActiveTab={setActiveTab} role={role}>
       <NotificationManager />
-      {activeTab === 'dashboard' && <Dashboard />}
+      {activeTab === 'dashboard' && (
+        <Dashboard 
+          onNavigate={(tab) => setActiveTab(tab as any)} 
+        />
+      )}
       {activeTab === 'debts' && <Debts />}
       {activeTab === 'savings' && <Savings />}
       {activeTab === 'deposits' && <Deposits />}
       {activeTab === 'vouchers' && <VoucherRecaps />}
-      {activeTab === 'team' && role === 'bos' && <Team />}
+      {activeTab === 'team' && (role === 'bos' || role === 'mandor') && <Team />}
       {activeTab === 'sop' && <SOPPage />}
     </Layout>
   );
