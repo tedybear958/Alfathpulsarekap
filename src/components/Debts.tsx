@@ -113,13 +113,13 @@ export function Debts() {
     }
   };
 
-  const canEdit = !!branchId;
+  const canEdit = role === 'bos' || !!branchId;
 
   if (selectedPerson) {
     const totalDebt = store.getPersonTotalDebt(selectedPerson);
     
     return (
-      <div className="flex flex-col min-h-full bg-asphalt-900 pb-32">
+      <div className="flex flex-col min-h-full bg-asphalt-900 pb-40">
         <header className="bg-asphalt-800 px-5 py-4 flex items-center gap-4 shadow-xl border-b border-asphalt-700/50 sticky top-0 z-20">
           <button 
             onClick={() => setSelectedPersonId(null)}
@@ -284,7 +284,7 @@ export function Debts() {
   }
 
   return (
-    <div className="p-5 space-y-7 bg-asphalt-900 min-h-full pb-32">
+    <div className="p-5 space-y-7 bg-asphalt-900 min-h-full pb-40">
       {/* Summary Header */}
       <div className="bg-asphalt-800 rounded-[2.5rem] p-7 border border-asphalt-700/50 shadow-2xl relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/10 rounded-full -mr-32 -mt-32 blur-[100px] group-hover:bg-rose-500/20 transition-all duration-1000"></div>

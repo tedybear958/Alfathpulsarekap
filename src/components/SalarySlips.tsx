@@ -142,6 +142,19 @@ export function SalarySlips() {
 
   const handleDelete = async () => {
     if (!deleteConfirm.id) return;
+    
+    if (deleteConfirm.id === 'ALL') {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'salarySlips'));
+        const deletePromises = querySnapshot.docs.map(d => deleteDoc(doc(db, 'salarySlips', d.id)));
+        await Promise.all(deletePromises);
+        setDeleteConfirm({ isOpen: false, id: '', name: '' });
+      } catch (error) {
+        handleFirestoreError(error, OperationType.DELETE, 'salarySlips-all');
+      }
+      return;
+    }
+
     try {
       await deleteDoc(doc(db, 'salarySlips', deleteConfirm.id));
       setDeleteConfirm({ isOpen: false, id: '', name: '' });
@@ -163,7 +176,7 @@ export function SalarySlips() {
   }
 
   return (
-    <div className="p-5 space-y-6 bg-asphalt-900 min-h-screen pb-32">
+    <div className="p-5 space-y-6 bg-asphalt-900 min-h-screen pb-40">
       {/* Mini Header */}
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-3">
@@ -175,15 +188,25 @@ export function SalarySlips() {
             <p className="text-[10px] text-asphalt-text-400 font-bold uppercase tracking-widest">{slips.length} Tersedia</p>
           </div>
         </div>
-        {isBos && !isAdding && (
-          <button
-            onClick={() => setIsAdding(true)}
-            className="px-4 py-2 bg-brand-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-600 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-brand-500/20"
-          >
-            <Plus className="w-4 h-4 stroke-[3px]" />
-            BUAT
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {isBos && slips.length > 0 && !isAdding && (
+            <button
+              onClick={() => setDeleteConfirm({ isOpen: true, id: 'ALL', name: 'SEMUA SLIP GAJI' })}
+              className="px-3 py-2 bg-asphalt-800 text-rose-500 border border-asphalt-700/50 rounded-xl text-[8px] font-black uppercase tracking-widest hover:bg-asphalt-700 transition-all"
+            >
+              BERSIHKAN
+            </button>
+          )}
+          {isBos && !isAdding && (
+            <button
+              onClick={() => setIsAdding(true)}
+              className="px-4 py-2 bg-brand-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-600 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-brand-500/20"
+            >
+              <Plus className="w-4 h-4 stroke-[3px]" />
+              BUAT
+            </button>
+          )}
+        </div>
       </div>
 
       {isAdding && (
