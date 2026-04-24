@@ -13,13 +13,14 @@ import { VoucherRecaps } from './components/VoucherRecaps';
 import { Login } from './components/Login';
 import { Team } from './components/Team';
 import { SOPPage } from './components/SOPPage';
+import { SalarySlips } from './components/SalarySlips';
 import { NotificationManager } from './components/NotificationManager';
 import { useAuthStore } from './store/authStore';
 import { initFinanceStoreListeners } from './hooks/useFinanceStore';
 
 export default function App() {
   const { user, isAuthLoaded, role } = useAuthStore();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'debts' | 'savings' | 'deposits' | 'team' | 'vouchers' | 'sop'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'debts' | 'savings' | 'deposits' | 'team' | 'vouchers' | 'sop' | 'salary-slips'>('dashboard');
 
   useEffect(() => {
     if (user && role) {
@@ -54,6 +55,7 @@ export default function App() {
       {activeTab === 'vouchers' && <VoucherRecaps />}
       {activeTab === 'team' && (role === 'bos' || role === 'mandor') && <Team />}
       {activeTab === 'sop' && <SOPPage />}
+      {activeTab === 'salary-slips' && <SalarySlips />}
     </Layout>
   );
 }

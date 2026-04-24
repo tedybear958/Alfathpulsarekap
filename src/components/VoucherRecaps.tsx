@@ -394,7 +394,7 @@ export function VoucherRecaps() {
   const selectedBranch = branches.find(b => b.id === selectedBranchId);
 
   return (
-    <div className="p-5 space-y-7 bg-asphalt-900 min-h-screen">
+    <div className="p-5 space-y-7 bg-asphalt-900 min-h-screen pb-32">
       {/* Header */}
       <div className="bg-asphalt-800 rounded-[2.5rem] p-7 text-white shadow-2xl relative overflow-hidden border border-asphalt-700 group">
         <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/10 rounded-full -mr-24 -mt-24 blur-[100px] group-hover:bg-brand-500/20 transition-all duration-1000"></div>

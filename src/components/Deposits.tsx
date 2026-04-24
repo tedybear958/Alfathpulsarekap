@@ -119,7 +119,7 @@ export function Deposits() {
   };
 
   return (
-    <div className="p-5 space-y-7 bg-asphalt-900 min-h-screen">
+    <div className="p-5 space-y-7 bg-asphalt-900 min-h-screen pb-32">
       <DepositAnalytics />
 
       {/* Summary Header */}

@@ -106,3 +106,23 @@ export interface UserProfile {
   createdAt: string;
 }
 
+export interface SalarySlip {
+  id: string;
+  userId: string;
+  userName: string;
+  role: string;
+  branchId?: string;
+  branchName?: string;
+  month: number;
+  year: number;
+  baseSalary: number;
+  bonus: number;
+  deductions: number;
+  netSalary: number;
+  status: 'pending' | 'paid';
+  createdAt: string;
+  paidAt?: string;
+  createdBy: string;
+  createdByName?: string;
+}
+

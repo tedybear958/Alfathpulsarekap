@@ -112,6 +112,29 @@
         "status": { "type": "string", "enum": ["pending", "verified"] }
       },
       "required": ["totalSetor", "sisaSetor", "berhasilDisetor", "destination", "description", "date"]
+    },
+    "SalarySlip": {
+      "title": "SalarySlip",
+      "description": "Monthly salary slip for employee or mandor",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "role": { "type": "string" },
+        "branchId": { "type": "string" },
+        "branchName": { "type": "string" },
+        "month": { "type": "number" },
+        "year": { "type": "number" },
+        "baseSalary": { "type": "number" },
+        "bonus": { "type": "number" },
+        "deductions": { "type": "number" },
+        "netSalary": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "paid"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "paidAt": { "type": "string", "format": "date-time" },
+        "createdBy": { "type": "string" }
+      },
+      "required": ["userId", "userName", "month", "year", "baseSalary", "netSalary", "status"]
     }
   },
   "firestore": {
@@ -142,6 +165,10 @@
     "/branches/{branchId}/deposits/{depositId}": {
       "schema": { "$ref": "#/entities/BranchDeposit" },
       "description": "Deposits for a branch"
+    },
+    "/salarySlips/{slipId}": {
+      "schema": { "$ref": "#/entities/SalarySlip" },
+      "description": "Employee salary slips"
     }
   }
 }

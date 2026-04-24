@@ -120,7 +120,7 @@ export function Savings() {
     const totalSavings = store.getPersonTotalSavings(selectedPerson);
     
     return (
-      <div className="flex flex-col h-full bg-asphalt-900">
+      <div className="flex flex-col min-h-full bg-asphalt-900 pb-32">
         <header className="bg-asphalt-800 px-5 py-4 flex items-center gap-4 shadow-xl border-b border-asphalt-700/50 sticky top-0 z-20">
           <button 
             onClick={() => setSelectedPersonId(null)}
@@ -243,7 +243,7 @@ export function Savings() {
                               {canEdit && (
                                 <button
                                   onClick={() => setDeleteConfirm({ isOpen: true, type: 'transaction', personId: selectedPerson.id, transactionId: transaction.id, name: transaction.description })}
-                                  className="p-1.5 text-asphalt-text-400 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all"
+                                  className="p-1.5 text-asphalt-text-400 hover:text-rose-500 transition-all"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
@@ -338,7 +338,7 @@ export function Savings() {
   }
 
   return (
-    <div className="p-5 space-y-7 bg-asphalt-900 min-h-full">
+    <div className="p-5 space-y-7 bg-asphalt-900 min-h-full pb-32">
       {/* Summary Header */}
       <div className="bg-asphalt-800 rounded-[2.5rem] p-7 border border-asphalt-700/50 shadow-2xl relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full -mr-32 -mt-32 blur-[100px] group-hover:bg-emerald-500/20 transition-all duration-1000"></div>
@@ -520,7 +520,7 @@ export function Savings() {
                             </p>
                           </div>
                           {canEdit && (
-                            <button onClick={() => setDeleteConfirm({ isOpen: true, type: 'person', personId: person.id, name: person.personName })} className="p-2.5 text-asphalt-text-400 hover:text-rose-500 bg-asphalt-700/30 rounded-xl transition-all opacity-0 group-hover:opacity-100">
+                            <button onClick={() => setDeleteConfirm({ isOpen: true, type: 'person', personId: person.id, name: person.personName })} className="p-2.5 text-asphalt-text-400 hover:text-rose-500 bg-asphalt-700/30 rounded-xl transition-all">
                               <Trash2 className="w-4 h-4" />
                             </button>
                           )}

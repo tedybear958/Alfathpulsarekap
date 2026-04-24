@@ -3,7 +3,7 @@ import { BookOpen, AlertCircle, CheckCircle, Shield, Clock } from 'lucide-react'
 
 export const SOPPage: React.FC = () => {
   return (
-    <div className="p-5 pb-24 space-y-7 bg-asphalt-900 min-h-screen">
+    <div className="p-5 pb-32 space-y-7 bg-asphalt-900 min-h-screen">
       <div className="bg-asphalt-800 p-7 rounded-[2.5rem] shadow-2xl border border-asphalt-700 relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/10 rounded-full -mr-32 -mt-32 blur-[100px] group-hover:bg-brand-500/20 transition-all duration-1000"></div>
         <div className="relative z-10">

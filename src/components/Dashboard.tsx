@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useFinanceStore } from '../hooks/useFinanceStore';
 import { useAuthStore } from '../store/authStore';
 import { formatRupiah, formatNumberInput, formatDate } from '../utils/formatters';
-import { Building2, Plus, Trash2, Landmark, Receipt, Coins, Edit3, Check, Send, PiggyBank, Users, Ticket, Store, BookOpen, MoreHorizontal, History as HistoryIcon, UserCog, X } from 'lucide-react';
+import { Building2, Plus, Trash2, Landmark, Receipt, Coins, Edit3, Check, Send, PiggyBank, Users, Ticket, Store, BookOpen, MoreHorizontal, History as HistoryIcon, UserCog, X, FileText } from 'lucide-react';
 import { ConfirmModal } from './ConfirmModal';
 
 interface ServiceIconProps {
@@ -221,7 +221,7 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
   };
 
   return (
-    <div className="p-5 space-y-6">
+    <div className="p-5 space-y-6 pb-32">
       {/* Announcement Editor for Bos */}
       {isBosGlobal && (
         <div className="bg-asphalt-800 rounded-3xl p-5 border border-asphalt-700/50 shadow-xl overflow-hidden relative group transition-all hover:border-brand-500/30">
@@ -393,9 +393,9 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
             onClick={() => onNavigate?.('team')}
           />
           <ServiceIcon 
-            icon={<div className="grid grid-cols-2 gap-1"><div className="w-2.5 h-2.5 bg-asphalt-700 rounded-[3px]"></div><div className="w-2.5 h-2.5 bg-asphalt-700 rounded-[3px]"></div><div className="w-2.5 h-2.5 bg-asphalt-700 rounded-[3px]"></div><div className="w-2.5 h-2.5 bg-asphalt-700 rounded-[3px]"></div></div>} 
-            label="Lainnya" 
-            onClick={() => {}}
+            icon={<FileText className="w-6 h-6 text-brand-500" />} 
+            label="Slip Gaji" 
+            onClick={() => onNavigate?.('salary-slips')}
           />
         </div>
       </div>
