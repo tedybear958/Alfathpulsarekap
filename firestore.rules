@@ -13,10 +13,15 @@ service cloud.firestore {
       );
     }
 
-    // Aturan khusus untuk Salary Slips
-    match /salarySlips/{slipId} {
+    // Aturan khusus untuk Salary Slips - Izinkan baca untuk semua yang login
+    match /salarySlips/{document=**} {
       allow read: if isAuthenticated();
       allow write: if isBos();
+    }
+
+    // Aturan khusus untuk Users - Izinkan list untuk Bos
+    match /users/{document=**} {
+      allow read: if isAuthenticated();
     }
 
     // ===============================================================

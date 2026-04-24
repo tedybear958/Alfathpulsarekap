@@ -115,6 +115,7 @@ export function Savings() {
   };
 
   const canEdit = role === 'bos' || !!branchId;
+  const canDelete = !!branchId; // Hanya karyawan/mandor di cabang yang bisa hapus
 
   if (selectedPerson) {
     const totalSavings = store.getPersonTotalSavings(selectedPerson);
@@ -240,14 +241,14 @@ export function Savings() {
                               {formatRupiah(transaction.balance)}
                             </td>
                             <td className="p-2 text-center">
-                              {canEdit && (
-                                <button
-                                  onClick={() => setDeleteConfirm({ isOpen: true, type: 'transaction', personId: selectedPerson.id, transactionId: transaction.id, name: transaction.description })}
-                                  className="p-1.5 text-asphalt-text-400 hover:text-rose-500 transition-all"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                              )}
+                        {canDelete && (
+                          <button
+                            onClick={() => setDeleteConfirm({ isOpen: true, type: 'transaction', personId: selectedPerson.id, transactionId: transaction.id, name: transaction.description })}
+                            className="p-1.5 text-asphalt-text-400 hover:text-rose-500 transition-all"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
                             </td>
                           </tr>
                         ));
@@ -519,7 +520,7 @@ export function Savings() {
                               {formatRupiah(total)}
                             </p>
                           </div>
-                          {canEdit && (
+                          {canDelete && (
                             <button onClick={() => setDeleteConfirm({ isOpen: true, type: 'person', personId: person.id, name: person.personName })} className="p-2.5 text-asphalt-text-400 hover:text-rose-500 bg-asphalt-700/30 rounded-xl transition-all">
                               <Trash2 className="w-4 h-4" />
                             </button>

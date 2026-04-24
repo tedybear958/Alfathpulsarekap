@@ -114,6 +114,7 @@ export function Debts() {
   };
 
   const canEdit = role === 'bos' || !!branchId;
+  const canDelete = !!branchId; // Hanya karyawan/mandor di cabang yang bisa hapus
 
   if (selectedPerson) {
     const totalDebt = store.getPersonTotalDebt(selectedPerson);
@@ -212,7 +213,7 @@ export function Debts() {
                         <p className={`text-base font-black ${detail.type === 'add' ? 'text-rose-500' : 'text-emerald-500'}`}>
                           {detail.type === 'add' ? '+' : '-'}{formatRupiah(detail.amount)}
                         </p>
-                        {canEdit && (
+                        {canDelete && (
                           <button
                             onClick={() => setDeleteConfirm({ isOpen: true, type: 'detail', personId: selectedPerson.id, detailId: detail.id, name: detail.description })}
                             className="text-[9px] font-black text-rose-500/50 hover:text-rose-500 uppercase tracking-widest mt-1 transition-all"
@@ -450,7 +451,7 @@ export function Debts() {
                           {formatRupiah(total)}
                         </p>
                       </div>
-                      {canEdit && (
+                      {canDelete && (
                         <button
                           onClick={() => setDeleteConfirm({ isOpen: true, type: 'person', personId: person.id, name: person.personName })}
                           className="p-2.5 text-asphalt-text-400 hover:text-rose-500 bg-asphalt-700/30 hover:bg-asphalt-700 rounded-xl transition-all"
