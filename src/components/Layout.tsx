@@ -197,7 +197,7 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
                   <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand-500 rounded-full"></div>
                 )}
               </div>
-              <span className={`text-[10px] font-black tracking-tight uppercase ${activeTab === 'savings' || activeTab === 'debts' ? 'text-brand-500' : 'opacity-70'}`}>Dompet</span>
+              <span className={`text-[10px] font-black tracking-tight uppercase ${activeTab === 'savings' || activeTab === 'debts' ? 'text-brand-500' : 'opacity-70'}`}>Tabungan</span>
             </button>
 
             {/* Aktivitas (Riwayat) */}
@@ -213,7 +213,7 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
                   <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand-500 rounded-full"></div>
                 )}
               </div>
-              <span className={`text-[10px] font-black tracking-tight uppercase ${activeTab === 'vouchers' ? 'text-brand-500' : 'opacity-70'}`}>Pesanan</span>
+              <span className={`text-[10px] font-black tracking-tight uppercase ${activeTab === 'vouchers' ? 'text-brand-500' : 'opacity-70'}`}>Rekapan</span>
             </button>
 
             {/* Akun/Tim */}
