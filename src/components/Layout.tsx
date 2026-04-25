@@ -74,13 +74,20 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
             </div>
           </div>
           <div className="flex items-center gap-2">
-              <button
-                onClick={() => setActiveTab('sop')}
-                className="p-2.5 bg-asphalt-800 hover:bg-asphalt-700 rounded-2xl transition-all border border-asphalt-700/50"
-                title="Panduan SOP"
-              >
-                <BookOpen className="w-5 h-5 text-asphalt-text-100" />
-              </button>
+            <button
+              onClick={() => setShowThemePicker(true)}
+              className="p-2.5 bg-asphalt-800 hover:bg-asphalt-700 rounded-2xl transition-all border border-asphalt-700/50"
+              title="Pilih Tema"
+            >
+              <Palette className="w-5 h-5 text-brand-500" />
+            </button>
+            <button
+              onClick={() => setActiveTab('sop')}
+              className="p-2.5 bg-asphalt-800 hover:bg-asphalt-700 rounded-2xl transition-all border border-asphalt-700/50"
+              title="Panduan SOP"
+            >
+              <BookOpen className="w-5 h-5 text-asphalt-text-100" />
+            </button>
             <button
               onClick={logout}
               className="p-2.5 bg-asphalt-800 hover:bg-asphalt-700 rounded-2xl transition-all border border-asphalt-700/50"
@@ -92,7 +99,7 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
         </header>
         
         {/* Running Text / Announcement */}
-        {announcement && (
+        { (announcement || "Buaya darat makan pepaya, makannya pelan di atas peti. Ayo kerja jangan hanya gaya, pikirkan keselamatan, dan tetap teliti!") && (
           <div className="bg-asphalt-800 border-b border-asphalt-700 flex items-center overflow-hidden h-10 shadow-lg">
             <div className="bg-brand-500 self-stretch px-4 flex items-center z-10 shadow-[8px_0_15px_rgba(0,0,0,0.3)]">
               <AlertCircle className="w-4 h-4 text-white animate-pulse" />
@@ -101,20 +108,20 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
             <div className="flex-1 overflow-hidden relative flex items-center h-full bg-asphalt-900/50">
               <div className="flex whitespace-nowrap animate-marquee py-1">
                 <span className="text-xs font-black text-white px-10 uppercase tracking-wide">
-                  {announcement}
+                  {announcement || "Buaya darat makan pepaya, makannya pelan di atas peti. Ayo kerja jangan hanya gaya, pikirkan keselamatan, dan tetap teliti!"}
                 </span>
                 {/* Duplicate for seamless loop */}
                 <span className="text-xs font-black text-white px-10 uppercase tracking-wide">
-                  {announcement}
+                  {announcement || "Buaya darat makan pepaya, makannya pelan di atas peti. Ayo kerja jangan hanya gaya, pikirkan keselamatan, dan tetap teliti!"}
                 </span>
                 <span className="text-xs font-black text-white px-10 uppercase tracking-wide">
-                  {announcement}
+                  {announcement || "Buaya darat makan pepaya, makannya pelan di atas peti. Ayo kerja jangan hanya gaya, pikirkan keselamatan, dan tetap teliti!"}
                 </span>
               </div>
             </div>
           </div>
         )}
-
+      
         {/* Theme Picker Overlay */}
         {showThemePicker && (
           <div className="absolute inset-0 z-40 bg-black/60 backdrop-blur-md flex flex-col justify-end">

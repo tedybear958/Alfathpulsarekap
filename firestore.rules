@@ -2,26 +2,30 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // ===============================================================
-    // SAKTI RULES - PRIORITAS UTAMA
+    // SACRED RULES & ADMIN ACCESS
     // ===============================================================
 
-    // Izinkan akses mutlak untuk Anda (Admin)
     match /{document=**} {
-      allow read, write: if request.auth != null && (
-        request.auth.token.email == "alfathpulsa27@gmail.com" ||
-        request.auth.uid == "RU9vfuH9VyS6arM2kRFJ9eEpAeL2"
-      );
-    }
-
-    // Aturan khusus untuk Salary Slips - Izinkan baca untuk semua yang login
-    match /salarySlips/{document=**} {
-      allow read: if isAuthenticated();
+      allow read: if true;
       allow write: if isBos();
     }
 
-    // Aturan khusus untuk Users - Izinkan list untuk Bos
-    match /users/{document=**} {
+    match /salarySlips {
       allow read: if isAuthenticated();
+      match /{slipId} {
+        allow read: if isAuthenticated();
+        allow write: if isBos();
+      }
+    }
+
+    match /users {
+      allow read: if isAuthenticated();
+      match /{userId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated() && request.auth.uid == userId;
+        allow update: if isAuthenticated() && (request.auth.uid == userId || isBos());
+        allow delete: if isBos();
+      }
     }
 
     // ===============================================================
@@ -70,17 +74,6 @@ service cloud.firestore {
         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('branchId', null) == branchId)
       );
-    }
-
-    // ===============================================================
-    // Rules Sakti
-    // ===============================================================
-
-    match /users/{userId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && request.auth.uid == userId;
-      allow update: if isAuthenticated() && (request.auth.uid == userId || isBos());
-      allow delete: if isBos();
     }
 
     match /settings/{settingId} {
@@ -141,9 +134,5 @@ service cloud.firestore {
       );
     }
 
-    // Default deny at the end
-    match /{document=**} {
-      allow read, write: if false;
-    }
   }
 }
