@@ -18,14 +18,25 @@ service cloud.firestore {
 
     // Collection: salarySlips
     match /salarySlips/{document=**} {
-      allow read: if isAuthenticated();
+      allow read: if isAuthenticated() && (
+        isBosGlobal() || 
+        (resource.data.branchId != null && isAssignedToBranch(resource.data.branchId)) || 
+        resource.data.userId == request.auth.uid
+      );
       allow write: if isBos();
     }
 
     // Collection: users
     match /users/{userId} {
       allow read: if isAuthenticated();
-      allow write: if isBos() || (isAuthenticated() && request.auth.uid == userId);
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isBos() || (
+        isAuthenticated() && request.auth.uid == userId && 
+        request.resource.data.get('role', 'karyawan') == resource.data.get('role', 'karyawan') &&
+        request.resource.data.get('branchId', '') == resource.data.get('branchId', '') &&
+        request.resource.data.get('baseSalary', 0) == resource.data.get('baseSalary', 0)
+      );
+      allow delete: if isBos();
     }
     match /users/{userId}/{document=**} {
       allow read: if isAuthenticated();

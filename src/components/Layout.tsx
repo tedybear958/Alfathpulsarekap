@@ -225,20 +225,22 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
             </button>
 
             {/* Akun/Tim */}
-            <button
-              onClick={() => setActiveTab('team')}
-              className={`flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all active:scale-90 ${
-                activeTab === 'team' || activeTab === 'sop' ? 'text-brand-500' : 'text-asphalt-text-400 hover:text-asphalt-text-100'
-              }`}
-            >
-              <div className="relative">
-                <Users className={`w-6 h-6 ${activeTab === 'team' || activeTab === 'sop' ? 'stroke-[2.5px]' : 'stroke-2'}`} />
-                {(activeTab === 'team' || activeTab === 'sop') && (
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand-500 rounded-full"></div>
-                )}
-              </div>
-              <span className={`text-[10px] font-black tracking-tight uppercase ${activeTab === 'team' || activeTab === 'sop' ? 'text-brand-500' : 'opacity-70'}`}>Akun</span>
-            </button>
+            {checkIsBos(user, role) && (
+              <button
+                onClick={() => setActiveTab('team')}
+                className={`flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all active:scale-90 ${
+                  activeTab === 'team' || activeTab === 'sop' ? 'text-brand-500' : 'text-asphalt-text-400 hover:text-asphalt-text-100'
+                }`}
+              >
+                <div className="relative">
+                  <Users className={`w-6 h-6 ${activeTab === 'team' || activeTab === 'sop' ? 'stroke-[2.5px]' : 'stroke-2'}`} />
+                  {(activeTab === 'team' || activeTab === 'sop') && (
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand-500 rounded-full"></div>
+                  )}
+                </div>
+                <span className={`text-[10px] font-black tracking-tight uppercase ${activeTab === 'team' || activeTab === 'sop' ? 'text-brand-500' : 'opacity-70'}`}>Akun</span>
+              </button>
+            )}
             
           </div>
         </nav>

@@ -57,7 +57,7 @@ export default function App() {
       {activeTab === 'savings' && <Savings />}
       {activeTab === 'deposits' && <Deposits />}
       {activeTab === 'vouchers' && <VoucherRecaps />}
-      {activeTab === 'team' && (isBos || isMandor) && <Team />}
+      {activeTab === 'team' && isBos && <Team />}
       {activeTab === 'sop' && <SOPPage />}
       {activeTab === 'salary-slips' && <SalarySlips />}
     </Layout>

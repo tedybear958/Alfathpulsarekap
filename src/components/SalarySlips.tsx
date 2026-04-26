@@ -14,7 +14,7 @@ export function SalarySlips() {
   const [slips, setSlips] = useState<SalarySlip[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { user, role, isAuthLoaded } = useAuthStore();
+  const { user, role, branchId: currentUserBranchId, isAuthLoaded } = useAuthStore();
   const { branches } = useFinanceStore();
   
   const uid = user?.uid;
@@ -40,19 +40,29 @@ export function SalarySlips() {
   });
 
   const isBos = checkIsBos(user, role);
+  // Bos Pusat (Global) adalah Bos tanpa branchId
+  const isGlobalBos = isBos && !currentUserBranchId;
 
   const [batchMonth, setBatchMonth] = useState(new Date().getMonth() + 1);
   const [batchYear, setBatchYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
-    if (!isAuthLoaded || !uid) return;
+    if (!isAuthLoaded) return;
+    
+    if (!uid) {
+      setIsLoading(false);
+      return;
+    }
 
     let isMounted = true;
     let q;
     
-    // Gunakan filter jika bukan bos, tapi jika email adalah admin, langsung tampilkan semua
     if (isBos) {
-      q = query(collection(db, 'salarySlips'));
+      if (isGlobalBos) {
+        q = query(collection(db, 'salarySlips'));
+      } else {
+        q = query(collection(db, 'salarySlips'), where('branchId', '==', currentUserBranchId));
+      }
     } else {
       q = query(collection(db, 'salarySlips'), where('userId', '==', uid));
     }
@@ -75,7 +85,14 @@ export function SalarySlips() {
     });
 
     if (isBos) {
-      const unsubUsers = onSnapshot(collection(db, 'users'), (snapshot) => {
+      let usersQuery;
+      if (isGlobalBos) {
+        usersQuery = query(collection(db, 'users'));
+      } else {
+        usersQuery = query(collection(db, 'users'), where('branchId', '==', currentUserBranchId));
+      }
+
+      const unsubUsers = onSnapshot(usersQuery, (snapshot) => {
         if (!isMounted) return;
         const usersData = snapshot.docs.map(doc => ({ ...doc.data(), uid: doc.id } as UserProfile));
         setUsers(usersData.filter(u => u.role !== 'bos'));
@@ -88,7 +105,7 @@ export function SalarySlips() {
     }
 
     return () => { isMounted = false; unsub(); };
-  }, [isBos, uid, isAuthLoaded]);
+  }, [isBos, isGlobalBos, currentUserBranchId, uid, isAuthLoaded]);
 
   const handleBatchGenerate = async () => {
     if (!isBos || users.length === 0) return;
@@ -333,7 +350,7 @@ export function SalarySlips() {
             <button onClick={() => setIsAdding(false)} className="text-asphalt-text-400 p-2"><ArrowLeft className="w-5 h-5" /></button>
           </div>
 
-          <form onSubmit={handleAddSlip} className="space-y-6">
+                  <form onSubmit={handleAddSlip} className="space-y-6">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Pilih Anggota</label>
               <select
@@ -344,7 +361,7 @@ export function SalarySlips() {
               >
                 <option value="">-- Pilih Karyawan/Mandor --</option>
                 {users.map(u => (
-                  <option key={u.uid} value={u.uid}>{u.name.toUpperCase()} ({u.role.toUpperCase()})</option>
+                  <option key={u.uid} value={u.uid}>{(u.name || 'TANPA NAMA').toUpperCase()} ({(u.role || 'ROLE').toUpperCase()})</option>
                 ))}
               </select>
             </div>
@@ -450,7 +467,7 @@ export function SalarySlips() {
                         {slip.status === 'paid' ? <Check className="w-5 h-5 stroke-[3px]" /> : <Clock className="w-5 h-5" />}
                       </div>
                       <div>
-                        <h4 className="text-xs font-black text-white uppercase tracking-tight">{slip.userName}</h4>
+                        <h4 className="text-xs font-black text-white uppercase tracking-tight">{slip.userName || 'Karyawan'}</h4>
                         <p className="text-[9px] text-asphalt-text-400 font-bold uppercase tracking-widest mt-0.5">
                           {getMonthName(slip.month)} {slip.year}
                         </p>
