@@ -6,6 +6,7 @@ import { logout } from '../firebase';
 import { useFinanceStore } from '../hooks/useFinanceStore';
 import { useAuthStore } from '../store/authStore';
 import { useThemeStore, ThemeColor } from '../store/themeStore';
+import { checkIsBos, checkIsMandor } from '../utils/authUtils';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -66,8 +67,8 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
               <div className="flex items-center gap-1.5 mt-1.5">
                 <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
                 <p className="text-[10px] text-asphalt-text-400 font-bold uppercase tracking-wider">
-                  {role === 'bos' ? (branchId ? `Bos - ${branchName}` : 'Bos - Pusat') : 
-                   role === 'mandor' ? `Mandor - ${branchName}` : 
+                  {checkIsBos(user, role) ? (branchId ? `Bos - ${branchName}` : 'Bos - Pusat') : 
+                   checkIsMandor(role) ? `Mandor - ${branchName}` : 
                    branchId ? `Karyawan - ${branchName}` : 'Karyawan'}
                 </p>
               </div>
@@ -99,7 +100,7 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
         </header>
         
         {/* Running Text / Announcement */}
-        { (announcement || "Buaya darat makan pepaya, makannya pelan di atas peti. Ayo kerja jangan hanya gaya, pikirkan keselamatan, dan tetap teliti!") && (
+        {announcement && (
           <div className="bg-asphalt-800 border-b border-asphalt-700 flex items-center overflow-hidden h-10 shadow-lg">
             <div className="bg-brand-500 self-stretch px-4 flex items-center z-10 shadow-[8px_0_15px_rgba(0,0,0,0.3)]">
               <AlertCircle className="w-4 h-4 text-white animate-pulse" />
@@ -108,14 +109,14 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
             <div className="flex-1 overflow-hidden relative flex items-center h-full bg-asphalt-900/50">
               <div className="flex whitespace-nowrap animate-marquee py-1">
                 <span className="text-xs font-black text-white px-10 uppercase tracking-wide">
-                  {announcement || "Buaya darat makan pepaya, makannya pelan di atas peti. Ayo kerja jangan hanya gaya, pikirkan keselamatan, dan tetap teliti!"}
+                  {announcement}
                 </span>
                 {/* Duplicate for seamless loop */}
                 <span className="text-xs font-black text-white px-10 uppercase tracking-wide">
-                  {announcement || "Buaya darat makan pepaya, makannya pelan di atas peti. Ayo kerja jangan hanya gaya, pikirkan keselamatan, dan tetap teliti!"}
+                  {announcement}
                 </span>
                 <span className="text-xs font-black text-white px-10 uppercase tracking-wide">
-                  {announcement || "Buaya darat makan pepaya, makannya pelan di atas peti. Ayo kerja jangan hanya gaya, pikirkan keselamatan, dan tetap teliti!"}
+                  {announcement}
                 </span>
               </div>
             </div>

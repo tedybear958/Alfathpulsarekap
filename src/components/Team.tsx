@@ -5,22 +5,24 @@ import { Shield, UserCog, User as UserIcon, Trash2, Store, Plus, Check, Phone, S
 import { useFinanceStore } from '../hooks/useFinanceStore';
 import { useAuthStore } from '../store/authStore';
 import { UserProfile } from '../types';
+import { checkIsBos } from '../utils/authUtils';
 import { ConfirmModal } from './ConfirmModal';
 import { sendWhatsAppMessage } from '../services/whatsappService';
 
 export function Team() {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { branchId, role: currentUserRole } = useAuthStore();
+  const { user, branchId, role: currentUserRole } = useAuthStore();
   const { branches, addBranch, deleteBranch } = useFinanceStore();
   const [newBranchName, setNewBranchName] = useState('');
   
   const [editingBranch, setEditingBranch] = useState<{ id: string; capital: string; physicalCapital: string } | null>(null);
   const [editingPhone, setEditingPhone] = useState<{ uid: string; phone: string } | null>(null);
+  const [editingSalary, setEditingSalary] = useState<{ uid: string; salary: string } | null>(null);
   const [isBroadcasting, setIsBroadcasting] = useState(false);
   const [broadcastStatus, setBroadcastStatus] = useState<{ total: number; success: number; failed: number } | null>(null);
 
-  const isBos = currentUserRole === 'bos';
+  const isBos = checkIsBos(user, currentUserRole);
   
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; type: 'user' | 'branch'; id: string; name: string }>({
     isOpen: false,
@@ -56,6 +58,16 @@ export function Team() {
     try {
       await updateDoc(doc(db, 'users', uid), { phone });
       setEditingPhone(null);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `users/${uid}`);
+    }
+  };
+  
+  const handleSalaryChange = async (uid: string, salary: string) => {
+    const val = parseInt(salary.replace(/\D/g, ''), 10);
+    try {
+      await updateDoc(doc(db, 'users', uid), { baseSalary: val });
+      setEditingSalary(null);
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `users/${uid}`);
     }
@@ -473,6 +485,40 @@ export function Team() {
                               {user.phone || 'BELUM DIATUR'}
                             </span>
                             <Phone className="w-4 h-4 text-asphalt-text-400 group-hover:text-brand-500 transition-colors" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[9px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Gaji Pokok Default</label>
+                      <div className="flex items-center gap-3">
+                        {editingSalary?.uid === user.uid ? (
+                          <>
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              className="flex-1 px-5 py-4 text-xs bg-asphalt-900 border border-brand-500/30 rounded-2xl outline-none focus:ring-2 focus:ring-brand-500 text-white font-black shadow-inner"
+                              value={editingSalary.salary.replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
+                              onChange={(e) => setEditingSalary({ ...editingSalary, salary: e.target.value.replace(/\D/g, '') })}
+                              autoFocus
+                            />
+                            <button
+                              onClick={() => handleSalaryChange(user.uid, editingSalary.salary)}
+                              className="h-14 w-14 bg-emerald-500 text-white rounded-2xl hover:bg-emerald-600 transition-all shadow-lg active:scale-90 flex items-center justify-center shrink-0"
+                            >
+                              <Check className="w-6 h-6 stroke-[3px]" />
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => setEditingSalary({ uid: user.uid, salary: (user.baseSalary || 2000000).toString() })}
+                            className="flex-1 flex items-center justify-between px-5 py-4 bg-asphalt-900 rounded-2xl text-[11px] font-black uppercase tracking-widest text-white hover:bg-asphalt-700 transition-all group border border-asphalt-700 shadow-inner"
+                          >
+                            <span className="text-emerald-500 font-black">
+                              {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(user.baseSalary || 2000000)}
+                            </span>
+                            <Plus className="w-4 h-4 text-asphalt-text-400 group-hover:text-emerald-500 transition-colors" />
                           </button>
                         )}
                       </div>

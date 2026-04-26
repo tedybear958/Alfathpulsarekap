@@ -103,6 +103,7 @@ export interface UserProfile {
   role: 'bos' | 'mandor' | 'karyawan';
   branchId: string | null;
   phone?: string;
+  baseSalary?: number;
   createdAt: string;
 }
 

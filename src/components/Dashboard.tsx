@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useFinanceStore } from '../hooks/useFinanceStore';
 import { useAuthStore } from '../store/authStore';
+import { checkIsBos } from '../utils/authUtils';
 import { formatRupiah, formatNumberInput, formatDate } from '../utils/formatters';
 import { Building2, Plus, Trash2, Landmark, Receipt, Coins, Edit3, Check, Send, PiggyBank, Users, Ticket, Store, BookOpen, MoreHorizontal, History as HistoryIcon, UserCog, X, FileText } from 'lucide-react';
 import { ConfirmModal } from './ConfirmModal';
@@ -38,7 +39,7 @@ function ServiceIcon({ icon, label, onClick, badge }: ServiceIconProps) {
 
 export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }) {
   const store = useFinanceStore();
-  const { role, branchId } = useAuthStore();
+  const { user, role, branchId } = useAuthStore();
   const [isEditingFixed, setIsEditingFixed] = useState(false);
   const [fixedInput, setFixedInput] = useState('');
   
@@ -108,6 +109,8 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
       ? (store.bankBalances || []).reduce((sum, b) => sum + (Number(b.balance) || 0), 0)
       : (store.bankBalances || []).filter(b => b.branchId === branchId).reduce((sum, b) => sum + (Number(b.balance) || 0), 0)
   , [isBosGlobal, store.bankBalances, branchId]);
+
+  const isBos = checkIsBos(user, role);
     
   const currentDebtTotal = useMemo(() => 
     isBosGlobal
@@ -332,7 +335,7 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
               ) : (
                 <div className="flex items-center justify-between group/row">
                   <p className="text-base font-black text-white">{formatRupiah(isBosGlobal ? totalAllBranchesNonPhysicalCapital : effectiveFixedBalance)}</p>
-                  {role === 'bos' && !isBosGlobal && (
+                  {isBos && !isBosGlobal && (
                     <button 
                       onClick={() => { setFixedInput(effectiveFixedBalance.toString()); setIsEditingFixed(true); }} 
                       className="text-asphalt-text-400 hover:text-brand-500 p-2 bg-asphalt-700/50 rounded-lg transition-all opacity-0 group-hover/row:opacity-100"

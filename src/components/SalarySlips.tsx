@@ -6,6 +6,7 @@ import { useAuthStore } from '../store/authStore';
 import { useFinanceStore } from '../hooks/useFinanceStore';
 import { SalarySlip, UserProfile } from '../types';
 import { formatRupiah, formatNumberInput } from '../utils/formatters';
+import { checkIsBos } from '../utils/authUtils';
 import { ConfirmModal } from './ConfirmModal';
 import { SuccessToast } from './SuccessToast';
 
@@ -22,6 +23,7 @@ export function SalarySlips() {
   const [isAdding, setIsAdding] = useState(false);
   const [isGeneratingBatch, setIsGeneratingBatch] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('Slip gaji berhasil disimpan!');
   
   // Form state
   const [selectedUserId, setSelectedUserId] = useState('');
@@ -37,7 +39,10 @@ export function SalarySlips() {
     name: ''
   });
 
-  const isBos = role === 'bos' || user?.email === 'alfathpulsa27@gmail.com' || user?.uid === 'RU9vfuH9VyS6arM2kRFJ9eEpAeL2';
+  const isBos = checkIsBos(user, role);
+
+  const [batchMonth, setBatchMonth] = useState(new Date().getMonth() + 1);
+  const [batchYear, setBatchYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
     if (!isAuthLoaded || !uid) return;
@@ -85,6 +90,55 @@ export function SalarySlips() {
     return () => { isMounted = false; unsub(); };
   }, [isBos, uid, isAuthLoaded]);
 
+  const handleBatchGenerate = async () => {
+    if (!isBos || users.length === 0) return;
+    setIsGeneratingBatch(true);
+    
+    try {
+      let createdCount = 0;
+      for (const targetUser of users) {
+        // Cek apakah sudah ada slip untuk user ini di bulan/tahun ini
+        const exists = slips.find(s => s.userId === targetUser.uid && s.month === batchMonth && s.year === batchYear);
+        
+        if (!exists) {
+          const salaryBase = targetUser.baseSalary || 2000000; // Default 2jt jika belum ada
+          const branch = branches.find(b => b.id === targetUser.branchId);
+          
+          await addDoc(collection(db, 'salarySlips'), {
+            userId: targetUser.uid,
+            userName: targetUser.name,
+            role: targetUser.role,
+            branchId: targetUser.branchId || null,
+            branchName: branch?.name || null,
+            month: batchMonth,
+            year: batchYear,
+            baseSalary: salaryBase,
+            bonus: 0,
+            deductions: 0,
+            netSalary: salaryBase,
+            status: 'pending',
+            createdAt: new Date().toISOString(),
+            createdBy: uid,
+            createdByName: currentUserName
+          });
+          createdCount++;
+        }
+      }
+      
+      if (createdCount > 0) {
+        setSuccessMessage("Makan sate di pinggir jalan, rasanya enak bikin ketagihan. Gajian masal sudah dijalankan, karyawan senang dapur pun aman! 🔥");
+        setShowSuccess(true);
+      } else {
+        alert("Semua karyawan sudah punya slip gaji untuk bulan ini!");
+      }
+      setIsGeneratingBatch(false);
+    } catch (error) {
+      console.error("Error batch generating:", error);
+      handleFirestoreError(error, OperationType.CREATE, 'salarySlips-batch');
+      setIsGeneratingBatch(false);
+    }
+  };
+
   const handleAddSlip = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedUserId || !baseSalary || !uid) return;
@@ -123,6 +177,7 @@ export function SalarySlips() {
       setBaseSalary('');
       setBonus('0');
       setDeductions('0');
+      setSuccessMessage("Buah manggis di atas peti, dimakan satu manis sekali. Slip gaji sudah rapi, tinggal bayar biar happy! 💰");
       setShowSuccess(true);
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'salarySlips');
@@ -198,6 +253,17 @@ export function SalarySlips() {
             </button>
           )}
           {isBos && !isAdding && (
+             <button
+              onClick={() => setIsGeneratingBatch(!isGeneratingBatch)}
+              className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shadow-lg ${
+                isGeneratingBatch ? 'bg-amber-500 text-white shadow-amber-500/20' : 'bg-asphalt-800 text-brand-500 border border-asphalt-700 shadow-brand-500/10'
+              }`}
+            >
+              <Send className="w-4 h-4" />
+              GAJIAN MASAL
+            </button>
+          )}
+          {isBos && !isAdding && (
             <button
               onClick={() => setIsAdding(true)}
               className="px-4 py-2 bg-brand-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-600 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-brand-500/20"
@@ -208,6 +274,57 @@ export function SalarySlips() {
           )}
         </div>
       </div>
+
+      {isBos && isGeneratingBatch && !isAdding && (
+        <div className="bg-asphalt-800 rounded-[2.5rem] p-7 shadow-2xl border border-amber-500/30 animate-in fade-in slide-in-from-top duration-500">
+           <div className="flex items-center justify-between mb-6">
+            <h3 className="text-sm font-black text-white uppercase tracking-tight flex items-center gap-2">
+              <Send className="w-4 h-4 text-amber-500" />
+              Gajian Masal Karyawan
+            </h3>
+            <button onClick={() => setIsGeneratingBatch(false)} className="text-asphalt-text-400 p-2"><ArrowLeft className="w-5 h-5" /></button>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Pilih Bulan</label>
+              <select
+                value={batchMonth}
+                onChange={(e) => setBatchMonth(parseInt(e.target.value))}
+                className="w-full px-5 py-4 bg-asphalt-900 border border-asphalt-700 rounded-2xl text-sm text-white font-bold outline-none uppercase tracking-widest"
+              >
+                {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
+                  <option key={m} value={m}>{getMonthName(m).toUpperCase()}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Pilih Tahun</label>
+              <select
+                value={batchYear}
+                onChange={(e) => setBatchYear(parseInt(e.target.value))}
+                className="w-full px-5 py-4 bg-asphalt-900 border border-asphalt-700 rounded-2xl text-sm text-white font-bold outline-none uppercase tracking-widest"
+              >
+                {[batchYear - 1, batchYear, batchYear + 1].map(y => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <p className="text-[11px] text-asphalt-text-400 font-medium mb-6 px-1">
+            Fitur ini akan membuat draf slip gaji untuk <span className="text-white font-bold">{users.length} karyawan</span> yang belum memiliki slip di bulan {getMonthName(batchMonth)} {batchYear}.
+          </p>
+
+          <button
+            onClick={handleBatchGenerate}
+            disabled={isLoading}
+            className="w-full py-4.5 bg-amber-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.25em] hover:bg-amber-600 active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-lg shadow-amber-500/20 disabled:opacity-50"
+          >
+            {isLoading ? 'MEMPROSES...' : '🔥 GENERATE SEMUA SLIP'}
+          </button>
+        </div>
+      )}
 
       {isAdding && (
         <div className="bg-asphalt-800 rounded-[2.5rem] p-7 shadow-2xl border border-asphalt-700 animate-in slide-in-from-bottom duration-500">
@@ -395,7 +512,7 @@ export function SalarySlips() {
         onConfirm={handleDelete}
         onCancel={() => setDeleteConfirm({ isOpen: false, id: '', name: '' })}
       />
-      {showSuccess && <SuccessToast show={showSuccess} message="Slip gaji berhasil disimpan!" onClose={() => setShowSuccess(false)} />}
+      {showSuccess && <SuccessToast show={showSuccess} message={successMessage} onClose={() => setShowSuccess(false)} />}
     </div>
   );
 }

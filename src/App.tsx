@@ -17,6 +17,7 @@ import { SalarySlips } from './components/SalarySlips';
 import { NotificationManager } from './components/NotificationManager';
 import { useAuthStore } from './store/authStore';
 import { initFinanceStoreListeners } from './hooks/useFinanceStore';
+import { checkIsBos, checkIsMandor } from './utils/authUtils';
 
 export default function App() {
   const { user, isAuthLoaded, role } = useAuthStore();
@@ -41,6 +42,9 @@ export default function App() {
     return <Login />;
   }
 
+  const isBos = checkIsBos(user, role);
+  const isMandor = checkIsMandor(role);
+
   return (
     <Layout activeTab={activeTab} setActiveTab={setActiveTab} role={role}>
       <NotificationManager />
@@ -53,7 +57,7 @@ export default function App() {
       {activeTab === 'savings' && <Savings />}
       {activeTab === 'deposits' && <Deposits />}
       {activeTab === 'vouchers' && <VoucherRecaps />}
-      {activeTab === 'team' && (role === 'bos' || role === 'mandor') && <Team />}
+      {activeTab === 'team' && (isBos || isMandor) && <Team />}
       {activeTab === 'sop' && <SOPPage />}
       {activeTab === 'salary-slips' && <SalarySlips />}
     </Layout>

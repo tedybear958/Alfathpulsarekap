@@ -1,37 +1,8 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // ===============================================================
-    // SACRED RULES & ADMIN ACCESS
-    // ===============================================================
-
-    match /{document=**} {
-      allow read: if true;
-      allow write: if isBos();
-    }
-
-    match /salarySlips {
-      allow read: if isAuthenticated();
-      match /{slipId} {
-        allow read: if isAuthenticated();
-        allow write: if isBos();
-      }
-    }
-
-    match /users {
-      allow read: if isAuthenticated();
-      match /{userId} {
-        allow read: if isAuthenticated();
-        allow create: if isAuthenticated() && request.auth.uid == userId;
-        allow update: if isAuthenticated() && (request.auth.uid == userId || isBos());
-        allow delete: if isBos();
-      }
-    }
-
-    // ===============================================================
-    // Helper Functions
-    // ===============================================================
     
+    // Helpers
     function isAuthenticated() {
       return request.auth != null;
     }
@@ -45,16 +16,20 @@ service cloud.firestore {
       );
     }
 
-    function isMandor() {
-      return isAuthenticated() && 
-             exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == 'mandor';
+    // Collection: salarySlips
+    match /salarySlips/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if isBos();
     }
 
-    function isKaryawan() {
-      return isAuthenticated() && 
-             exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == 'karyawan';
+    // Collection: users
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isBos() || (isAuthenticated() && request.auth.uid == userId);
+    }
+    match /users/{userId}/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if isBos() || (isAuthenticated() && request.auth.uid == userId);
     }
 
     function isBosGlobal() {
@@ -70,69 +45,75 @@ service cloud.firestore {
 
     function isAssignedToBranch(branchId) {
       return isAuthenticated() && (
-        (branchId == null && isBosGlobal()) ||
+        isBosGlobal() ||
         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('branchId', null) == branchId)
       );
     }
 
-    match /settings/{settingId} {
+    // Settings
+    match /settings/{document=**} {
       allow read: if isAuthenticated();
       allow write: if isBos();
     }
 
-    match /banks/{bankId} {
+    // Banks
+    match /banks/{document=**} {
       allow read: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(resource.data.branchId));
       allow create: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(request.resource.data.branchId));
       allow update, delete: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(resource.data.branchId));
     }
 
+    // Branches
     match /branches/{branchId} {
       allow read: if isAuthenticated();
       allow create: if isBosGlobal();
       allow update: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(branchId));
       allow delete: if isBosGlobal();
       
-      match /deposits/{depositId} {
+      match /deposits/{document=**} {
         allow read: if isAuthenticated();
-        allow write: if isAuthenticated() && (isBosGlobal() || isMandor() || isAssignedToBranch(branchId));
+        allow write: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(branchId));
       }
     }
 
+    // Customers (Debts)
     match /customers/{customerId} {
-      allow read: if isAuthenticated() && (isBosGlobal() || isMandor() || isAssignedToBranch(resource.data.branchId));
+      allow read: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(resource.data.branchId));
       allow create: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(request.resource.data.branchId));
       allow update, delete: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(resource.data.branchId));
 
-      match /transactions/{txId} {
-        allow read: if isAuthenticated() && (isBosGlobal() || isMandor() || isAssignedToBranch(get(/databases/$(database)/documents/customers/$(customerId)).data.branchId));
-        allow write: if isAuthenticated() && (isBosGlobal() || isMandor() || isAssignedToBranch(get(/databases/$(database)/documents/customers/$(customerId)).data.branchId));
+      match /transactions/{document=**} {
+        allow read: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(get(/databases/$(database)/documents/customers/$(customerId)).data.branchId));
+        allow write: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(get(/databases/$(database)/documents/customers/$(customerId)).data.branchId));
       }
     }
 
+    // Savings
     match /savings/{savingId} {
       allow read: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(resource.data.branchId));
       allow create: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(request.resource.data.branchId));
       allow update, delete: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(resource.data.branchId));
 
-      match /transactions/{txId} {
+      match /transactions/{document=**} {
         allow read: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(get(/databases/$(database)/documents/savings/$(savingId)).data.branchId));
-        allow write: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(get(/databases/$(database)/documents/savings/$(savingId)).data.branchId));
+        allow write: if isAuthenticated() && (isAssignedToBranch(get(/databases/$(database)/documents/savings/$(savingId)).data.branchId));
       }
     }
 
-    match /voucherRecaps/{recapId} {
+    // Voucher Recaps
+    match /voucherRecaps/{document=**} {
       allow read: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(resource.data.branchId));
       allow create: if isAuthenticated() && (isBosGlobal() || isAssignedToBranch(request.resource.data.branchId));
-      allow update: if isAuthenticated() && (
-        isBosGlobal() || 
-        (isAssignedToBranch(resource.data.branchId) && resource.data.get('status', 'reported') == 'draft')
-      );
-      allow delete: if isAuthenticated() && (
+      allow update, delete: if isAuthenticated() && (
         isBosGlobal() || 
         (isAssignedToBranch(resource.data.branchId) && resource.data.get('status', 'reported') == 'draft')
       );
     }
 
+    // Default Deny Fallback
+    match /{document=**} {
+      allow read, write: if false;
+    }
   }
 }
