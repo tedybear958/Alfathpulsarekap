@@ -30,14 +30,26 @@ export function SalarySlips() {
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
   const [baseSalary, setBaseSalary] = useState('');
-  const [bonus, setBonus] = useState('0');
-  const [deductions, setDeductions] = useState('0');
+  const [bonus, setBonus] = useState('');
+  const [deductions, setDeductions] = useState('');
 
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; id: string; name: string }>({
     isOpen: false,
     id: '',
     name: ''
   });
+
+  const handleNumericInput = (e: React.ChangeEvent<HTMLInputElement>, setter: (val: string) => void) => {
+    const value = e.target.value.replace(/\D/g, '');
+    setter(value);
+    
+    // Explicitly set cursor to the end
+    const target = e.target;
+    requestAnimationFrame(() => {
+      const len = target.value.length;
+      target.setSelectionRange(len, len);
+    });
+  };
 
   const isBos = checkIsBos(user, role);
   // Bos Pusat (Global) adalah Bos tanpa branchId
@@ -47,7 +59,7 @@ export function SalarySlips() {
   const [batchYear, setBatchYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
-    if (!isAuthLoaded) return;
+    if (!isAuthLoaded || !role) return;
     
     if (!uid) {
       setIsLoading(false);
@@ -428,8 +440,8 @@ export function SalarySlips() {
                   inputMode="numeric"
                   placeholder="0"
                   className="w-full pl-12 pr-5 py-4 bg-asphalt-900 border border-asphalt-700 rounded-2xl text-sm text-white font-black outline-none focus:ring-2 focus:ring-brand-500 shadow-inner"
-                  value={baseSalary}
-                  onChange={(e) => setBaseSalary(formatNumberInput(e.target.value))}
+                  value={formatNumberInput(baseSalary)}
+                  onChange={(e) => handleNumericInput(e, setBaseSalary)}
                   required
                 />
               </div>
@@ -442,8 +454,8 @@ export function SalarySlips() {
                   type="text"
                   inputMode="numeric"
                   className="w-full px-5 py-4 bg-asphalt-900 border border-asphalt-700 rounded-2xl text-sm text-emerald-500 font-black outline-none focus:ring-2 focus:ring-emerald-500 shadow-inner"
-                  value={bonus}
-                  onChange={(e) => setBonus(formatNumberInput(e.target.value))}
+                  value={formatNumberInput(bonus)}
+                  onChange={(e) => handleNumericInput(e, setBonus)}
                 />
               </div>
               <div className="space-y-2">
@@ -452,8 +464,8 @@ export function SalarySlips() {
                   type="text"
                   inputMode="numeric"
                   className="w-full px-5 py-4 bg-asphalt-900 border border-asphalt-700 rounded-2xl text-sm text-rose-500 font-black outline-none focus:ring-2 focus:ring-rose-500 shadow-inner"
-                  value={deductions}
-                  onChange={(e) => setDeductions(formatNumberInput(e.target.value))}
+                  value={formatNumberInput(deductions)}
+                  onChange={(e) => handleNumericInput(e, setDeductions)}
                 />
               </div>
             </div>

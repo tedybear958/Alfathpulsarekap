@@ -57,44 +57,41 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
         )}
 
         {/* Top Header */}
-        <header className="bg-asphalt-900 text-white sticky top-0 z-20 px-5 py-6 pt-safe flex items-center justify-between border-b border-asphalt-800">
-          <div className="flex items-center gap-3">
-            <div className="bg-brand-500 p-2 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-brand-500/20">
-              <span className="text-[10px] font-black text-white tracking-tighter uppercase">AP</span>
+        <header className="bg-[#0B111D] text-white sticky top-0 z-20 px-5 pt-[env(safe-area-inset-top,1.5rem)] pb-4 flex items-center justify-between">
+          <div className="flex items-center gap-3.5">
+            <div className="relative group">
+              <div className="w-12 h-12 bg-gradient-to-br from-brand-500 to-brand-700 rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-brand-500/20 ring-2 ring-brand-500/10 active:scale-95 transition-transform">
+                <span className="text-sm font-black text-white tracking-widest uppercase">AP</span>
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#0B111D] rounded-full flex items-center justify-center border-2 border-[#0B111D]">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+              </div>
             </div>
             <div>
-              <h1 className="text-lg font-black tracking-tight leading-none">{user?.displayName || 'AlfathPulsa'}</h1>
+              <h1 className="text-base font-black tracking-tight leading-none text-white/95 uppercase">{user?.displayName || 'AlfathPulsa'}</h1>
               <div className="flex items-center gap-1.5 mt-1.5">
-                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                <p className="text-[10px] text-asphalt-text-400 font-bold uppercase tracking-wider">
-                  {checkIsBos(user, role) ? (branchId ? `Bos - ${branchName}` : 'Bos - Pusat') : 
-                   checkIsMandor(role) ? `Mandor - ${branchName}` : 
-                   branchId ? `Karyawan - ${branchName}` : 'Karyawan'}
+                <p className="text-[9px] text-asphalt-text-400 font-extrabold uppercase tracking-[0.1em]">
+                  {checkIsBos(user, role) ? (branchId ? `BOS • ${branchName}` : 'BOS PUSAT') : 
+                   checkIsMandor(role) ? `MANDOR • ${branchName || 'SEMUA'}` : 
+                   branchId ? `KARYAWAN • ${branchName}` : 'KARYAWAN'}
                 </p>
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <button
               onClick={() => setShowThemePicker(true)}
-              className="p-2.5 bg-asphalt-800 hover:bg-asphalt-700 rounded-2xl transition-all border border-asphalt-700/50"
+              className="w-10 h-10 flex items-center justify-center bg-asphalt-800/50 hover:bg-asphalt-700 rounded-xl transition-all border border-asphalt-700/50 active:scale-90"
               title="Pilih Tema"
             >
-              <Palette className="w-5 h-5 text-brand-500" />
-            </button>
-            <button
-              onClick={() => setActiveTab('sop')}
-              className="p-2.5 bg-asphalt-800 hover:bg-asphalt-700 rounded-2xl transition-all border border-asphalt-700/50"
-              title="Panduan SOP"
-            >
-              <BookOpen className="w-5 h-5 text-asphalt-text-100" />
+              <Palette className="w-4.5 h-4.5 text-brand-500" />
             </button>
             <button
               onClick={logout}
-              className="p-2.5 bg-asphalt-800 hover:bg-asphalt-700 rounded-2xl transition-all border border-asphalt-700/50"
+              className="w-10 h-10 flex items-center justify-center bg-asphalt-800/50 hover:bg-asphalt-700 rounded-xl transition-all border border-asphalt-700/50 active:scale-90"
               title="Keluar"
             >
-              <LogOut className="w-5 h-5 text-rose-500" />
+              <LogOut className="w-4.5 h-4.5 text-rose-500" />
             </button>
           </div>
         </header>

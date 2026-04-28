@@ -17,18 +17,20 @@ function ServiceIcon({ icon, label, onClick, badge }: ServiceIconProps) {
   return (
     <button 
       onClick={onClick}
-      className="flex flex-col items-center gap-2 group relative"
+      className="flex flex-col items-center gap-2.5 group relative"
     >
-      <div className="w-14 h-14 bg-gray-800 rounded-2xl flex items-center justify-center transition-all group-active:scale-90 shadow-lg border border-gray-700/50">
-        {icon}
+      <div className="w-16 h-16 bg-asphalt-900/50 border border-asphalt-700/50 rounded-[1.5rem] flex items-center justify-center transition-all group-active:scale-90 group-hover:bg-asphalt-700/50 shadow-lg relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        <div className="text-brand-500 group-hover:scale-110 transition-transform duration-300">
+          {icon}
+        </div>
       </div>
-      <span className="text-[10px] font-bold text-gray-400 text-center leading-tight">
+      <span className="text-[10px] font-extrabold text-asphalt-text-400 text-center leading-tight uppercase tracking-tight group-hover:text-asphalt-text-100 transition-colors">
         {label}
       </span>
       {badge && (
-        <div className="absolute -top-1 -left-1 flex flex-col items-start pointer-events-none">
-          <div className="bg-emerald-500 text-white text-[6px] font-black px-1 py-0.5 rounded-sm uppercase tracking-tighter leading-none flex items-center gap-0.5">
-            <div className="w-0.5 h-1.5 bg-white/40"></div>
+        <div className="absolute top-0 right-1 pointer-events-none z-10">
+          <div className="bg-rose-500 text-white text-[7px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-tighter leading-none shadow-lg shadow-rose-500/20 border-2 border-[#0B111D]">
             {badge}
           </div>
         </div>
