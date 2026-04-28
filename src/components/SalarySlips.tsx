@@ -107,6 +107,16 @@ export function SalarySlips() {
     return () => { isMounted = false; unsub(); };
   }, [isBos, isGlobalBos, currentUserBranchId, uid, isAuthLoaded]);
 
+  // Auto-fill base salary when user selected
+  useEffect(() => {
+    if (selectedUserId) {
+      const selectedUser = users.find(u => u.uid === selectedUserId);
+      if (selectedUser && selectedUser.baseSalary) {
+        setBaseSalary(formatRupiah(selectedUser.baseSalary).replace('Rp ', ''));
+      }
+    }
+  }, [selectedUserId, users]);
+
   const handleBatchGenerate = async () => {
     if (!isBos || users.length === 0) return;
     setIsGeneratingBatch(true);
@@ -159,6 +169,13 @@ export function SalarySlips() {
   const handleAddSlip = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedUserId || !baseSalary || !uid) return;
+
+    // Check for duplicate
+    const existing = slips.find(s => s.userId === selectedUserId && s.month === month && s.year === year);
+    if (existing) {
+      alert(`Waduh! Sepertinya karyawan ini sudah punya slip gaji untuk periode ${getMonthName(month)} ${year}.`);
+      return;
+    }
 
     const userToSalary = users.find(u => u.uid === selectedUserId);
     if (!userToSalary) return;
@@ -217,7 +234,14 @@ export function SalarySlips() {
     
     if (deleteConfirm.id === 'ALL') {
       try {
-        const querySnapshot = await getDocs(collection(db, 'salarySlips'));
+        let q;
+        if (isGlobalBos) {
+          q = query(collection(db, 'salarySlips'));
+        } else {
+          q = query(collection(db, 'salarySlips'), where('branchId', '==', currentUserBranchId));
+        }
+        
+        const querySnapshot = await getDocs(q);
         const deletePromises = querySnapshot.docs.map(d => deleteDoc(doc(db, 'salarySlips', d.id)));
         await Promise.all(deletePromises);
         setDeleteConfirm({ isOpen: false, id: '', name: '' });
@@ -272,12 +296,14 @@ export function SalarySlips() {
           {isBos && !isAdding && (
              <button
               onClick={() => setIsGeneratingBatch(!isGeneratingBatch)}
+              disabled={isLoading || users.length === 0}
               className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shadow-lg ${
-                isGeneratingBatch ? 'bg-amber-500 text-white shadow-amber-500/20' : 'bg-asphalt-800 text-brand-500 border border-asphalt-700 shadow-brand-500/10'
+                isGeneratingBatch ? 'bg-amber-500 text-white shadow-amber-500/20' : 
+                (users.length === 0 ? 'bg-asphalt-800 text-asphalt-text-400 border border-asphalt-700 cursor-not-allowed' : 'bg-asphalt-800 text-brand-500 border border-asphalt-700 shadow-brand-500/10')
               }`}
             >
               <Send className="w-4 h-4" />
-              GAJIAN MASAL
+              {users.length === 0 ? 'TIDAK ADA KARYAWAN' : 'GAJIAN MASAL'}
             </button>
           )}
           {isBos && !isAdding && (

@@ -24,6 +24,18 @@ export function Deposits() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
 
+  const handleNumericInput = (e: React.ChangeEvent<HTMLInputElement>, setter: (val: string) => void) => {
+    const value = e.target.value.replace(/\D/g, '');
+    setter(value);
+    
+    // Explicitly set cursor to the end
+    const target = e.target;
+    requestAnimationFrame(() => {
+      const len = target.value.length;
+      target.setSelectionRange(len, len);
+    });
+  };
+
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; branchId: string; depositId: string; name: string }>({
     isOpen: false,
     branchId: '',
@@ -273,7 +285,7 @@ export function Deposits() {
                     inputMode="numeric"
                     className="w-full pl-12 pr-5 py-4 text-xl bg-asphalt-900 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-white font-black shadow-inner"
                     value={formatNumberInput(setorAmount)}
-                    onChange={(e) => setSetorAmount(e.target.value.replace(/\D/g, ''))}
+                    onChange={(e) => handleNumericInput(e, setSetorAmount)}
                     required
                   />
                 </div>
@@ -560,7 +572,7 @@ export function Deposits() {
                             setCompletingDeposit({ 
                               branchId: deposit.branchId, 
                               depositId: deposit.id, 
-                              amount: '0',
+                              amount: '',
                               atmName: ''
                             });
                           }}
@@ -657,7 +669,7 @@ export function Deposits() {
                             inputMode="numeric"
                             className="w-full pl-10 pr-4 py-4 bg-asphalt-800 border border-asphalt-700 rounded-2xl text-sm font-black text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-inner"
                             value={formatNumberInput(completingDeposit.amount)}
-                            onChange={(e) => setCompletingDeposit({ ...completingDeposit, amount: e.target.value.replace(/\D/g, '') })}
+                            onChange={(e) => handleNumericInput(e, (val) => setCompletingDeposit({ ...completingDeposit, amount: val }))}
                           />
                         </div>
                         <div className="flex items-center justify-between mt-3 px-1">
@@ -712,7 +724,7 @@ export function Deposits() {
                           inputMode="numeric"
                           className="w-full pl-10 pr-4 py-4 bg-asphalt-800 border border-asphalt-700 rounded-2xl text-base font-black text-white focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-inner"
                           value={formatNumberInput(editingDeposit.amount)}
-                          onChange={(e) => setEditingDeposit({ ...editingDeposit, amount: e.target.value.replace(/\D/g, '') })}
+                          onChange={(e) => handleNumericInput(e, (val) => setEditingDeposit({ ...editingDeposit, amount: val }))}
                           autoFocus
                         />
                       </div>

@@ -110,7 +110,13 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
     try {
       const authState = useAuthStore.getState();
       const branchId = authState.branchId || null;
-      await addDoc(collection(db, 'banks'), { bankName, balance, branchId, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+      await addDoc(collection(db, 'banks'), { 
+        bankName, 
+        balance, 
+        branchId, 
+        createdAt: new Date().toISOString(), 
+        updatedAt: new Date().toISOString() 
+      });
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'banks');
     }

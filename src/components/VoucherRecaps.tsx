@@ -11,7 +11,17 @@ export function VoucherRecaps() {
   const { voucherRecaps, addVoucherRecap, updateVoucherRecap, reportVoucherRecaps, deleteVoucherRecap, isLoaded, branches } = useFinanceStore();
   const { role, branchId: userBranchId } = useAuthStore();
   
-  const [selectedBranchId, setSelectedBranchId] = useState<string | null>(userBranchId || null);
+  const [selectedBranchId, setSelectedBranchId] = useState<string | null>(() => {
+    if (userBranchId) return userBranchId;
+    return localStorage.getItem('last_selected_branch') || null;
+  });
+
+  // Sync selected branch to localStorage for boss/mandor
+  React.useEffect(() => {
+    if (selectedBranchId && (role === 'bos' || role === 'mandor')) {
+      localStorage.setItem('last_selected_branch', selectedBranchId);
+    }
+  }, [selectedBranchId, role]);
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [adminSiang, setAdminSiang] = useState('');
   const [adminMalam, setAdminMalam] = useState('');
@@ -241,8 +251,8 @@ export function VoucherRecaps() {
     };
   }, [batches]);
 
-  // If Bos and no branch selected, show Executive Dashboard
-  if (role === 'bos' && !selectedBranchId) {
+  // If Bos/Mandor and no branch selected, show Executive Dashboard
+  if ((role === 'bos' || role === 'mandor') && !selectedBranchId) {
     // Global Stats Calculation (All Reported Recaps)
     const reportedRecaps = voucherRecaps.filter(r => r.status === 'reported');
     const globalTotalAdm = reportedRecaps.reduce((sum, r) => sum + (r.adminSiang + r.adminMalam), 0);
@@ -543,31 +553,29 @@ export function VoucherRecaps() {
               </div>
             </div>
 
-            <div className="bg-rose-500/5 rounded-3xl p-6 border border-rose-500/10 space-y-6">
-              <div className="grid grid-cols-2 gap-5">
-                <div className="space-y-2.5">
-                  <label className="text-[10px] font-black text-rose-500 uppercase tracking-widest ml-1">Nominal Out</label>
-                  <input
-                    type="text"
-                    placeholder="Rp 0"
-                    inputMode="numeric"
-                    className="w-full px-5 py-4.5 text-sm bg-asphalt-900 border border-rose-500/30 rounded-2xl focus:ring-2 focus:ring-rose-500 outline-none text-rose-500 font-black shadow-inner placeholder:text-rose-500/30"
-                    value={formatNumberInput(expenseAmount)}
-                    onChange={(e) => handleNumericInput(e, setExpenseAmount)}
-                  />
+                <div className="flex gap-3">
+                  <div className="flex-1 space-y-2">
+                    <label className="text-[10px] font-black text-rose-500 uppercase tracking-widest ml-1">Keterangan Pengeluaran</label>
+                    <input
+                      type="text"
+                      placeholder="Ex: Token Listrik"
+                      className="w-full px-5 py-4.5 text-sm bg-asphalt-900 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none text-white font-black shadow-inner"
+                      value={expenseDescription}
+                      onChange={(e) => setExpenseDescription(e.target.value)}
+                    />
+                  </div>
+                  <div className="w-1/3 space-y-2">
+                    <label className="text-[10px] font-black text-rose-500 uppercase tracking-widest ml-1">Nominal</label>
+                    <input
+                      type="text"
+                      placeholder="0"
+                      inputMode="numeric"
+                      className="w-full px-5 py-4.5 text-sm bg-asphalt-900 border border-rose-500/30 rounded-2xl focus:ring-2 focus:ring-rose-500 outline-none text-rose-500 font-black shadow-inner"
+                      value={formatNumberInput(expenseAmount)}
+                      onChange={(e) => handleNumericInput(e, setExpenseAmount)}
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2.5">
-                  <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Label Out</label>
-                  <input
-                    type="text"
-                    placeholder="Ex: Token"
-                    className="w-full px-5 py-4.5 text-sm bg-asphalt-900 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none text-white font-black shadow-inner placeholder:text-asphalt-text-400/30"
-                    value={expenseDescription}
-                    onChange={(e) => setExpenseDescription(e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
 
             <div className="pt-3">
               <button

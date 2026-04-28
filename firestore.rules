@@ -2,28 +2,70 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Helpers
+    // Global Deny Fallback
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
     function isAuthenticated() {
       return request.auth != null;
     }
 
-    function isBos() {
+    function isOwner() {
       return isAuthenticated() && (
         request.auth.uid == "RU9vfuH9VyS6arM2kRFJ9eEpAeL2" ||
-        request.auth.token.email == "alfathpulsa27@gmail.com" ||
-        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
-         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == 'bos')
+        request.auth.token.email == "alfathpulsa27@gmail.com"
       );
     }
 
-    // Collection: salarySlips
-    match /salarySlips/{document=**} {
-      allow read: if isAuthenticated() && (
-        isBosGlobal() || 
-        (resource.data.branchId != null && isAssignedToBranch(resource.data.branchId)) || 
-        resource.data.userId == request.auth.uid
+    function isBos() {
+      return isOwner() || (
+        isAuthenticated() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == 'bos'
       );
-      allow write: if isBos();
+    }
+
+    function isBosGlobal() {
+      return isOwner() || (
+        isAuthenticated() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == 'bos' &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('branchId', '') == '' || 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('branchId', null) == null)
+      );
+    }
+
+    function isMandor() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == 'mandor';
+    }
+
+    function isMandorGlobal() {
+      return isMandor() && (
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('branchId', '') == '' || 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('branchId', null) == null
+      );
+    }
+
+    function isAssignedToBranch(branchId) {
+      return isAuthenticated() && (
+        isBosGlobal() ||
+        isMandorGlobal() ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('branchId', null) == branchId)
+      );
+    }
+
+    // --- Collections ---
+
+    // Collection: salarySlips
+    match /salarySlips/{slipId} {
+      allow read: if isAuthenticated();
+      allow create: if isBos() && isAssignedToBranch(request.resource.data.get('branchId', null));
+      allow update, delete: if isBos() && isAssignedToBranch(resource.data.get('branchId', null));
     }
 
     // Collection: users
@@ -41,25 +83,6 @@ service cloud.firestore {
     match /users/{userId}/{document=**} {
       allow read: if isAuthenticated();
       allow write: if isBos() || (isAuthenticated() && request.auth.uid == userId);
-    }
-
-    function isBosGlobal() {
-      return isAuthenticated() && (
-        request.auth.uid == "RU9vfuH9VyS6arM2kRFJ9eEpAeL2" || 
-        request.auth.token.email == "alfathpulsa27@gmail.com" ||
-        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
-         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == 'bos' &&
-         (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('branchId', null) == null || 
-          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('branchId', '') == ''))
-      );
-    }
-
-    function isAssignedToBranch(branchId) {
-      return isAuthenticated() && (
-        isBosGlobal() ||
-        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
-         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('branchId', null) == branchId)
-      );
     }
 
     // Settings
@@ -120,11 +143,6 @@ service cloud.firestore {
         isBosGlobal() || 
         (isAssignedToBranch(resource.data.branchId) && resource.data.get('status', 'reported') == 'draft')
       );
-    }
-
-    // Default Deny Fallback
-    match /{document=**} {
-      allow read, write: if false;
     }
   }
 }

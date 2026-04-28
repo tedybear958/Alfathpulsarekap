@@ -117,21 +117,9 @@ export function Team() {
     }
   };
 
-  const [pendingBranchChanges, setPendingBranchChanges] = useState<Record<string, string>>({});
-
   const handleBranchChange = async (uid: string, newBranchId: string) => {
-    setPendingBranchChanges(prev => ({ ...prev, [uid]: newBranchId }));
-  };
-
-  const handleSaveBranchChange = async (uid: string) => {
-    const newBranchId = pendingBranchChanges[uid];
     try {
       await updateDoc(doc(db, 'users', uid), { branchId: newBranchId || null });
-      setPendingBranchChanges(prev => {
-        const next = { ...prev };
-        delete next[uid];
-        return next;
-      });
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `users/${uid}`);
     }
@@ -433,26 +421,16 @@ export function Team() {
                       <label className="text-[9px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Penempatan Cabang</label>
                       <div className="flex items-center gap-3">
                         <select
-                          value={pendingBranchChanges[user.uid] !== undefined ? pendingBranchChanges[user.uid] : (user.branchId || '')}
+                          value={user.branchId || ''}
                           onChange={(e) => handleBranchChange(user.uid, e.target.value)}
                           disabled={!isBos}
-                          className={`text-xs font-black rounded-2xl px-5 py-4 border border-asphalt-700 outline-none flex-1 transition-all shadow-inner uppercase tracking-widest ${
-                            pendingBranchChanges[user.uid] !== undefined ? 'bg-brand-500/10 text-brand-500 ring-2 ring-brand-500/20' : 'bg-asphalt-900 text-white'
-                          }`}
+                          className="text-xs font-black rounded-2xl px-5 py-4 border border-asphalt-700 outline-none flex-1 transition-all shadow-inner bg-asphalt-900 text-white uppercase tracking-widest"
                         >
                           <option value="">-- {user.role === 'bos' ? 'Pusat (Global)' : 'Pilih Cabang'} --</option>
                           {branches.map(b => (
                             <option key={b.id} value={b.id}>{b.name.toUpperCase()}</option>
                           ))}
                         </select>
-                        {pendingBranchChanges[user.uid] !== undefined && (
-                          <button
-                            onClick={() => handleSaveBranchChange(user.uid)}
-                            className="h-14 w-14 bg-emerald-500 text-white rounded-2xl hover:bg-emerald-600 transition-all shadow-lg active:scale-90 flex items-center justify-center shrink-0"
-                          >
-                            <Check className="w-6 h-6 stroke-[3px]" />
-                          </button>
-                        )}
                       </div>
                     </div>
 
