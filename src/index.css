@@ -116,5 +116,20 @@
 
 body {
   -webkit-tap-highlight-color: transparent;
+  background-color: #0B111D;
+}
+
+/* Sembunyikan indikator loading sisa jika ada */
+#nprogress .bar {
+  background: var(--brand-500) !important;
+}
+
+#nprogress .peg {
+  box-shadow: 0 0 10px var(--brand-500), 0 0 5px var(--brand-500) !important;
+}
+
+/* Jika ingin benar-benar hilang, gunakan ini: */
+#nprogress {
+  display: none !important;
 }
 

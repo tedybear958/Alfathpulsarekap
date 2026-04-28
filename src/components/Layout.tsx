@@ -38,12 +38,12 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
   ];
 
   return (
-    <div className="min-h-[100dvh] bg-asphalt-900 flex justify-center" data-theme={theme}>
-      <div className="w-full max-w-md bg-asphalt-900 h-[100dvh] flex flex-col relative shadow-2xl overflow-hidden text-asphalt-text-100">
+    <div className="min-h-[100dvh] bg-[#0B111D] flex justify-center selection:bg-brand-500/30" data-theme={theme}>
+      <div className="w-full max-w-md bg-[#0B111D] h-[100dvh] flex flex-col relative shadow-2xl overflow-hidden text-asphalt-text-100 border-x border-asphalt-800/30">
         {/* Global Error Display */}
         {error && (
           <div
-            className="absolute top-20 left-4 right-4 z-50 bg-rose-600 text-white p-4 rounded-2xl shadow-xl flex items-center gap-3"
+            className="absolute top-24 left-4 right-4 z-50 bg-rose-600 text-white p-4 rounded-2xl shadow-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4"
           >
             <AlertCircle className="w-5 h-5 shrink-0" />
             <div className="flex-1 min-w-0">
@@ -170,7 +170,7 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
         </main>
 
         {/* Bottom Navigation */}
-        <nav className="fixed bottom-0 max-w-md w-full bg-asphalt-900/90 backdrop-blur-xl border-t border-asphalt-800 z-30 pb-safe shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+        <nav className="fixed bottom-0 max-w-md w-full bg-[#0B111D]/90 backdrop-blur-xl border-t border-asphalt-800/30 z-30 pb-safe shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
           <div className="flex justify-around items-center h-20 px-2">
             
             {/* Beranda */}

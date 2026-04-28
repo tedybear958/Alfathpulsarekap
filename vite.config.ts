@@ -38,8 +38,8 @@ export default defineConfig(({mode}) => {
           name: 'AlfathPulsa',
           short_name: 'AlfathPulsa',
           description: 'Aplikasi pembukuan keuangan dan pencatatan bon untuk agen AlfathPulsa.',
-          theme_color: '#1d4ed8',
-          background_color: '#ffffff',
+          theme_color: '#0B111D',
+          background_color: '#0B111D',
           display: 'standalone',
           start_url: '/',
           icons: [
