@@ -129,8 +129,8 @@ export function Savings() {
     }
   };
 
-  const canEdit = role === 'bos' || !!branchId;
-  const canDelete = role === 'bos' || !!branchId; // Bos bisa hapus global, karyawan/mandor di cabang
+  const canEdit = role !== 'bos' && !!branchId;
+  const canDelete = role !== 'bos' && !!branchId;
 
   if (selectedPerson) {
     const totalSavings = store.getPersonTotalSavings(selectedPerson);

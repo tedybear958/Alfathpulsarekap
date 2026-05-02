@@ -506,42 +506,44 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
           </div>
 
           <div className="bg-asphalt-800 rounded-[2.5rem] border border-asphalt-700/50 shadow-2xl overflow-hidden">
-            <div className="p-4 bg-asphalt-900/40 border-b border-asphalt-700/50">
-              <form onSubmit={handleAddBank} className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <label className="text-[9px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Bank</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. BCA"
-                      className="w-full pl-4 pr-3 py-3 text-xs bg-asphalt-800 border border-asphalt-700 rounded-xl focus:ring-1 focus:ring-brand-500 outline-none text-white font-bold"
-                      value={newBankName}
-                      onChange={(e) => setNewBankName(e.target.value)}
-                      required
-                    />
+            {role !== 'bos' && (
+              <div className="p-4 bg-asphalt-900/40 border-b border-asphalt-700/50">
+                <form onSubmit={handleAddBank} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <label className="text-[9px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Bank</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. BCA"
+                        className="w-full pl-4 pr-3 py-3 text-xs bg-asphalt-800 border border-asphalt-700 rounded-xl focus:ring-1 focus:ring-brand-500 outline-none text-white font-bold"
+                        value={newBankName}
+                        onChange={(e) => setNewBankName(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[9px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Saldo</label>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="0"
+                        className="w-full pl-4 pr-3 py-3 text-xs bg-asphalt-800 border border-asphalt-700 rounded-xl focus:ring-1 focus:ring-brand-500 outline-none text-white font-bold"
+                        value={formatNumberInput(newBankBalance)}
+                        onChange={(e) => handleNumericInput(e, setNewBankBalance)}
+                        required
+                      />
+                    </div>
                   </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[9px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Saldo</label>
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      placeholder="0"
-                      className="w-full pl-4 pr-3 py-3 text-xs bg-asphalt-800 border border-asphalt-700 rounded-xl focus:ring-1 focus:ring-brand-500 outline-none text-white font-bold"
-                      value={formatNumberInput(newBankBalance)}
-                      onChange={(e) => handleNumericInput(e, setNewBankBalance)}
-                      required
-                    />
-                  </div>
-                </div>
-                <button 
-                  type="submit" 
-                  disabled={isAddingBank}
-                  className="w-full bg-brand-500 hover:bg-brand-600 font-black text-[10px] py-3.5 rounded-xl transition-all shadow-lg active:scale-95 disabled:opacity-50 uppercase tracking-widest"
-                >
-                  {isAddingBank ? 'Sabar...' : 'Tambah Rekening'}
-                </button>
-              </form>
-            </div>
+                  <button 
+                    type="submit" 
+                    disabled={isAddingBank}
+                    className="w-full bg-brand-500 hover:bg-brand-600 font-black text-[10px] py-3.5 rounded-xl transition-all shadow-lg active:scale-95 disabled:opacity-50 uppercase tracking-widest"
+                  >
+                    {isAddingBank ? 'Sabar...' : 'Tambah Rekening'}
+                  </button>
+                </form>
+              </div>
+            )}
 
             <div className="divide-y divide-asphalt-700/50">
               {store.bankBalances.length === 0 ? (
@@ -599,20 +601,24 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
                     
                     {editingBankId !== bank.id && (
                       <div className="flex items-center gap-2 shrink-0 ml-1">
-                        <button
-                          onClick={() => { setBankInput(bank.balance.toString()); setEditingBankId(bank.id); }}
-                          className="p-2 text-brand-500 bg-brand-500/10 border border-brand-500/20 rounded-lg transition-all active:scale-90"
-                          title="Edit Saldo"
-                        >
-                          <Edit3 className="w-3 h-3" />
-                        </button>
-                        <button
-                          onClick={() => setDeleteConfirm({ isOpen: true, id: bank.id, name: bank.bankName })}
-                          className="p-2 text-rose-500 bg-rose-500/10 border border-rose-500/20 rounded-lg transition-all active:scale-90"
-                          title="Hapus Rekening"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </button>
+                        {role !== 'bos' && (
+                          <button
+                            onClick={() => { setBankInput(bank.balance.toString()); setEditingBankId(bank.id); }}
+                            className="p-2 text-brand-500 bg-brand-500/10 border border-brand-500/20 rounded-lg transition-all active:scale-90"
+                            title="Edit Saldo"
+                          >
+                            <Edit3 className="w-3 h-3" />
+                          </button>
+                        )}
+                        {role !== 'bos' && (
+                          <button
+                            onClick={() => setDeleteConfirm({ isOpen: true, id: bank.id, name: bank.bankName })}
+                            className="p-2 text-rose-500 bg-rose-500/10 border border-rose-500/20 rounded-lg transition-all active:scale-90"
+                            title="Hapus Rekening"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>

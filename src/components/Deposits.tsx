@@ -633,12 +633,14 @@ export function Deposits() {
                         >
                           Update Rp
                         </button>
-                        <button
-                          onClick={() => setDeleteConfirm({ isOpen: true, branchId: deposit.branchId, depositId: deposit.id, name: deposit.description })}
-                          className="w-14 h-14 bg-asphalt-900 text-asphalt-700 hover:text-rose-500 rounded-2xl flex items-center justify-center border border-asphalt-700 hover:bg-rose-500/10 transition-all"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
+                          {role === 'mandor' && (
+                            <button
+                              onClick={() => setDeleteConfirm({ isOpen: true, branchId: deposit.branchId, depositId: deposit.id, name: deposit.description })}
+                              className="w-14 h-14 bg-asphalt-900 text-asphalt-700 hover:text-rose-500 rounded-2xl flex items-center justify-center border border-asphalt-700 hover:bg-rose-500/10 transition-all"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                          )}
                       </div>
                     </div>
                   )}
