@@ -114,7 +114,7 @@ export function Debts() {
   };
 
   const canEdit = role === 'bos' || !!branchId;
-  const canDelete = !!branchId; // Hanya karyawan/mandor di cabang yang bisa hapus
+  const canDelete = role === 'bos' || !!branchId; // Bos bisa hapus global, karyawan/mandor di cabang
 
   if (selectedPerson) {
     const totalDebt = store.getPersonTotalDebt(selectedPerson);

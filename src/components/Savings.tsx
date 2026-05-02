@@ -13,6 +13,7 @@ export function Savings() {
   const [newPersonPhone, setNewPersonPhone] = useState('');
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedBranchFilter, setSelectedBranchFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'name' | 'amount' | 'latest'>('latest');
 
   const [amountInput, setAmountInput] = useState('');
@@ -57,12 +58,18 @@ export function Savings() {
         branchId: person.branchId
       }))
     );
-    return allTxs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }, [store.savings]);
+    return allTxs
+      .filter(tx => selectedBranchFilter === 'all' || tx.branchId === selectedBranchFilter)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [store.savings, selectedBranchFilter]);
 
   const filteredSavings = useMemo(() => {
     return savingsWithTotals
-      .filter(s => s.personName.toLowerCase().includes(searchQuery.toLowerCase()))
+      .filter(s => {
+        const matchesSearch = s.personName.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesBranch = selectedBranchFilter === 'all' || s.branchId === selectedBranchFilter;
+        return matchesSearch && matchesBranch;
+      })
       .sort((a, b) => {
         if (sortBy === 'name') return a.personName.localeCompare(b.personName);
         if (sortBy === 'amount') return b.totalSavings - a.totalSavings;
@@ -70,7 +77,9 @@ export function Savings() {
       });
   }, [savingsWithTotals, searchQuery, sortBy]);
 
-  const totalAllSavings = useMemo(() => store.getTotalSavings(), [store.getTotalSavings]);
+  const totalFilteredSavings = useMemo(() => {
+    return filteredSavings.reduce((sum, s) => sum + s.totalSavings, 0);
+  }, [filteredSavings]);
 
   const [isAddingPerson, setIsAddingPerson] = useState(false);
   const [isAddingTransaction, setIsAddingTransaction] = useState(false);
@@ -115,7 +124,7 @@ export function Savings() {
   };
 
   const canEdit = role === 'bos' || !!branchId;
-  const canDelete = !!branchId; // Hanya karyawan/mandor di cabang yang bisa hapus
+  const canDelete = role === 'bos' || !!branchId; // Bos bisa hapus global, karyawan/mandor di cabang
 
   if (selectedPerson) {
     const totalSavings = store.getPersonTotalSavings(selectedPerson);
@@ -359,12 +368,12 @@ export function Savings() {
           
           <div className="space-y-1">
             <h3 className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-[0.25em]">
-              Tabungan Terkumpul
+              Tabungan Terkumpul {selectedBranchFilter !== 'all' ? `(${store.branches.find(b => b.id === selectedBranchFilter)?.name})` : '(Semua Cabang)'}
             </h3>
             <div className="flex items-baseline gap-2">
               <span className="text-xl font-black text-emerald-500">Rp</span>
               <p className="text-4xl font-black tracking-tighter text-white">
-                {totalAllSavings.toLocaleString('id-ID')}
+                {totalFilteredSavings.toLocaleString('id-ID')}
               </p>
             </div>
           </div>
@@ -405,17 +414,32 @@ export function Savings() {
               RIWAYAT
             </button>
           </div>
-          {activeMainTab === 'savers' && (
-            <select 
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              className="text-[10px] font-black text-asphalt-text-400 bg-asphalt-800 border border-asphalt-700 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 uppercase tracking-widest"
-            >
-              <option value="latest">TERBARU</option>
-              <option value="name">A-Z</option>
-              <option value="amount">SALDO</option>
-            </select>
-          )}
+          
+          <div className="flex items-center gap-2">
+            {(role === 'bos' || role === 'mandor') && (
+              <select 
+                value={selectedBranchFilter}
+                onChange={(e) => setSelectedBranchFilter(e.target.value)}
+                className="text-[10px] font-black text-brand-500 bg-brand-500/10 border border-brand-500/20 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-brand-500 uppercase tracking-widest"
+              >
+                <option value="all">SEMUA CABANG</option>
+                {store.branches.map(b => (
+                  <option key={b.id} value={b.id}>{b.name.toUpperCase()}</option>
+                ))}
+              </select>
+            )}
+            {activeMainTab === 'savers' && (
+              <select 
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="text-[10px] font-black text-asphalt-text-400 bg-asphalt-800 border border-asphalt-700 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 uppercase tracking-widest"
+              >
+                <option value="latest">TERBARU</option>
+                <option value="name">A-Z</option>
+                <option value="amount">SALDO</option>
+              </select>
+            )}
+          </div>
         </div>
 
         <div className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden">
