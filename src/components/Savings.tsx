@@ -77,9 +77,15 @@ export function Savings() {
       });
   }, [savingsWithTotals, searchQuery, sortBy]);
 
-  const totalFilteredSavings = useMemo(() => {
-    return filteredSavings.reduce((sum, s) => sum + s.totalSavings, 0);
-  }, [filteredSavings]);
+  const branchSpecificData = useMemo(() => {
+    const branchSavings = savingsWithTotals.filter(s => 
+      selectedBranchFilter === 'all' || s.branchId === selectedBranchFilter
+    );
+    return {
+      total: branchSavings.reduce((sum, s) => sum + s.totalSavings, 0),
+      count: branchSavings.length
+    };
+  }, [savingsWithTotals, selectedBranchFilter]);
 
   const [isAddingPerson, setIsAddingPerson] = useState(false);
   const [isAddingTransaction, setIsAddingTransaction] = useState(false);
@@ -368,12 +374,12 @@ export function Savings() {
           
           <div className="space-y-1">
             <h3 className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-[0.25em]">
-              Tabungan Terkumpul {selectedBranchFilter !== 'all' ? `(${store.branches.find(b => b.id === selectedBranchFilter)?.name})` : '(Semua Cabang)'}
+              Tabungan Terkumpul {selectedBranchFilter !== 'all' ? `(${store.branches.find(b => b.id === selectedBranchFilter)?.name})` : '(Global)'}
             </h3>
             <div className="flex items-baseline gap-2">
               <span className="text-xl font-black text-emerald-500">Rp</span>
               <p className="text-4xl font-black tracking-tighter text-white">
-                {totalFilteredSavings.toLocaleString('id-ID')}
+                {branchSpecificData.total.toLocaleString('id-ID')}
               </p>
             </div>
           </div>
@@ -381,14 +387,14 @@ export function Savings() {
           <div className="pt-6 border-t border-asphalt-700 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex -space-x-3">
-                {[...Array(Math.min(3, filteredSavings.length))].map((_, i) => (
+                {[...Array(Math.min(3, branchSpecificData.count))].map((_, i) => (
                   <div key={i} className="w-8 h-8 rounded-xl border-2 border-asphalt-800 bg-asphalt-700 flex items-center justify-center overflow-hidden">
                     <div className="w-full h-full bg-gradient-to-br from-emerald-500 to-emerald-700"></div>
                   </div>
                 ))}
               </div>
               <p className="text-[10px] text-asphalt-text-100 font-black uppercase tracking-tight">
-                {filteredSavings.length} Nasabah
+                {branchSpecificData.count} Nasabah
               </p>
             </div>
             <div className="px-2 py-1 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
@@ -398,63 +404,66 @@ export function Savings() {
         </div>
       </div>
 
-      <div className="space-y-5">
-        <div className="flex items-center justify-between px-1">
-        <div className="flex flex-col gap-4">
-          <div className="flex justify-between items-center bg-asphalt-800 p-1.5 rounded-2xl border border-asphalt-700/50 shadow-lg">
+      <div className="space-y-6">
+        {/* Navigation Tabs */}
+        <div className="flex flex-col gap-5 px-1">
+          <div className="flex p-1.5 bg-asphalt-800 rounded-2xl border border-asphalt-700/50 shadow-xl">
             <button
               onClick={() => setActiveMainTab('savers')}
-              className={`flex-1 py-2 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest ${activeMainTab === 'savers' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20' : 'text-asphalt-text-400 hover:text-white'}`}
+              className={`flex-1 py-2.5 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest ${activeMainTab === 'savers' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20' : 'text-asphalt-text-400 hover:text-white'}`}
             >
               NASABAH
             </button>
             <button
               onClick={() => setActiveMainTab('history')}
-              className={`flex-1 py-2 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest ${activeMainTab === 'history' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20' : 'text-asphalt-text-400 hover:text-white'}`}
+              className={`flex-1 py-2.5 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest ${activeMainTab === 'history' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20' : 'text-asphalt-text-400 hover:text-white'}`}
             >
               RIWAYAT
             </button>
           </div>
           
-          <div className="flex flex-col gap-3">
-            {role === 'bos' && (
+          {/* Branch Filter for Owner */}
+          {role === 'bos' && (
+            <div className="space-y-2">
+              <p className="text-[8px] font-black text-brand-500 uppercase tracking-[0.2em] ml-1">Filter Cabang</p>
               <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
                 <button
                   onClick={() => setSelectedBranchFilter('all')}
-                  className={`px-3.5 py-1.5 rounded-lg text-[9px] font-black transition-all uppercase tracking-wider border whitespace-nowrap ${selectedBranchFilter === 'all' ? 'bg-brand-500/10 border-brand-500 text-brand-500' : 'bg-asphalt-800/50 border-asphalt-700 text-asphalt-text-400 hover:text-white'}`}
+                  className={`px-4 py-2 rounded-xl text-[9px] font-black transition-all uppercase tracking-wider border whitespace-nowrap ${selectedBranchFilter === 'all' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20 border-brand-500' : 'bg-asphalt-800 border-asphalt-700 text-asphalt-text-400 hover:border-asphalt-600'}`}
                 >
-                  Semua Cabang
+                  Global
                 </button>
                 {store.branches.map(b => (
                   <button
                     key={b.id}
                     onClick={() => setSelectedBranchFilter(b.id)}
-                    className={`px-3.5 py-1.5 rounded-lg text-[9px] font-black transition-all uppercase tracking-wider border whitespace-nowrap ${selectedBranchFilter === b.id ? 'bg-brand-500/10 border-brand-500 text-brand-500' : 'bg-asphalt-800/50 border-asphalt-700 text-asphalt-text-400 hover:text-white'}`}
+                    className={`px-4 py-2 rounded-xl text-[9px] font-black transition-all uppercase tracking-wider border whitespace-nowrap ${selectedBranchFilter === b.id ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20 border-brand-500' : 'bg-asphalt-800 border-asphalt-700 text-asphalt-text-400 hover:border-asphalt-600'}`}
                   >
                     {b.name}
                   </button>
                 ))}
               </div>
-            )}
+            </div>
+          )}
+          
+          {/* Sorting / Meta Row */}
+          <div className="flex items-center justify-between px-1">
+            <div className="text-[9px] font-black text-asphalt-text-400 uppercase tracking-widest">
+              {activeMainTab === 'savers' ? `${filteredSavings.length} Penabung Ditemukan` : 'Riwayat Terakhir'}
+            </div>
             
             {activeMainTab === 'savers' && (
-              <div className="flex items-center gap-2">
-                <div className="flex-1 text-[9px] font-black text-asphalt-text-400 uppercase tracking-widest px-1">
-                  Urutan:
-                </div>
-                <select 
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
-                  className="text-[10px] font-black text-asphalt-text-400 bg-asphalt-800 border border-asphalt-700 rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-emerald-500 uppercase tracking-widest transition-all hover:border-asphalt-600"
-                >
-                  <option value="latest">TERBARU</option>
-                  <option value="name">A-Z</option>
-                  <option value="amount">SALDO</option>
-                </select>
-              </div>
+              <select 
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="text-[10px] font-black text-asphalt-text-400 bg-asphalt-800 border border-asphalt-700 rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-emerald-500 uppercase tracking-widest transition-all hover:border-asphalt-600"
+              >
+                <option value="latest">URUT: TERBARU</option>
+                <option value="name">URUT: A-Z</option>
+                <option value="amount">URUT: SALDO</option>
+              </select>
             )}
           </div>
-        </div>
         </div>
 
         <div className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden">
