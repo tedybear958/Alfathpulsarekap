@@ -400,46 +400,61 @@ export function Savings() {
 
       <div className="space-y-5">
         <div className="flex items-center justify-between px-1">
-          <div className="flex bg-asphalt-800 p-1.5 rounded-2xl border border-asphalt-700/50 shadow-lg">
+        <div className="flex flex-col gap-4">
+          <div className="flex justify-between items-center bg-asphalt-800 p-1.5 rounded-2xl border border-asphalt-700/50 shadow-lg">
             <button
               onClick={() => setActiveMainTab('savers')}
-              className={`px-5 py-2 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest ${activeMainTab === 'savers' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20' : 'text-asphalt-text-400 hover:text-white'}`}
+              className={`flex-1 py-2 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest ${activeMainTab === 'savers' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20' : 'text-asphalt-text-400 hover:text-white'}`}
             >
               NASABAH
             </button>
             <button
               onClick={() => setActiveMainTab('history')}
-              className={`px-5 py-2 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest ${activeMainTab === 'history' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20' : 'text-asphalt-text-400 hover:text-white'}`}
+              className={`flex-1 py-2 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest ${activeMainTab === 'history' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20' : 'text-asphalt-text-400 hover:text-white'}`}
             >
               RIWAYAT
             </button>
           </div>
           
-          <div className="flex items-center gap-2">
-            {(role === 'bos' || role === 'mandor') && (
-              <select 
-                value={selectedBranchFilter}
-                onChange={(e) => setSelectedBranchFilter(e.target.value)}
-                className="text-[10px] font-black text-brand-500 bg-brand-500/10 border border-brand-500/20 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-brand-500 uppercase tracking-widest"
-              >
-                <option value="all">SEMUA CABANG</option>
+          <div className="flex flex-col gap-3">
+            {role === 'bos' && (
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+                <button
+                  onClick={() => setSelectedBranchFilter('all')}
+                  className={`px-3.5 py-1.5 rounded-lg text-[9px] font-black transition-all uppercase tracking-wider border whitespace-nowrap ${selectedBranchFilter === 'all' ? 'bg-brand-500/10 border-brand-500 text-brand-500' : 'bg-asphalt-800/50 border-asphalt-700 text-asphalt-text-400 hover:text-white'}`}
+                >
+                  Semua Cabang
+                </button>
                 {store.branches.map(b => (
-                  <option key={b.id} value={b.id}>{b.name.toUpperCase()}</option>
+                  <button
+                    key={b.id}
+                    onClick={() => setSelectedBranchFilter(b.id)}
+                    className={`px-3.5 py-1.5 rounded-lg text-[9px] font-black transition-all uppercase tracking-wider border whitespace-nowrap ${selectedBranchFilter === b.id ? 'bg-brand-500/10 border-brand-500 text-brand-500' : 'bg-asphalt-800/50 border-asphalt-700 text-asphalt-text-400 hover:text-white'}`}
+                  >
+                    {b.name}
+                  </button>
                 ))}
-              </select>
+              </div>
             )}
+            
             {activeMainTab === 'savers' && (
-              <select 
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                className="text-[10px] font-black text-asphalt-text-400 bg-asphalt-800 border border-asphalt-700 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 uppercase tracking-widest"
-              >
-                <option value="latest">TERBARU</option>
-                <option value="name">A-Z</option>
-                <option value="amount">SALDO</option>
-              </select>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 text-[9px] font-black text-asphalt-text-400 uppercase tracking-widest px-1">
+                  Urutan:
+                </div>
+                <select 
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  className="text-[10px] font-black text-asphalt-text-400 bg-asphalt-800 border border-asphalt-700 rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-emerald-500 uppercase tracking-widest transition-all hover:border-asphalt-600"
+                >
+                  <option value="latest">TERBARU</option>
+                  <option value="name">A-Z</option>
+                  <option value="amount">SALDO</option>
+                </select>
+              </div>
             )}
           </div>
+        </div>
         </div>
 
         <div className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden">
