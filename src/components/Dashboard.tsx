@@ -5,6 +5,7 @@ import { checkIsBos } from '../utils/authUtils';
 import { formatRupiah, formatNumberInput, formatDate } from '../utils/formatters';
 import { Building2, Plus, Trash2, Landmark, Receipt, Coins, Edit3, Check, Send, PiggyBank, Users, Ticket, Store, BookOpen, MoreHorizontal, History as HistoryIcon, UserCog, X, FileText } from 'lucide-react';
 import { ConfirmModal } from './ConfirmModal';
+import { SuccessToast } from './SuccessToast';
 
 interface ServiceIconProps {
   icon: React.ReactNode;
@@ -66,6 +67,11 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
 
   const [editingBankId, setEditingBankId] = useState<string | null>(null);
   const [bankInput, setBankInput] = useState('');
+
+  const [toast, setToast] = useState<{ show: boolean; message: string }>({
+    show: false,
+    message: ''
+  });
 
   const totalBank = store.getTotalBankBalance();
   const totalDebt = store.getTotalDebt();
@@ -191,6 +197,7 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
         await store.addBankBalance(newBankName, val);
         setNewBankName('');
         setNewBankBalance('');
+        setToast({ show: true, message: `Rekening ${newBankName} berhasil ditambahkan` });
       } catch (error) {
         console.error("Failed to add bank", error);
         store.setError("Gagal menambah rekening. Pastikan koneksi internet stabil.");
@@ -208,8 +215,10 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
     const val = parseInt(bankInput.replace(/\D/g, ''), 10);
     if (!isNaN(val)) {
       await store.updateBankBalance(id, val);
+      setToast({ show: true, message: 'Saldo rekening berhasil diperbarui' });
     } else if (bankInput === '') {
       await store.updateBankBalance(id, 0);
+      setToast({ show: true, message: 'Saldo rekening berhasil diperbarui menjadi 0' });
     }
     setEditingBankId(null);
   };
@@ -226,12 +235,12 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
   };
 
   return (
-    <div className="p-5 space-y-6 pb-32">
+    <div className="p-4 space-y-6 pb-32">
       {/* Announcement Editor for Bos */}
       {isBosGlobal && (
-        <div className="bg-asphalt-800 rounded-3xl p-5 border border-asphalt-700/50 shadow-xl overflow-hidden relative group transition-all hover:border-brand-500/30">
+        <div className="bg-asphalt-800 rounded-3xl p-4 border border-asphalt-700/50 shadow-xl overflow-hidden relative group transition-all hover:border-brand-500/30">
           <div className="absolute top-0 right-0 w-24 h-24 bg-brand-500/5 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-brand-500/10 transition-colors"></div>
-          <div className="relative z-10 space-y-4">
+          <div className="relative z-10 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
@@ -242,7 +251,7 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
               {!isEditingAnnouncement ? (
                 <button 
                   onClick={() => { setAnnouncementInput(store.announcement); setIsEditingAnnouncement(true); }}
-                  className="text-[10px] font-black text-brand-500 bg-brand-500/10 px-4 py-2 rounded-xl border border-brand-500/20 hover:bg-brand-500/20 transition-all uppercase tracking-tighter"
+                  className="text-[9px] font-black text-brand-500 bg-brand-500/10 px-3 py-1.5 rounded-lg border border-brand-500/20 hover:bg-brand-500/20 transition-all uppercase tracking-tighter"
                 >
                   Ubah Pesan
                 </button>
@@ -250,14 +259,14 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
                 <div className="flex gap-2">
                   <button 
                     onClick={() => setIsEditingAnnouncement(false)}
-                    className="text-[10px] font-black text-asphalt-text-400 px-4 py-2 uppercase tracking-tighter"
+                    className="text-[9px] font-black text-asphalt-text-400 px-3 py-1.5 uppercase tracking-tighter"
                   >
                     Batal
                   </button>
                   <button 
                     onClick={handleSaveAnnouncement}
                     disabled={isSavingAnnouncement}
-                    className="text-[10px] font-black text-white px-4 py-2 bg-brand-500 rounded-xl shadow-lg shadow-brand-500/20 disabled:opacity-50 uppercase tracking-tighter"
+                    className="text-[9px] font-black text-white px-3 py-1.5 bg-brand-500 rounded-lg shadow-lg shadow-brand-500/20 disabled:opacity-50 uppercase tracking-tighter"
                   >
                     {isSavingAnnouncement ? '...' : 'Simpan'}
                   </button>
@@ -267,15 +276,15 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
             
             {isEditingAnnouncement ? (
               <textarea
-                className="w-full p-4 text-sm bg-asphalt-900 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none resize-none min-h-[100px] text-asphalt-text-100 transition-all"
-                placeholder="Masukkan pesan untuk karyawan (misal: INFO: Pastikan teliti sebelum klik!...)"
+                className="w-full p-3 text-xs bg-asphalt-900 border border-asphalt-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none resize-none min-h-[80px] text-asphalt-text-100 transition-all font-medium"
+                placeholder="Masukkan pesan untuk karyawan..."
                 value={announcementInput}
                 onChange={(e) => setAnnouncementInput(e.target.value)}
               />
             ) : (
-              <div className="bg-asphalt-900/50 p-4 rounded-2xl border border-asphalt-700/50 min-h-[60px] flex items-center">
-                <p className="text-sm italic text-asphalt-text-400 leading-relaxed font-medium">
-                  {store.announcement || 'Belum ada pesan running text. Tambahkan pesan untuk memotivasi atau mengingatkan karyawan.'}
+              <div className="bg-asphalt-900/50 p-3 rounded-xl border border-asphalt-700/50 min-h-[50px] flex items-center">
+                <p className="text-xs italic text-asphalt-text-400 leading-relaxed font-medium">
+                  {store.announcement || 'Belum ada pesan running text.'}
                 </p>
               </div>
             )}
@@ -284,7 +293,7 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
       )}
 
       {/* Main Balance Card (GoPay Inspired Card) */}
-      <div className="bg-asphalt-800 rounded-[2.5rem] p-7 border border-asphalt-700/50 shadow-2xl relative overflow-hidden group">
+      <div className="bg-asphalt-800 rounded-[2.5rem] p-6 border border-asphalt-700/50 shadow-2xl relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-48 h-48 bg-brand-500/10 rounded-full -mr-24 -mt-24 blur-[80px] group-hover:bg-brand-500/20 transition-all duration-700"></div>
         <div className="relative z-10 space-y-6">
           <div className="space-y-1">
@@ -304,7 +313,7 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
             </div>
           </div>
           
-          <div className="grid grid-cols-2 gap-6 pt-6 border-t border-asphalt-700/50">
+          <div className="grid grid-cols-2 gap-6 pt-5 border-t border-asphalt-700/50">
             <div className="space-y-2">
               <p className="text-[9px] font-black text-asphalt-text-400 uppercase tracking-widest">
                 Dana Digital
@@ -360,8 +369,8 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
       </div>
 
       {/* Grid Services - Asphalt Style Menu */}
-      <div className="bg-asphalt-800 rounded-[2.5rem] p-6 border border-asphalt-700/50 shadow-2xl">
-        <div className="grid grid-cols-4 gap-y-8">
+      <div className="bg-asphalt-800 rounded-[2.5rem] p-5 border border-asphalt-700/50 shadow-2xl">
+        <div className="grid grid-cols-4 gap-y-7">
           <ServiceIcon 
             icon={<Users className="w-6 h-6 text-brand-500" />} 
             label="Hutang / Bon" 
@@ -421,8 +430,8 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
               if (!currentBranchData) return null;
 
               return (
-                <div key={branch.id} className="bg-asphalt-800 rounded-[2rem] p-5 border border-asphalt-700/50 shadow-xl space-y-4">
-                  <div className="flex justify-between items-center border-b border-asphalt-700/50 pb-4">
+                <div key={branch.id} className="bg-asphalt-800 rounded-[2rem] p-4 border border-asphalt-700/50 shadow-xl space-y-4">
+                  <div className="flex justify-between items-center border-b border-asphalt-700/50 pb-3">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-2xl bg-brand-500/10 flex items-center justify-center border border-brand-500/20">
                         <Building2 className="w-5 h-5 text-brand-500" />
@@ -458,7 +467,7 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
       {/* Mini Stats - Hidden for Bos Global as requested */}
       {!isBosGlobal && (
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-asphalt-800 p-5 rounded-3xl border border-asphalt-700/50 shadow-xl flex flex-col justify-center space-y-2 group hover:border-emerald-500/30 transition-all">
+          <div className="bg-asphalt-800 p-4 rounded-3xl border border-asphalt-700/50 shadow-xl flex flex-col justify-center space-y-2 group hover:border-emerald-500/30 transition-all">
             <div className="flex items-center gap-2 text-emerald-500">
               <div className="p-1.5 bg-emerald-500/10 rounded-lg">
                 <Landmark className="w-4 h-4" />
@@ -467,7 +476,7 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
             </div>
             <p className="text-base font-black text-white">{formatRupiah(currentBankTotal)}</p>
           </div>
-          <div className="bg-asphalt-800 p-5 rounded-3xl border border-asphalt-700/50 shadow-xl flex flex-col justify-center space-y-2 group hover:border-rose-500/30 transition-all">
+          <div className="bg-asphalt-800 p-4 rounded-3xl border border-asphalt-700/50 shadow-xl flex flex-col justify-center space-y-2 group hover:border-rose-500/30 transition-all">
             <div className="flex items-center gap-2 text-rose-500">
               <div className="p-1.5 bg-rose-500/10 rounded-lg">
                 <Receipt className="w-4 h-4" />
@@ -476,7 +485,7 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
             </div>
             <p className="text-base font-black text-white">{formatRupiah(currentDebtTotal)}</p>
           </div>
-          <div className="bg-brand-500 p-5 rounded-[2rem] shadow-xl shadow-brand-500/20 flex flex-col justify-center col-span-2 space-y-2">
+          <div className="bg-brand-500 p-4 rounded-[2rem] shadow-xl shadow-brand-500/20 flex flex-col justify-center col-span-2 space-y-2">
             <div className="flex items-center gap-2 text-white/80">
               <PiggyBank className="w-5 h-5 text-white" />
               <span className="text-[10px] font-black uppercase tracking-[0.2em]">Tabungan Karyawan</span>
@@ -497,27 +506,27 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
           </div>
 
           <div className="bg-asphalt-800 rounded-[2.5rem] border border-asphalt-700/50 shadow-2xl overflow-hidden">
-            <div className="p-6 bg-asphalt-900/40 border-b border-asphalt-700/50">
+            <div className="p-4 bg-asphalt-900/40 border-b border-asphalt-700/50">
               <form onSubmit={handleAddBank} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
                     <label className="text-[9px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Bank</label>
                     <input
                       type="text"
                       placeholder="e.g. BCA"
-                      className="w-full px-4 py-3 text-xs bg-asphalt-800 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none text-white font-bold"
+                      className="w-full pl-4 pr-3 py-3 text-xs bg-asphalt-800 border border-asphalt-700 rounded-xl focus:ring-1 focus:ring-brand-500 outline-none text-white font-bold"
                       value={newBankName}
                       onChange={(e) => setNewBankName(e.target.value)}
                       required
                     />
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <label className="text-[9px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Saldo</label>
                     <input
                       type="text"
                       inputMode="numeric"
                       placeholder="0"
-                      className="w-full px-4 py-3 text-xs bg-asphalt-800 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none text-white font-bold"
+                      className="w-full pl-4 pr-3 py-3 text-xs bg-asphalt-800 border border-asphalt-700 rounded-xl focus:ring-1 focus:ring-brand-500 outline-none text-white font-bold"
                       value={formatNumberInput(newBankBalance)}
                       onChange={(e) => handleNumericInput(e, setNewBankBalance)}
                       required
@@ -527,7 +536,7 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
                 <button 
                   type="submit" 
                   disabled={isAddingBank}
-                  className="w-full bg-brand-500 hover:bg-brand-600 font-black text-white text-[10px] py-3.5 rounded-2xl transition-all shadow-lg shadow-brand-500/20 active:scale-95 disabled:opacity-50 uppercase tracking-widest"
+                  className="w-full bg-brand-500 hover:bg-brand-600 font-black text-[10px] py-3.5 rounded-xl transition-all shadow-lg active:scale-95 disabled:opacity-50 uppercase tracking-widest"
                 >
                   {isAddingBank ? 'Sabar...' : 'Tambah Rekening'}
                 </button>
@@ -542,11 +551,11 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
                 </div>
               ) : (
                 store.bankBalances.map((bank) => (
-                  <div key={bank.id} className="p-5 flex items-center justify-between group hover:bg-asphalt-700/20 transition-all">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-md p-2">
-                        <span className="text-[10px] font-black text-brand-900 line-clamp-1 text-center leading-none">
-                          {bank.bankName.toUpperCase()}
+                  <div key={bank.id} className="p-3.5 flex items-center justify-between group hover:bg-asphalt-700/20 transition-all">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-md p-1.5 shrink-0">
+                        <span className="text-[8px] font-black text-brand-900 line-clamp-1 text-center leading-none uppercase tracking-tighter">
+                          {bank.bankName}
                         </span>
                       </div>
                       {editingBankId === bank.id ? (
@@ -556,53 +565,53 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
                             <input
                               type="text"
                               inputMode="numeric"
-                              className="w-full pl-8 pr-3 py-2 bg-asphalt-900 border border-brand-500 rounded-xl text-xs text-white outline-none focus:ring-1 focus:ring-brand-500"
+                              className="w-full pl-8 pr-3 py-2.5 bg-asphalt-900 border border-brand-500 rounded-xl text-xs text-white outline-none focus:ring-1 focus:ring-brand-500"
                               value={formatNumberInput(bankInput)}
                               onChange={(e) => handleNumericInput(e, setBankInput)}
                               onKeyDown={(e) => e.key === 'Enter' && handleSaveBankBalance(bank.id)}
                               autoFocus
                             />
                           </div>
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-1.5">
                             <button
                               onClick={() => handleSaveBankBalance(bank.id)}
-                              className="p-2.5 bg-brand-500 text-white rounded-xl shadow-lg shadow-brand-500/20 active:scale-95 transition-all"
+                              className="p-2.5 bg-brand-500 text-white rounded-lg shadow-lg shadow-brand-500/20 active:scale-95 transition-all"
                               title="Simpan"
                             >
-                              <Check className="w-3.5 h-3.5 stroke-[4px]" />
+                              <Check className="w-3.5 h-3.5 stroke-[3px]" />
                             </button>
                             <button
                               onClick={() => setEditingBankId(null)}
-                              className="p-2.5 bg-asphalt-700 text-asphalt-text-400 rounded-xl hover:text-white transition-all"
+                              className="p-2.5 bg-asphalt-700 text-asphalt-text-400 rounded-lg hover:text-white transition-all"
                               title="Batal"
                             >
-                              <X className="w-3.5 h-3.5" />
+                              <X className="w-3.5 h-3.5 stroke-[3px]" />
                             </button>
                           </div>
                         </div>
                       ) : (
-                        <div>
-                          <p className="text-[9px] font-black text-asphalt-text-400 uppercase tracking-widest">{bank.bankName}</p>
-                          <p className="text-sm font-black text-white">{formatRupiah(bank.balance)}</p>
+                        <div className="min-w-0">
+                          <p className="text-[9px] font-black text-asphalt-text-400 uppercase tracking-widest truncate max-w-[80px]">{bank.bankName}</p>
+                          <p className="text-[13px] font-black text-white">{formatRupiah(bank.balance)}</p>
                         </div>
                       )}
                     </div>
                     
                     {editingBankId !== bank.id && (
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-2 shrink-0 ml-1">
                         <button
                           onClick={() => { setBankInput(bank.balance.toString()); setEditingBankId(bank.id); }}
-                          className="p-2.5 text-brand-500 bg-brand-500/10 border border-brand-500/20 rounded-xl transition-all active:scale-90"
+                          className="p-2 text-brand-500 bg-brand-500/10 border border-brand-500/20 rounded-lg transition-all active:scale-90"
                           title="Edit Saldo"
                         >
-                          <Edit3 className="w-3.5 h-3.5" />
+                          <Edit3 className="w-3 h-3" />
                         </button>
                         <button
                           onClick={() => setDeleteConfirm({ isOpen: true, id: bank.id, name: bank.bankName })}
-                          className="p-2.5 text-rose-500 bg-rose-500/10 border border-rose-500/20 rounded-xl transition-all active:scale-90"
+                          className="p-2 text-rose-500 bg-rose-500/10 border border-rose-500/20 rounded-lg transition-all active:scale-90"
                           title="Hapus Rekening"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-3 h-3" />
                         </button>
                       </div>
                     )}
@@ -636,8 +645,23 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
         isOpen={deleteConfirm.isOpen}
         title="Hapus Rekening"
         message={`Apakah Anda yakin ingin menghapus rekening ${deleteConfirm.name}? Data yang dihapus tidak dapat dikembalikan.`}
-        onConfirm={() => store.deleteBankBalance(deleteConfirm.id)}
+        onConfirm={async () => {
+          try {
+            await store.deleteBankBalance(deleteConfirm.id);
+            setToast({ show: true, message: `Rekening ${deleteConfirm.name} berhasil dihapus` });
+          } catch (error) {
+            console.error("Failed to delete bank", error);
+            store.setError("Gagal menghapus rekening.");
+          }
+          setDeleteConfirm({ isOpen: false, id: '', name: '' });
+        }}
         onCancel={() => setDeleteConfirm({ isOpen: false, id: '', name: '' })}
+      />
+
+      <SuccessToast 
+        show={toast.show} 
+        message={toast.message} 
+        onClose={() => setToast({ ...toast, show: false })} 
       />
     </div>
   );

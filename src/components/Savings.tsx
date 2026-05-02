@@ -122,10 +122,10 @@ export function Savings() {
     
     return (
       <div className="flex flex-col min-h-full bg-asphalt-900 pb-40">
-        <header className="bg-asphalt-800 px-5 py-4 flex items-center gap-4 shadow-xl border-b border-asphalt-700/50 sticky top-0 z-20">
+        <header className="bg-asphalt-800 px-4 py-4 flex items-center gap-4 shadow-xl border-b border-asphalt-700/50 sticky top-0 z-20">
           <button 
             onClick={() => setSelectedPersonId(null)}
-            className="p-2.5 -ml-2 bg-asphalt-700/50 hover:bg-asphalt-700 rounded-2xl transition-all text-asphalt-text-100"
+            className="p-2 -ml-1 bg-asphalt-700/50 hover:bg-asphalt-700 rounded-2xl transition-all text-asphalt-text-100"
           >
             <ArrowLeft className="w-5 h-5 stroke-[2.5px]" />
           </button>
@@ -135,7 +135,7 @@ export function Savings() {
           </div>
         </header>
 
-        <div className="p-5 space-y-6">
+        <div className="p-4 space-y-6">
           <div className="bg-gradient-to-br from-emerald-500 to-emerald-700 p-8 rounded-[2.5rem] shadow-2xl shadow-emerald-500/20 text-center text-white relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-24 -mt-24 blur-3xl group-hover:scale-125 transition-transform duration-1000"></div>
             <div className="relative z-10">
@@ -148,7 +148,7 @@ export function Savings() {
 
           {canEdit && (
             <div className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden">
-              <div className="p-6 bg-asphalt-900/40 border-b border-asphalt-700/50">
+              <div className="p-5 bg-asphalt-900/40 border-b border-asphalt-700/50">
                 <form onSubmit={handleAddTransaction} className="space-y-4">
                   <div className="grid grid-cols-3 gap-3">
                     <select
@@ -176,7 +176,7 @@ export function Savings() {
                     <input
                       type="text"
                       placeholder="Keterangan (ex: Tabungan Lebaran)"
-                      className="flex-1 px-5 py-3.5 text-sm bg-asphalt-800 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-white font-medium"
+                      className="flex-1 px-4 py-3.5 text-sm bg-asphalt-800 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-white font-medium"
                       value={descInput}
                       onChange={(e) => setDescInput(e.target.value)}
                       required
@@ -198,19 +198,19 @@ export function Savings() {
 
               <div className="overflow-x-auto">
                 {selectedPerson.transactions.length === 0 ? (
-                  <div className="py-20 flex flex-col items-center justify-center opacity-20">
+                  <div className="py-16 flex flex-col items-center justify-center opacity-20">
                     <PiggyBank className="w-12 h-12 text-asphalt-text-400 mb-2" />
                     <p className="text-[10px] font-black uppercase tracking-widest text-asphalt-text-400">Belum ada transaksi</p>
                   </div>
                 ) : (
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-asphalt-900/40 border-b border-asphalt-700/50 text-[9px] font-black text-asphalt-text-400 uppercase tracking-widest">
-                        <th className="p-4 whitespace-nowrap">Tanggal</th>
-                        <th className="p-4">Keterangan</th>
-                        <th className="p-4 text-right">In/Out</th>
-                        <th className="p-4 text-right">Saldo</th>
-                        <th className="p-1"></th>
+                      <tr className="bg-asphalt-900/40 border-b border-asphalt-700/50 text-[8px] font-black text-asphalt-text-400 uppercase tracking-widest">
+                        <th className="px-2 py-2 whitespace-nowrap">Tanggal</th>
+                        <th className="px-2 py-2">Keterangan</th>
+                        <th className="px-2 py-2 text-right">In/Out</th>
+                        <th className="px-2 py-2 text-right">Saldo</th>
+                        <th className="p-0.5 w-6"></th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-asphalt-700/50 text-xs">
@@ -224,29 +224,29 @@ export function Savings() {
                         
                         return txsWithBalance.reverse().map((transaction) => (
                           <tr key={transaction.id} className="hover:bg-asphalt-700/20 transition-all group">
-                            <td className="p-4 whitespace-nowrap">
-                              <p className="text-white font-bold">{formatDate(transaction.date).split(' ')[0]}</p>
-                              <p className="text-[9px] text-asphalt-text-400">{formatDate(transaction.date).split(' ')[1]}</p>
+                            <td className="px-2 py-2 whitespace-nowrap">
+                              <p className="text-white font-bold text-[10px]">{formatDate(transaction.date).split(' ')[0]}</p>
+                              <p className="text-[7px] text-asphalt-text-400">{formatDate(transaction.date).split(' ')[1]}</p>
                             </td>
-                            <td className="p-4">
-                              <p className="font-black text-white uppercase tracking-tight line-clamp-1">{transaction.description}</p>
+                            <td className="px-2 py-2">
+                              <p className="font-black text-white uppercase tracking-tight leading-tight text-[10px] line-clamp-1">{transaction.description}</p>
                               {transaction.createdByName && (
-                                <p className="text-[8px] text-brand-500 font-black uppercase tracking-widest mt-0.5">{transaction.createdByName}</p>
+                                <p className="text-[7px] text-brand-500 font-black uppercase tracking-widest mt-0.5">{transaction.createdByName}</p>
                               )}
                             </td>
-                            <td className={`p-4 text-right font-black ${transaction.type === 'deposit' ? 'text-emerald-500' : 'text-rose-500'}`}>
+                            <td className={`px-2 py-2 text-right font-black text-[10px] ${transaction.type === 'deposit' ? 'text-emerald-500' : 'text-rose-500'}`}>
                               {transaction.type === 'deposit' ? '+' : '-'}{formatRupiah(transaction.amount)}
                             </td>
-                            <td className="p-4 text-right font-black text-white">
+                            <td className="px-2 py-2 text-right font-black text-white text-[10px]">
                               {formatRupiah(transaction.balance)}
                             </td>
-                            <td className="p-2 text-center">
+                            <td className="p-0.5 text-center">
                         {canDelete && (
                           <button
                             onClick={() => setDeleteConfirm({ isOpen: true, type: 'transaction', personId: selectedPerson.id, transactionId: transaction.id, name: transaction.description })}
-                            className="p-1.5 text-asphalt-text-400 hover:text-rose-500 transition-all"
+                            className="p-1 text-asphalt-text-400 hover:text-rose-500 transition-all"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-3 h-3" />
                           </button>
                         )}
                             </td>
@@ -271,11 +271,11 @@ export function Savings() {
                 ) : (
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-asphalt-900/40 border-b border-asphalt-700/50 text-[9px] font-black text-asphalt-text-400 uppercase tracking-widest">
-                        <th className="p-4 whitespace-nowrap">Tanggal</th>
-                        <th className="p-4">Keterangan</th>
-                        <th className="p-4 text-right">In/Out</th>
-                        <th className="p-4 text-right">Saldo</th>
+                      <tr className="bg-asphalt-900/40 border-b border-asphalt-700/50 text-[8px] font-black text-asphalt-text-400 uppercase tracking-widest">
+                        <th className="px-3 py-2 whitespace-nowrap">Tanggal</th>
+                        <th className="px-3 py-2">Keterangan</th>
+                        <th className="px-3 py-2 text-right">In/Out</th>
+                        <th className="px-3 py-2 text-right">Saldo</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-asphalt-700/50 text-xs text-white">
@@ -288,19 +288,19 @@ export function Savings() {
                         });
                         return txsWithBalance.reverse().map((transaction) => (
                           <tr key={transaction.id} className="hover:bg-asphalt-700/20 transition-all">
-                            <td className="p-4 whitespace-nowrap text-asphalt-text-100 font-bold">
+                            <td className="px-3 py-2.5 whitespace-nowrap text-asphalt-text-100 font-bold text-[10px]">
                               {formatDate(transaction.date)}
                             </td>
-                            <td className="p-4">
-                              <p className="font-black uppercase tracking-tight">{transaction.description}</p>
+                            <td className="px-3 py-2.5">
+                              <p className="font-black uppercase tracking-tight leading-tight">{transaction.description}</p>
                               {transaction.createdByName && (
                                 <p className="text-[8px] text-brand-500 font-black uppercase tracking-widest mt-0.5">{transaction.createdByName}</p>
                               )}
                             </td>
-                            <td className={`p-4 text-right font-black ${transaction.type === 'deposit' ? 'text-emerald-500' : 'text-rose-500'}`}>
+                            <td className={`px-3 py-2.5 text-right font-black ${transaction.type === 'deposit' ? 'text-emerald-500' : 'text-rose-500'}`}>
                               {transaction.type === 'deposit' ? '+' : '-'}{formatRupiah(transaction.amount)}
                             </td>
-                            <td className="p-4 text-right font-black">
+                            <td className="px-3 py-2.5 text-right font-black">
                               {formatRupiah(transaction.balance)}
                             </td>
                           </tr>
@@ -339,7 +339,7 @@ export function Savings() {
   }
 
   return (
-    <div className="p-5 space-y-7 bg-asphalt-900 min-h-full pb-40">
+    <div className="p-4 space-y-7 bg-asphalt-900 min-h-full pb-40">
       {/* Summary Header */}
       <div className="bg-asphalt-800 rounded-[2.5rem] p-7 border border-asphalt-700/50 shadow-2xl relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full -mr-32 -mt-32 blur-[100px] group-hover:bg-emerald-500/20 transition-all duration-1000"></div>
@@ -394,13 +394,13 @@ export function Savings() {
           <div className="flex bg-asphalt-800 p-1.5 rounded-2xl border border-asphalt-700/50 shadow-lg">
             <button
               onClick={() => setActiveMainTab('savers')}
-              className={`px-6 py-2 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest ${activeMainTab === 'savers' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20' : 'text-asphalt-text-400 hover:text-white'}`}
+              className={`px-5 py-2 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest ${activeMainTab === 'savers' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20' : 'text-asphalt-text-400 hover:text-white'}`}
             >
               NASABAH
             </button>
             <button
               onClick={() => setActiveMainTab('history')}
-              className={`px-6 py-2 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest ${activeMainTab === 'history' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20' : 'text-asphalt-text-400 hover:text-white'}`}
+              className={`px-5 py-2 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest ${activeMainTab === 'history' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20' : 'text-asphalt-text-400 hover:text-white'}`}
             >
               RIWAYAT
             </button>
@@ -409,7 +409,7 @@ export function Savings() {
             <select 
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="text-[10px] font-black text-asphalt-text-400 bg-asphalt-800 border border-asphalt-700 rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-emerald-500 uppercase tracking-widest"
+              className="text-[10px] font-black text-asphalt-text-400 bg-asphalt-800 border border-asphalt-700 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 uppercase tracking-widest"
             >
               <option value="latest">TERBARU</option>
               <option value="name">A-Z</option>
@@ -422,15 +422,15 @@ export function Savings() {
           {activeMainTab === 'savers' ? (
             <>
               {canEdit && (
-                <div className="p-6 bg-asphalt-900/40 border-b border-asphalt-700/50 space-y-5">
+                <div className="p-5 bg-asphalt-900/40 border-b border-asphalt-700/50 space-y-5">
                   <form onSubmit={handleAddPerson} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-3">
                       <div className="relative">
-                        <PiggyBank className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-asphalt-text-400" />
+                        <PiggyBank className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-asphalt-text-400" />
                         <input
                           type="text"
                           placeholder="Nama Nasabah"
-                          className="w-full pl-10 pr-4 py-3.5 text-sm bg-asphalt-800 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-white font-black placeholder:text-asphalt-text-400/30"
+                          className="w-full pl-9 pr-3 py-3.5 text-xs bg-asphalt-800 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-white font-black placeholder:text-asphalt-text-400/30"
                           value={newPersonName}
                           onChange={(e) => setNewPersonName(e.target.value)}
                           required
@@ -441,7 +441,7 @@ export function Savings() {
                           type="tel"
                           placeholder="No. Telepon"
                           inputMode="numeric"
-                          className="w-full px-4 py-3.5 text-sm bg-asphalt-800 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-white font-black placeholder:text-asphalt-text-400/30"
+                          className="w-full px-3 py-3.5 text-xs bg-asphalt-800 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-white font-black placeholder:text-asphalt-text-400/30"
                           value={newPersonPhone}
                           onChange={(e) => setNewPersonPhone(e.target.value)}
                         />
@@ -456,7 +456,7 @@ export function Savings() {
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       ) : (
                         <>
-                          <Plus className="w-5 h-5 stroke-[3px]" />
+                          <CheckCircle2 className="w-4 h-4 stroke-[3px]" />
                           <span>NASABAH BARU</span>
                         </>
                       )}
@@ -478,7 +478,7 @@ export function Savings() {
 
               <div className="divide-y divide-asphalt-700/50">
                 {filteredSavings.length === 0 ? (
-                  <div className="text-center py-20 bg-asphalt-800/50">
+                  <div className="text-center py-16 bg-asphalt-800/50">
                     <div className="w-20 h-20 bg-asphalt-900 rounded-[2rem] flex items-center justify-center mx-auto mb-5 border border-asphalt-700/50">
                       <PiggyBank className="w-10 h-10 text-asphalt-700" />
                     </div>
@@ -493,36 +493,36 @@ export function Savings() {
                     const avatarColor = colors[colorIndex];
 
                     return (
-                      <div key={person.id} className="flex items-center p-5 hover:bg-asphalt-700/20 transition-all group active:bg-asphalt-700/40">
-                        <div className="flex-1 flex items-center gap-4 cursor-pointer min-w-0" onClick={() => setSelectedPersonId(person.id)}>
-                          <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${avatarColor} flex items-center justify-center text-white font-black text-sm shrink-0 shadow-lg border border-white/10 group-hover:scale-110 transition-all duration-300`}>
+                      <div key={person.id} className="flex items-center p-3 hover:bg-asphalt-700/20 transition-all group active:bg-asphalt-700/40">
+                        <div className="flex-1 flex items-center gap-3 cursor-pointer min-w-0" onClick={() => setSelectedPersonId(person.id)}>
+                          <div className={`w-10 h-10 rounded-2xl bg-gradient-to-br ${avatarColor} flex items-center justify-center text-white font-black text-sm shrink-0 shadow-lg border border-white/10 group-hover:scale-110 transition-all duration-300`}>
                             {initials}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className="text-sm font-black text-white leading-tight truncate uppercase tracking-tight">{person.personName}</h3>
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <h3 className="text-[13px] font-black text-white leading-tight uppercase tracking-tight truncate">{person.personName}</h3>
                               {(role === 'bos' || role === 'mandor') && (
-                                <span className="text-[8px] font-black px-1.5 py-0.5 bg-emerald-500/10 text-emerald-500 rounded-md uppercase tracking-wider border border-emerald-500/20">
+                                <span className="text-[7px] font-black px-1.5 py-0.5 bg-emerald-500/10 text-emerald-500 rounded-md uppercase tracking-wider border border-emerald-500/20 shrink-0">
                                   {store.branches.find(b => b.id === person.branchId)?.name || 'Central'}
                                 </span>
                               )}
                             </div>
                             <div className="flex items-center gap-2">
-                              {person.phone && <p className="text-[9px] text-asphalt-text-400 font-black tracking-widest">{person.phone}</p>}
+                              {person.phone && <p className="text-[8px] text-asphalt-text-400 font-black tracking-widest">{person.phone}</p>}
                               {person.phone && <span className="w-1 h-1 bg-asphalt-700 rounded-full"></span>}
-                              <p className="text-[9px] text-asphalt-text-400 font-black tracking-widest uppercase">{person.transactions.length} Aktivitas</p>
+                              <p className="text-[8px] text-asphalt-text-400 font-black tracking-widest uppercase">{person.transactions.length} Aktivitas</p>
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-5 shrink-0">
+                        <div className="flex items-center gap-2.5 shrink-0 ml-1">
                           <div className="text-right">
-                            <p className={`text-base font-black ${total > 0 ? 'text-emerald-500' : 'text-white'}`}>
+                            <p className={`text-[13px] font-black ${total > 0 ? 'text-emerald-500' : 'text-white'}`}>
                               {formatRupiah(total)}
                             </p>
                           </div>
                           {canDelete && (
-                            <button onClick={() => setDeleteConfirm({ isOpen: true, type: 'person', personId: person.id, name: person.personName })} className="p-2.5 text-asphalt-text-400 hover:text-rose-500 bg-asphalt-700/30 rounded-xl transition-all">
-                              <Trash2 className="w-4 h-4" />
+                            <button onClick={() => setDeleteConfirm({ isOpen: true, type: 'person', personId: person.id, name: person.personName })} className="p-1.5 text-asphalt-text-400 hover:text-rose-500 bg-asphalt-700/30 rounded-lg transition-all">
+                              <Trash2 className="w-3 h-3" />
                             </button>
                           )}
                         </div>
@@ -540,30 +540,30 @@ export function Savings() {
                 </div>
               ) : (
                 globalTransactionHistory.map((tx) => (
-                  <div key={tx.id} className="p-5 flex items-center justify-between hover:bg-asphalt-700/20 transition-all group">
-                    <div className="flex items-center gap-4">
-                      <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border transition-colors ${tx.type === 'deposit' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-rose-500/10 border-rose-500/20 text-rose-500'}`}>
-                        {tx.type === 'deposit' ? <ArrowDownToLine className="w-5 h-5" /> : <ArrowUpFromLine className="w-5 h-5" />}
+                  <div key={tx.id} className="p-3.5 flex items-center justify-between hover:bg-asphalt-700/20 transition-all group">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border transition-colors ${tx.type === 'deposit' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-rose-500/10 border-rose-500/20 text-rose-500'}`}>
+                        {tx.type === 'deposit' ? <ArrowDownToLine className="w-4 h-4" /> : <ArrowUpFromLine className="w-4 h-4" />}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3 mb-0.5">
-                          <h4 className="text-sm font-black text-white uppercase tracking-tight truncate">{tx.personName}</h4>
-                          <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-wider ${tx.type === 'deposit' ? 'bg-emerald-500/20 text-emerald-500' : 'bg-rose-500/20 text-rose-500'}`}>
-                            {tx.type === 'deposit' ? 'NABUNG' : 'TARIK'}
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <h4 className="text-[12px] font-black text-white uppercase tracking-tight truncate">{tx.personName}</h4>
+                          <span className={`text-[7px] font-black px-1 py-0.5 rounded-md uppercase tracking-wider ${tx.type === 'deposit' ? 'bg-emerald-500/20 text-emerald-500' : 'bg-rose-500/20 text-rose-500'}`}>
+                            {tx.type === 'deposit' ? 'IN' : 'OUT'}
                           </span>
                         </div>
-                        <p className="text-[10px] text-asphalt-text-400 font-medium truncate">{tx.description}</p>
-                        <p className="text-[8px] text-brand-500 font-black uppercase tracking-widest mt-1">
-                          {formatDate(tx.date)} • {tx.createdByName || 'SYSTEM'}
+                        <p className="text-[9px] text-asphalt-text-400 font-medium truncate max-w-[120px]">{tx.description}</p>
+                        <p className="text-[7px] text-brand-500 font-black uppercase tracking-widest mt-0.5">
+                          {formatDate(tx.date)}
                         </p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className={`text-base font-black ${tx.type === 'deposit' ? 'text-emerald-500' : 'text-rose-500'}`}>
+                    <div className="text-right shrink-0 ml-1">
+                      <p className={`text-[12px] font-black ${tx.type === 'deposit' ? 'text-emerald-500' : 'text-rose-500'}`}>
                         {tx.type === 'deposit' ? '+' : '-'}{formatRupiah(tx.amount)}
                       </p>
                       {(role === 'bos' || role === 'mandor') && tx.branchId && (
-                        <p className="text-[8px] font-black text-asphalt-text-400 uppercase tracking-tighter mt-1">
+                        <p className="text-[7px] font-black text-asphalt-text-400 uppercase tracking-tighter mt-0.5">
                           {store.branches.find(b => b.id === tx.branchId)?.name || 'Pusat'}
                         </p>
                       )}
