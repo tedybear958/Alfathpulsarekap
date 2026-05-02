@@ -288,9 +288,9 @@ export function VoucherRecaps() {
     const topBranches = [...branchStats].sort((a, b) => b.batchTotal - a.batchTotal);
 
     return (
-      <div className="p-5 space-y-7 pb-24 bg-asphalt-900 min-h-screen">
+      <div className="p-4 space-y-7 pb-24 bg-asphalt-900 min-h-screen">
         {/* Executive Header */}
-        <div className="flex items-center justify-between px-2">
+        <div className="flex items-center justify-between px-1">
           <div className="space-y-1">
             <h2 className="text-2xl font-black text-white tracking-tighter uppercase">Board Overview</h2>
             <p className="text-[10px] text-asphalt-text-400 font-black uppercase tracking-[0.2em] leading-none">Global Stats • All Branches</p>
@@ -404,9 +404,9 @@ export function VoucherRecaps() {
   const selectedBranch = branches.find(b => b.id === selectedBranchId);
 
   return (
-    <div className="p-5 space-y-7 bg-asphalt-900 min-h-screen pb-32">
+    <div className="p-3.5 space-y-6 bg-asphalt-900 min-h-screen pb-32">
       {/* Header */}
-      <div className="bg-asphalt-800 rounded-[2.5rem] p-7 text-white shadow-2xl relative overflow-hidden border border-asphalt-700 group">
+      <div className="bg-asphalt-800 rounded-[2.5rem] p-6 text-white shadow-2xl relative overflow-hidden border border-asphalt-700 group">
         <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/10 rounded-full -mr-24 -mt-24 blur-[100px] group-hover:bg-brand-500/20 transition-all duration-1000"></div>
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-8">
@@ -593,21 +593,21 @@ export function VoucherRecaps() {
 
       {/* Spreadsheet Feed */}
       <div className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden">
-        <div className="p-7 border-b border-asphalt-700/50 flex items-center justify-between bg-asphalt-900/20">
+        <div className="p-5 border-b border-asphalt-700/50 flex items-center justify-between bg-asphalt-900/20">
           <div>
             <h3 className="text-[10px] uppercase font-black tracking-[0.2em] text-asphalt-text-400 leading-none">
               {showHistory ? 'All-Time Logs' : 'Live Reporting Feed'}
             </h3>
             {!showHistory && recentRecaps.length === 0 && (
-              <p className="text-[9px] text-rose-500 font-black mt-2 uppercase tracking-widest">
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse mr-1.5"></span>
+              <p className="text-[8px] text-rose-500 font-black mt-2 uppercase tracking-widest">
+                <span className="inline-block w-1 h-1 rounded-full bg-rose-500 animate-pulse mr-1"></span>
                 Archived Log System Active
               </p>
             )}
           </div>
           <button 
             onClick={() => setShowHistory(!showHistory)}
-            className={`h-11 px-6 rounded-2xl text-[10px] font-black uppercase tracking-[0.15em] transition-all border shadow-lg ${
+            className={`h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-[0.1em] transition-all border shadow-lg ${
               showHistory 
                 ? 'bg-asphalt-900 text-brand-500 border-brand-500/30' 
                 : 'bg-brand-500 text-white border-brand-400 shadow-brand-500/20'
@@ -620,77 +620,77 @@ export function VoucherRecaps() {
         <div className="overflow-x-auto no-scrollbar">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-asphalt-900/50 text-[9px] uppercase font-black text-asphalt-text-400 tracking-[0.15em] border-b border-asphalt-700/50">
-                <th className="pl-7 pr-3 py-4 font-black border-r border-asphalt-700/50">Date</th>
-                <th className="px-3 py-4 font-black border-r border-asphalt-700/50 text-center">Adm S</th>
-                <th className="px-3 py-4 font-black border-r border-asphalt-700/50 text-center">Adm M</th>
-                <th className="px-3 py-4 font-black border-r border-asphalt-700/50 text-center">Vou S</th>
-                <th className="px-3 py-4 font-black border-r border-asphalt-700/50 text-center">Vou M</th>
-                <th className="px-4 py-4 text-center">Act</th>
+              <tr className="bg-asphalt-900/50 text-[9px] uppercase font-black text-asphalt-text-400 tracking-[0.1em] border-b border-asphalt-700/50">
+                <th className="pl-5 pr-2 py-3.5 font-black border-r border-asphalt-700/50">Date</th>
+                <th className="px-2 py-3.5 font-black border-r border-asphalt-700/50 text-center">Adm S</th>
+                <th className="px-2 py-3.5 font-black border-r border-asphalt-700/50 text-center">Adm M</th>
+                <th className="px-2 py-3.5 font-black border-r border-asphalt-700/50 text-center">Vou S</th>
+                <th className="px-2 py-3.5 font-black border-r border-asphalt-700/50 text-center">Vou M</th>
+                <th className="px-3 py-3.5 text-center">Act</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-asphalt-700/30">
               {displayRecaps.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-8 py-20 text-center text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest">
-                    <FileText className="w-12 h-12 text-asphalt-900 mx-auto mb-4" />
+                  <td colSpan={6} className="px-8 py-16 text-center text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest">
+                    <FileText className="w-10 h-10 text-asphalt-900 mx-auto mb-4" />
                     No Record Detected In This Range
                   </td>
                 </tr>
               ) : (
                 displayRecaps.map((recap) => (
                   <tr key={recap.id} className={`hover:bg-asphalt-900/10 transition-colors group ${recap.status === 'draft' ? 'bg-brand-500/[0.03]' : ''}`}>
-                    <td className="pl-7 pr-3 py-4.5 border-r border-asphalt-700/30">
+                    <td className="pl-5 pr-2 py-3.5 border-r border-asphalt-700/30">
                       <div className="flex flex-col gap-0.5">
-                        <div className="flex items-center gap-1.5">
-                          <p className="text-[11px] font-black text-white leading-none uppercase tracking-tight">
+                        <div className="flex items-center gap-1">
+                          <p className="text-[10px] font-black text-white leading-none uppercase tracking-tight">
                             {new Date(recap.date.replace(/ /g, 'T')).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })}
                           </p>
                           {recap.status === 'draft' && (
-                            <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse border border-asphalt-800 shadow-lg shadow-brand-500/40"></span>
+                            <span className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse border border-asphalt-800 shadow-lg shadow-brand-500/40"></span>
                           )}
                         </div>
-                        <p className="text-[8px] text-brand-500 font-black uppercase tracking-widest truncate max-w-[50px] leading-none mt-1 opacity-70">
+                        <p className="text-[7px] text-brand-500 font-black uppercase tracking-widest truncate max-w-[40px] leading-none mt-1 opacity-70">
                           {recap.createdByName || 'USER'}
                         </p>
                       </div>
                     </td>
-                    <td className="px-3 py-4.5 text-[10px] font-black text-white/80 border-r border-asphalt-700/30 text-center shadow-inner">
+                    <td className="px-2 py-3.5 text-[10px] font-black text-white/80 border-r border-asphalt-700/30 text-center shadow-inner">
                       {recap.adminSiang.toLocaleString('id-ID')}
                     </td>
-                    <td className="px-4 py-4.5 text-[10px] font-black text-white/80 border-r border-asphalt-700/30 text-center">
+                    <td className="px-2 py-3.5 text-[10px] font-black text-white/80 border-r border-asphalt-700/30 text-center">
                       {recap.adminMalam.toLocaleString('id-ID')}
                     </td>
-                    <td className="px-3 py-4.5 text-[10px] font-black text-emerald-500 border-r border-asphalt-700/30 text-center bg-emerald-500/[0.02]">
+                    <td className="px-2 py-3.5 text-[10px] font-black text-emerald-500 border-r border-asphalt-700/30 text-center bg-emerald-500/[0.02]">
                       {recap.voucherSiang.toLocaleString('id-ID')}
                     </td>
-                    <td className="px-3 py-4.5 text-[10px] font-black text-emerald-500 border-r border-asphalt-700/30 text-center bg-emerald-500/[0.02]">
+                    <td className="px-2 py-3.5 text-[10px] font-black text-emerald-500 border-r border-asphalt-700/30 text-center bg-emerald-500/[0.02]">
                       {recap.voucherMalam.toLocaleString('id-ID')}
                     </td>
-                    <td className="px-4 py-4.5 text-center">
+                    <td className="px-3 py-3.5 text-center">
                       <div className="flex items-center justify-center gap-1">
                         {recap.status === 'draft' && role === 'karyawan' && (
                           <>
                             <button 
                               onClick={() => handleEdit(recap)}
-                              className="w-8 h-8 flex items-center justify-center text-asphalt-text-400 hover:text-brand-500 hover:bg-brand-500/10 rounded-lg transition-all"
+                              className="w-7 h-7 flex items-center justify-center text-asphalt-text-400 hover:text-brand-500 hover:bg-brand-500/10 rounded-lg transition-all"
                             >
-                              <Edit2 className="w-3.5 h-3.5" />
+                              <Edit2 className="w-3 h-3" />
                             </button>
                             <button 
                               onClick={() => setDeleteConfirm({ isOpen: true, id: recap.id, date: recap.date })}
-                              className="w-8 h-8 flex items-center justify-center text-asphalt-text-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all"
+                              className="w-7 h-7 flex items-center justify-center text-asphalt-text-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all"
                             >
-                              <Trash2 className="w-3.5 h-3.5" />
+                              <Trash2 className="w-3 h-3" />
                             </button>
                           </>
                         )}
                         {role === 'bos' && (
                           <button 
                             onClick={() => setDeleteConfirm({ isOpen: true, id: recap.id, date: recap.date })}
-                            className="w-8 h-8 flex items-center justify-center text-asphalt-text-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all"
+                            className="w-7 h-7 flex items-center justify-center text-asphalt-text-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-3 h-3" />
                           </button>
                         )}
                       </div>
@@ -701,14 +701,14 @@ export function VoucherRecaps() {
             </tbody>
             {displayRecaps.length > 0 && (
               <tfoot>
-                <tr className="bg-asphalt-900/80 text-white text-[10px] font-black uppercase tracking-widest">
-                  <td className="pl-7 pr-3 py-5 border-r border-white/5">TOTAL</td>
-                  <td className="px-3 py-5 border-r border-white/5 text-center group-hover:text-brand-500">{(totalAdmS).toLocaleString('id-ID')}</td>
-                  <td className="px-3 py-5 border-r border-white/5 text-center">{(totalAdmM).toLocaleString('id-ID')}</td>
-                  <td className="px-3 py-5 border-r border-white/5 text-center text-emerald-500 bg-emerald-500/10">{(totalVouS).toLocaleString('id-ID')}</td>
-                  <td className="px-3 py-5 border-r border-white/5 text-center text-emerald-500 bg-emerald-500/10">{(totalVouM).toLocaleString('id-ID')}</td>
-                  <td className="px-4 py-5 text-center bg-asphalt-900 shadow-xl">
-                    <ChevronRight className="w-4 h-4 text-brand-500 mx-auto" />
+                <tr className="bg-asphalt-900/80 text-white text-[9px] font-black uppercase tracking-widest">
+                  <td className="pl-5 pr-2 py-4 border-r border-white/5">TOTAL</td>
+                  <td className="px-2 py-4 border-r border-white/5 text-center group-hover:text-brand-500">{(totalAdmS).toLocaleString('id-ID')}</td>
+                  <td className="px-2 py-4 border-r border-white/5 text-center">{(totalAdmM).toLocaleString('id-ID')}</td>
+                  <td className="px-2 py-4 border-r border-white/5 text-center text-emerald-500 bg-emerald-500/10">{(totalVouS).toLocaleString('id-ID')}</td>
+                  <td className="px-2 py-4 border-r border-white/5 text-center text-emerald-500 bg-emerald-500/10">{(totalVouM).toLocaleString('id-ID')}</td>
+                  <td className="px-3 py-4 text-center bg-asphalt-900 shadow-xl">
+                    <ChevronRight className="w-3 h-3 text-brand-500 mx-auto" />
                   </td>
                 </tr>
               </tfoot>
@@ -719,32 +719,32 @@ export function VoucherRecaps() {
 
       {/* Detail Pengeluaran Section */}
       <div className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden">
-        <div className="p-7 border-b border-asphalt-700/50 bg-rose-500/[0.03]">
+        <div className="p-5 border-b border-asphalt-700/50 bg-rose-500/[0.03]">
           <h3 className="text-[10px] uppercase font-black tracking-[0.2em] text-rose-500 leading-none">
             {showHistory ? 'Expense Archive' : 'Active Burn Logs'}
           </h3>
         </div>
         <div className="divide-y divide-asphalt-700/30">
           {displayRecaps.filter(r => r.expenseAmount > 0).length === 0 ? (
-            <div className="p-12 text-center">
-              <TrendingDown className="w-10 h-10 text-asphalt-900 mx-auto mb-4" />
+            <div className="p-10 text-center">
+              <TrendingDown className="w-8 h-8 text-asphalt-900 mx-auto mb-4" />
               <p className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest">No Operational Expenses Logged</p>
             </div>
           ) : (
             displayRecaps.filter(r => r.expenseAmount > 0).map(recap => (
-              <div key={`exp-${recap.id}`} className="p-6 flex items-center justify-between hover:bg-asphalt-900/20 transition-all group">
-                <div className="flex items-center gap-5">
-                  <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 shadow-inner group-hover:scale-110 transition-transform">
-                    <ArrowDownCircle className="w-6 h-6 stroke-[1.5px]" />
+              <div key={`exp-${recap.id}`} className="p-5 flex items-center justify-between hover:bg-asphalt-900/20 transition-all group">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 shadow-inner group-hover:scale-110 transition-transform">
+                    <ArrowDownCircle className="w-5 h-5 stroke-[1.5px]" />
                   </div>
                   <div>
-                    <p className="text-[12px] font-black text-white uppercase tracking-tight">{recap.expenseDescription || 'GENERAL EXPENSE'}</p>
-                    <div className="flex items-center gap-3 mt-1.5">
-                      <p className="text-[9px] font-black text-asphalt-text-400 uppercase tracking-widest">
+                    <p className="text-[11px] font-black text-white uppercase tracking-tight leading-tight">{recap.expenseDescription || 'GENERAL EXPENSE'}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="text-[8px] font-black text-asphalt-text-400 uppercase tracking-widest">
                         {new Date(recap.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })}
                       </p>
                       <span className="w-1 h-1 rounded-full bg-asphalt-700"></span>
-                      <p className="text-[9px] font-black text-brand-500 uppercase tracking-widest">{recap.createdByName.split(' ')[0]}</p>
+                      <p className="text-[8px] font-black text-brand-500 uppercase tracking-widest">{recap.createdByName.split(' ')[0]}</p>
                     </div>
                   </div>
                 </div>
@@ -755,40 +755,40 @@ export function VoucherRecaps() {
             ))
           )}
         </div>
-        <div className="bg-rose-500 p-6 text-white flex justify-between items-center shadow-inner relative overflow-hidden group">
+        <div className="bg-rose-500 p-5 text-white flex justify-between items-center shadow-inner relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:bg-white/20 transition-all duration-700"></div>
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] relative z-10">Burn Rate Total</span>
+          <span className="text-[9px] font-black uppercase tracking-[0.2em] relative z-10">Burn Rate Total</span>
           <span className="text-lg font-black tracking-tighter relative z-10">{formatRupiah(totalExp)}</span>
         </div>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 gap-5">
-        <div className="bg-asphalt-800 rounded-[2.5rem] p-6 text-white shadow-2xl border border-asphalt-700 relative overflow-hidden group">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-asphalt-800 rounded-[2.5rem] p-5 text-white shadow-2xl border border-asphalt-700 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-24 h-24 bg-brand-500/5 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-brand-500/10 transition-all duration-700"></div>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2.5 opacity-40">
-              <TrendingUp className="w-4 h-4" />
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2 opacity-40">
+              <TrendingUp className="w-3.5 h-3.5" />
               <span className="text-[9px] font-black uppercase tracking-widest group-hover:opacity-100 transition-opacity">Net Laba</span>
             </div>
-            {trend.admin === 'up' && <TrendingUp className="w-5 h-5 text-emerald-500 stroke-[2.5px]" />}
-            {trend.admin === 'down' && <TrendingDown className="w-5 h-5 text-rose-500 stroke-[2.5px]" />}
+            {trend.admin === 'up' && <TrendingUp className="w-4 h-4 text-emerald-500 stroke-[2.5px]" />}
+            {trend.admin === 'down' && <TrendingDown className="w-4 h-4 text-rose-500 stroke-[2.5px]" />}
           </div>
-          <p className="text-xl font-black text-white tracking-tighter">{formatRupiah(labaBersihAdm)}</p>
-          <p className="text-[8px] text-asphalt-text-400 font-black uppercase tracking-widest mt-2">After Deductions</p>
+          <p className="text-lg font-black text-white tracking-tighter">{formatRupiah(labaBersihAdm)}</p>
+          <p className="text-[8px] text-asphalt-text-400 font-black uppercase tracking-widest mt-1.5 leading-tight">After Deductions</p>
         </div>
-        <div className="bg-asphalt-800 rounded-[2.5rem] p-6 text-white shadow-2xl border border-asphalt-700 relative overflow-hidden group">
+        <div className="bg-asphalt-800 rounded-[2.5rem] p-5 text-white shadow-2xl border border-asphalt-700 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-emerald-500/10 transition-all duration-700"></div>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2.5 opacity-40">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2 opacity-40">
               <Wallet className="w-4 h-4" />
-              <span className="text-[9px] font-black uppercase tracking-widest group-hover:opacity-100 transition-opacity">Voucher Pool</span>
+              <span className="text-[9px] font-black uppercase tracking-widest group-hover:opacity-100 transition-opacity">Pool</span>
             </div>
-            {trend.voucher === 'up' && <TrendingUp className="w-5 h-5 text-emerald-500 stroke-[2.5px]" />}
-            {trend.voucher === 'down' && <TrendingDown className="w-5 h-5 text-rose-500 stroke-[2.5px]" />}
+            {trend.voucher === 'up' && <TrendingUp className="w-4 h-4 text-emerald-500 stroke-[2.5px]" />}
+            {trend.voucher === 'down' && <TrendingDown className="w-4 h-4 text-rose-500 stroke-[2.5px]" />}
           </div>
-          <p className="text-xl font-black text-emerald-500 tracking-tighter">{formatRupiah(totalVoucher)}</p>
-          <p className="text-[8px] text-asphalt-text-400 font-black uppercase tracking-widest mt-2">Active Circulation</p>
+          <p className="text-lg font-black text-emerald-500 tracking-tighter">{formatRupiah(totalVoucher)}</p>
+          <p className="text-[8px] text-asphalt-text-400 font-black uppercase tracking-widest mt-1.5 leading-tight">In Circulation</p>
         </div>
       </div>
 
