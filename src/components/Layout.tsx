@@ -167,12 +167,12 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
-              initial={{ opacity: 0, y: 15, scale: 0.98 }}
+              initial={{ opacity: 0, y: 8, scale: 0.99 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 1.02 }}
+              exit={{ opacity: 0, y: -4, scale: 1.01 }}
               transition={{ 
-                duration: 0.4, 
-                ease: [0.22, 1, 0.36, 1] // Custom cubic-bezier for a "luxurious" feel
+                duration: 0.25, 
+                ease: "easeOut"
               }}
               className="w-full flex flex-col"
             >
@@ -201,7 +201,7 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
                 <motion.div 
                   layoutId="nav-bg"
                   className="absolute inset-x-1 inset-y-2 bg-brand-500/10 rounded-2xl -z-10"
-                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  transition={{ type: "spring", bounce: 0.1, duration: 0.4 }}
                 />
               )}
               <motion.div 

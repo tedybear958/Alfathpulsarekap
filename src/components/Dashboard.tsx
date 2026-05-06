@@ -19,12 +19,12 @@ interface ServiceIconProps {
 function ServiceIcon({ icon, label, onClick, badge, index }: ServiceIconProps) {
   return (
     <motion.button 
-      initial={{ opacity: 0, scale: 0.8, y: 10 }}
+      initial={{ opacity: 0, scale: 0.95, y: 5 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ 
-        duration: 0.4, 
-        delay: index * 0.05,
-        ease: [0.22, 1, 0.36, 1]
+        duration: 0.3, 
+        delay: index * 0.03,
+        ease: "easeOut"
       }}
       whileTap={{ scale: 0.9 }}
       onClick={onClick}
@@ -308,9 +308,9 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
 
       {/* Main Balance Card (GoPay Inspired Card) */}
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.4, delay: 0.05 }}
         className="bg-asphalt-800 rounded-[2.5rem] p-6 border border-asphalt-700/50 shadow-2xl relative overflow-hidden group"
       >
         <div className="absolute top-0 right-0 w-48 h-48 bg-brand-500/10 rounded-full -mr-24 -mt-24 blur-[80px] group-hover:bg-brand-500/20 transition-all duration-700"></div>
