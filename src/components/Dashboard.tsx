@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 import { useFinanceStore } from '../hooks/useFinanceStore';
 import { useAuthStore } from '../store/authStore';
 import { checkIsBos } from '../utils/authUtils';
@@ -18,18 +17,9 @@ interface ServiceIconProps {
 
 function ServiceIcon({ icon, label, onClick, badge, index }: ServiceIconProps) {
   return (
-    <motion.button 
-      initial={{ opacity: 0, scale: 0.9, y: 10 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ 
-        type: "spring",
-        stiffness: 600,
-        damping: 30,
-        delay: index * 0.02
-      }}
-      whileTap={{ scale: 0.92 }}
+    <button 
       onClick={onClick}
-      className="flex flex-col items-center gap-2.5 group relative"
+      className="flex flex-col items-center gap-2.5 group relative active:scale-90"
     >
       <div className="w-16 h-16 bg-asphalt-900/50 border border-asphalt-700/50 rounded-[1.5rem] flex items-center justify-center transition-all group-hover:bg-asphalt-700/50 shadow-lg relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -41,17 +31,13 @@ function ServiceIcon({ icon, label, onClick, badge, index }: ServiceIconProps) {
         {label}
       </span>
       {badge && (
-        <motion.div 
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          className="absolute top-0 right-1 pointer-events-none z-10"
-        >
+        <div className="absolute top-0 right-1 pointer-events-none z-10">
           <div className="bg-rose-500 text-white text-[7px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-tighter leading-none shadow-lg shadow-rose-500/20 border-2 border-[#0B111D]">
             {badge}
           </div>
-        </motion.div>
+        </div>
       )}
-    </motion.button>
+    </button>
   );
 }
 
@@ -308,10 +294,7 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
       )}
 
       {/* Main Balance Card (GoPay Inspired Card) */}
-      <motion.div 
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.05 }}
+      <div 
         className="bg-asphalt-800 rounded-[2.5rem] p-6 border border-asphalt-700/50 shadow-2xl relative overflow-hidden group"
       >
         <div className="absolute top-0 right-0 w-48 h-48 bg-brand-500/10 rounded-full -mr-24 -mt-24 blur-[80px] group-hover:bg-brand-500/20 transition-all duration-700"></div>
@@ -386,7 +369,7 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Grid Services - Asphalt Style Menu */}
       <div className="bg-asphalt-800 rounded-[2.5rem] p-5 border border-asphalt-700/50 shadow-2xl">

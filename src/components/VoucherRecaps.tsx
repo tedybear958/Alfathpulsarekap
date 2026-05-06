@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 import { useFinanceStore } from '../hooks/useFinanceStore';
 import { useAuthStore } from '../store/authStore';
 import { formatRupiah, formatNumberInput } from '../utils/formatters';
@@ -426,11 +425,8 @@ export function VoucherRecaps() {
           <div className="grid grid-cols-1 gap-4">
             {topBranches.map((branch, index) => {
               return (
-                <motion.button
+                <button
                   key={branch.id}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.2, delay: index * 0.02 }}
                   onClick={() => setSelectedBranchId(branch.id)}
                   className="group relative bg-asphalt-800 rounded-[2.5rem] p-5 flex items-center justify-between shadow-2xl border border-asphalt-700/50 hover:bg-asphalt-900/40 hover:border-brand-500/40 transition-all duration-300 active:scale-[0.98] overflow-hidden"
                 >
@@ -460,7 +456,7 @@ export function VoucherRecaps() {
                     <p className="text-md font-black text-white leading-none">{formatRupiah(branch.batchTotal)}</p>
                     <p className="text-[9px] text-brand-500 font-black uppercase tracking-widest leading-none">Setoran Ini</p>
                   </div>
-                </motion.button>
+                </button>
               );
             })}
           </div>
@@ -740,11 +736,8 @@ export function VoucherRecaps() {
           </div>
         ) : (
           groupedRecaps.map((cycle, index) => (
-            <motion.div 
+            <div 
               key={cycle.id} 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.03 }}
               className="space-y-4"
             >
               <div className="flex items-center justify-between px-2">
@@ -849,7 +842,7 @@ export function VoucherRecaps() {
                   </table>
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))
         )}
       </div>
@@ -903,10 +896,7 @@ export function VoucherRecaps() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 gap-4">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
+        <div 
           className="bg-asphalt-800 rounded-[2.5rem] p-5 text-white shadow-2xl border border-asphalt-700 relative overflow-hidden group"
         >
           <div className="absolute top-0 right-0 w-24 h-24 bg-brand-500/5 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-brand-500/10 transition-all duration-700"></div>
@@ -920,11 +910,8 @@ export function VoucherRecaps() {
           </div>
           <p className="text-lg font-black text-white tracking-tighter">{formatRupiah(labaBersihAdm)}</p>
           <p className="text-[8px] text-asphalt-text-400 font-black uppercase tracking-widest mt-1.5 leading-tight">After Deductions</p>
-        </motion.div>
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3, delay: 0.15 }}
+        </div>
+        <div 
           className="bg-asphalt-800 rounded-[2.5rem] p-5 text-white shadow-2xl border border-asphalt-700 relative overflow-hidden group"
         >
           <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-emerald-500/10 transition-all duration-700"></div>
@@ -938,7 +925,7 @@ export function VoucherRecaps() {
           </div>
           <p className="text-lg font-black text-emerald-500 tracking-tighter">{formatRupiah(totalVoucher)}</p>
           <p className="text-[8px] text-asphalt-text-400 font-black uppercase tracking-widest mt-1.5 leading-tight">In Circulation</p>
-        </motion.div>
+        </div>
       </div>
 
       {/* Fixed Bottom Action Button */}

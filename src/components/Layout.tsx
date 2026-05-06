@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { LayoutDashboard, Users, Store, Download, LogOut, UserCog, PiggyBank, Ticket, ShoppingBag, AlertCircle, X, Palette, Check, BookOpen, FileText } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 import { logout } from '../firebase';
 
@@ -164,23 +163,7 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto pb-24 scroll-smooth no-scrollbar relative">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -30 }}
-              transition={{ 
-                type: "spring",
-                stiffness: 600,
-                damping: 40,
-                mass: 0.4
-              }}
-              className="w-full flex flex-col"
-            >
-              {children}
-            </motion.div>
-          </AnimatePresence>
+          {children}
           <div className="px-5 py-6 text-center">
             <p className="text-[9px] text-asphalt-text-400 font-black uppercase tracking-[0.4em] opacity-30">AlfathPulsa v2.0</p>
           </div>
@@ -197,24 +180,16 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
             {/* Beranda */}
             <button
               onClick={() => setActiveTab('dashboard')}
-              className={`relative flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all group`}
+              className={`flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all group active:scale-90 ${
+                activeTab === 'dashboard' ? 'text-brand-500' : 'text-asphalt-text-400 opacity-60'
+              }`}
             >
-              {activeTab === 'dashboard' && (
-                <motion.div 
-                  layoutId="nav-bg"
-                  className="absolute inset-x-1 inset-y-2 bg-brand-500/10 rounded-2xl -z-10"
-                  transition={{ type: "spring", bounce: 0.1, duration: 0.3 }}
-                />
-              )}
-              <motion.div 
-                whileTap={{ scale: 0.85 }}
-                className="relative"
-              >
+              <div className="relative">
                 <LayoutDashboard 
-                  className={`w-5.5 h-5.5 transition-colors duration-300 ${activeTab === 'dashboard' ? 'text-brand-500 stroke-[2.5px]' : 'text-asphalt-text-400 group-hover:text-asphalt-text-200 stroke-2'}`} 
+                  className={`w-5.5 h-5.5 transition-colors duration-300 ${activeTab === 'dashboard' ? 'stroke-[2.5px]' : 'stroke-2'}`} 
                 />
-              </motion.div>
-              <span className={`text-[9px] font-black tracking-widest uppercase transition-colors duration-300 ${activeTab === 'dashboard' ? 'text-brand-500' : 'text-asphalt-text-400 opacity-60'}`}>
+              </div>
+              <span className={`text-[9px] font-black tracking-widest uppercase`}>
                 Beranda
               </span>
             </button>
@@ -222,24 +197,16 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
             {/* Dompet / Tabungan */}
             <button
               onClick={() => setActiveTab('savings')}
-              className={`relative flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all group`}
+              className={`flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all group active:scale-90 ${
+                activeTab === 'savings' || activeTab === 'debts' ? 'text-brand-500' : 'text-asphalt-text-400 opacity-60'
+              }`}
             >
-              {(activeTab === 'savings' || activeTab === 'debts') && (
-                <motion.div 
-                  layoutId="nav-bg"
-                  className="absolute inset-x-1 inset-y-2 bg-brand-500/10 rounded-2xl -z-10"
-                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                />
-              )}
-              <motion.div 
-                whileTap={{ scale: 0.85 }}
-                className="relative"
-              >
+              <div className="relative">
                 <PiggyBank 
-                  className={`w-5.5 h-5.5 transition-colors duration-300 ${activeTab === 'savings' || activeTab === 'debts' ? 'text-brand-500 stroke-[2.5px]' : 'text-asphalt-text-400 group-hover:text-asphalt-text-200 stroke-2'}`} 
+                  className={`w-5.5 h-5.5 transition-colors duration-300 ${activeTab === 'savings' || activeTab === 'debts' ? 'stroke-[2.5px]' : 'stroke-2'}`} 
                 />
-              </motion.div>
-              <span className={`text-[9px] font-black tracking-widest uppercase transition-colors duration-300 ${activeTab === 'savings' || activeTab === 'debts' ? 'text-brand-500' : 'text-asphalt-text-400 opacity-60'}`}>
+              </div>
+              <span className={`text-[9px] font-black tracking-widest uppercase`}>
                 Tabungan
               </span>
             </button>
@@ -247,24 +214,16 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
             {/* Rekapan */}
             <button
               onClick={() => setActiveTab('vouchers')}
-              className={`relative flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all group`}
+              className={`flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all group active:scale-90 ${
+                activeTab === 'vouchers' ? 'text-brand-500' : 'text-asphalt-text-400 opacity-60'
+              }`}
             >
-              {activeTab === 'vouchers' && (
-                <motion.div 
-                  layoutId="nav-bg"
-                  className="absolute inset-x-1 inset-y-2 bg-brand-500/10 rounded-2xl -z-10"
-                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                />
-              )}
-              <motion.div 
-                whileTap={{ scale: 0.85 }}
-                className="relative"
-              >
+              <div className="relative">
                 <Ticket 
-                  className={`w-5.5 h-5.5 transition-colors duration-300 ${activeTab === 'vouchers' ? 'text-brand-500 stroke-[2.5px]' : 'text-asphalt-text-400 group-hover:text-asphalt-text-200 stroke-2'}`} 
+                  className={`w-5.5 h-5.5 transition-colors duration-300 ${activeTab === 'vouchers' ? 'stroke-[2.5px]' : 'stroke-2'}`} 
                 />
-              </motion.div>
-              <span className={`text-[9px] font-black tracking-widest uppercase transition-colors duration-300 ${activeTab === 'vouchers' ? 'text-brand-500' : 'text-asphalt-text-400 opacity-60'}`}>
+              </div>
+              <span className={`text-[9px] font-black tracking-widest uppercase`}>
                 Rekapan
               </span>
             </button>
@@ -273,24 +232,16 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
             {checkIsBos(user, role) && (
               <button
                 onClick={() => setActiveTab('team')}
-                className={`relative flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all group`}
+                className={`flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all group active:scale-90 ${
+                  activeTab === 'team' || activeTab === 'sop' ? 'text-brand-500' : 'text-asphalt-text-400 opacity-60'
+                }`}
               >
-                {(activeTab === 'team' || activeTab === 'sop') && (
-                  <motion.div 
-                    layoutId="nav-bg"
-                    className="absolute inset-x-1 inset-y-2 bg-brand-500/10 rounded-2xl -z-10"
-                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                  />
-                )}
-                <motion.div 
-                  whileTap={{ scale: 0.85 }}
-                  className="relative"
-                >
+                <div className="relative">
                   <Users 
-                    className={`w-5.5 h-5.5 transition-colors duration-300 ${activeTab === 'team' || activeTab === 'sop' ? 'text-brand-500 stroke-[2.5px]' : 'text-asphalt-text-400 group-hover:text-asphalt-text-200 stroke-2'}`} 
+                    className={`w-5.5 h-5.5 transition-colors duration-300 ${activeTab === 'team' || activeTab === 'sop' ? 'stroke-[2.5px]' : 'stroke-2'}`} 
                   />
-                </motion.div>
-                <span className={`text-[9px] font-black tracking-widest uppercase transition-colors duration-300 ${activeTab === 'team' || activeTab === 'sop' ? 'text-brand-500' : 'text-asphalt-text-400 opacity-60'}`}>
+                </div>
+                <span className={`text-[9px] font-black tracking-widest uppercase`}>
                   Akun
                 </span>
               </button>
