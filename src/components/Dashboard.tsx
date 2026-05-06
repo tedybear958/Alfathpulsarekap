@@ -19,14 +19,15 @@ interface ServiceIconProps {
 function ServiceIcon({ icon, label, onClick, badge, index }: ServiceIconProps) {
   return (
     <motion.button 
-      initial={{ opacity: 0, scale: 0.95, y: 5 }}
+      initial={{ opacity: 0, scale: 0.9, y: 10 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ 
-        duration: 0.3, 
-        delay: index * 0.03,
-        ease: "easeOut"
+        type: "spring",
+        stiffness: 600,
+        damping: 30,
+        delay: index * 0.02
       }}
-      whileTap={{ scale: 0.9 }}
+      whileTap={{ scale: 0.92 }}
       onClick={onClick}
       className="flex flex-col items-center gap-2.5 group relative"
     >

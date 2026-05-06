@@ -430,7 +430,7 @@ export function VoucherRecaps() {
                   key={branch.id}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.03 }}
+                  transition={{ duration: 0.2, delay: index * 0.02 }}
                   onClick={() => setSelectedBranchId(branch.id)}
                   className="group relative bg-asphalt-800 rounded-[2.5rem] p-5 flex items-center justify-between shadow-2xl border border-asphalt-700/50 hover:bg-asphalt-900/40 hover:border-brand-500/40 transition-all duration-300 active:scale-[0.98] overflow-hidden"
                 >
@@ -744,7 +744,7 @@ export function VoucherRecaps() {
               key={cycle.id} 
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: index * 0.04 }}
+              transition={{ duration: 0.3, delay: index * 0.03 }}
               className="space-y-4"
             >
               <div className="flex items-center justify-between px-2">
