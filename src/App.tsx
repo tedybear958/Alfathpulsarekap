@@ -33,9 +33,30 @@ export default function App() {
 
   if (!isAuthLoaded) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600"></div>
-        <span className="ml-3 text-gray-600 font-medium">Memuat AlfathPulsa...</span>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-asphalt-900 text-center px-6">
+        <div className="relative">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-brand-500"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-8 h-8 bg-brand-500/20 rounded-full animate-pulse"></div>
+          </div>
+        </div>
+        <h2 className="mt-8 text-xl font-black text-white uppercase tracking-widest">AlfathPulsa</h2>
+        <div className="mt-4 flex flex-col items-center gap-2">
+          <span className="text-[10px] text-asphalt-text-400 font-black uppercase tracking-[0.3em] animate-pulse">
+            Menghubungkan ke Server...
+          </span>
+          <p className="text-[9px] text-asphalt-text-400/50 italic max-w-xs leading-relaxed">
+            Jika ini memakan waktu lama, pastikan koneksi internet Anda stabil dan tidak ada pemblokir iklan yang aktif.
+          </p>
+        </div>
+        
+        {/* Fallback button that appears after 10s via CSS animation or just always show small */}
+        <button 
+          onClick={() => window.location.reload()}
+          className="mt-12 text-[8px] text-white/30 hover:text-white uppercase tracking-widest font-black underline underline-offset-4"
+        >
+          Muat Ulang Paksa
+        </button>
       </div>
     );
   }
