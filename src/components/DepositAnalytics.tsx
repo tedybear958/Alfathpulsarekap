@@ -186,8 +186,8 @@ export function DepositAnalytics() {
           </div>
         </div>
 
-        <div className="h-[240px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="h-[240px] w-full min-h-[240px]">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <BarChart data={branchComparisonData} layout="vertical" margin={{ left: -10, right: 30, top: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#1e293b" />
               <XAxis type="number" hide />
@@ -210,8 +210,8 @@ export function DepositAnalytics() {
       {/* Trend Area Chart - Secondary Focus */}
       <div className="pt-8 border-t border-asphalt-700/50 space-y-5">
         <h4 className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest px-1">Trend Perputaran Dana</h4>
-        <div className="h-[180px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="h-[180px] w-full min-h-[180px]">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">

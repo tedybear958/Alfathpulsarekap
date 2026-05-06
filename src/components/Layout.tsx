@@ -172,9 +172,9 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
               exit={{ opacity: 0, x: -30 }}
               transition={{ 
                 type: "spring",
-                stiffness: 500,
-                damping: 35,
-                mass: 0.5
+                stiffness: 600,
+                damping: 40,
+                mass: 0.4
               }}
               className="w-full flex flex-col"
             >
