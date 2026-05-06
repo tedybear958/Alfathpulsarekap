@@ -11,10 +11,53 @@ export function VoucherRecaps() {
   const { voucherRecaps, addVoucherRecap, updateVoucherRecap, reportVoucherRecaps, deleteVoucherRecap, isLoaded, branches } = useFinanceStore();
   const { role, branchId: userBranchId } = useAuthStore();
   
+  // Reported recaps for global stats
+  const reportedRecaps = useMemo(() => {
+    return voucherRecaps.filter(r => r.status === 'reported');
+  }, [voucherRecaps]);
+
+  // Months labels moved outside or kept inside if needed for the hook
+  const months = [
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+  ];
+
+  // Calculate stats per month for executive dashboard
+  const monthlyData = useMemo(() => {
+    const data: Record<string, { adm: number; exp: number; vou: number; label: string }> = {};
+    reportedRecaps.forEach(r => {
+      const d = new Date(r.date.replace(/ /g, 'T'));
+      const key = `${d.getFullYear()}-${d.getMonth()}`;
+      if (!data[key]) {
+        data[key] = { adm: 0, exp: 0, vou: 0, label: `${months[d.getMonth()]} ${d.getFullYear()}` };
+      }
+      data[key].adm += (r.adminSiang + r.adminMalam);
+      data[key].exp += r.expenseAmount;
+      data[key].vou += (r.voucherSiang + r.voucherMalam);
+    });
+    return Object.entries(data).sort((a, b) => b[0].localeCompare(a[0]));
+  }, [reportedRecaps, months]);
+
   const [selectedBranchId, setSelectedBranchId] = useState<string | null>(() => {
     if (userBranchId) return userBranchId;
     return localStorage.getItem('last_selected_branch') || null;
   });
+
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+
+  const years = Array.from({ length: 3 }, (_, i) => new Date().getFullYear() - i);
+
+  // Cycle Helper
+  const getCycle = (dateStr: string) => {
+    const d = new Date(dateStr.replace(/ /g, 'T')).getDate();
+    if (d <= 5) return { id: 1, label: 'Siklus 1 (Tgl 1-5)' };
+    if (d <= 10) return { id: 2, label: 'Siklus 2 (Tgl 6-10)' };
+    if (d <= 15) return { id: 3, label: 'Siklus 3 (Tgl 11-15)' };
+    if (d <= 20) return { id: 4, label: 'Siklus 4 (Tgl 16-20)' };
+    if (d <= 25) return { id: 5, label: 'Siklus 5 (Tgl 21-25)' };
+    return { id: 6, label: 'Siklus 6 (Tgl 26-Akhir)' };
+  };
 
   // Sync selected branch to localStorage for boss/mandor
   React.useEffect(() => {
@@ -43,59 +86,86 @@ export function VoucherRecaps() {
     date: ''
   });
 
+  // If not loaded, we still define hooks above
+  // but we return early only AFTER all hooks are defined if possible.
+  // Actually, hooks must be called every render.
+  
+  // Filter and Group Recaps
+  const { groupedRecaps, currentMonthStats } = useMemo(() => {
+    if (!selectedBranchId) return { groupedRecaps: [], currentMonthStats: null };
+    
+    const branchRecaps = voucherRecaps.filter(r => r.branchId === selectedBranchId);
+    
+    // Filter by selected month/year
+    const monthlyRecaps = branchRecaps.filter(r => {
+      const d = new Date(r.date.replace(/ /g, 'T'));
+      return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
+    });
+
+    // Group by cycle
+    const cycles: Record<number, { 
+      label: string; 
+      items: VoucherRecap[]; 
+      totalAdm: number; 
+      totalVou: number; 
+      totalExp: number;
+      isReported: boolean;
+      allDraft: boolean;
+    }> = {};
+
+    monthlyRecaps.forEach(recap => {
+      const cycle = getCycle(recap.date);
+      if (!cycles[cycle.id]) {
+        cycles[cycle.id] = { 
+          label: cycle.label, 
+          items: [], 
+          totalAdm: 0, 
+          totalVou: 0, 
+          totalExp: 0,
+          isReported: true,
+          allDraft: true
+        };
+      }
+      cycles[cycle.id].items.push(recap);
+      cycles[cycle.id].totalAdm += (recap.adminSiang + recap.adminMalam);
+      cycles[cycle.id].totalVou += (recap.voucherSiang + recap.voucherMalam);
+      cycles[cycle.id].totalExp += recap.expenseAmount;
+      
+      if (recap.status === 'draft') cycles[cycle.id].isReported = false;
+      if (recap.status !== 'draft') cycles[cycle.id].allDraft = false;
+    });
+
+    // Convert to array and sort items within cycles by date
+    const sortedCycles = Object.entries(cycles)
+      .map(([id, data]) => ({
+        id: parseInt(id),
+        ...data,
+        items: data.items.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      }))
+      .sort((a, b) => a.id - b.id);
+
+    // Stats for the monthly view
+    const stats = {
+      totalAdm: monthlyRecaps.reduce((s, r) => s + r.adminSiang + r.adminMalam, 0),
+      totalVou: monthlyRecaps.reduce((s, r) => s + r.voucherSiang + r.voucherMalam, 0),
+      totalExp: monthlyRecaps.reduce((s, r) => s + r.expenseAmount, 0),
+    };
+
+    return { 
+      groupedRecaps: sortedCycles, 
+      currentMonthStats: stats 
+    };
+  }, [voucherRecaps, selectedBranchId, selectedMonth, selectedYear]);
+
+  const hasDrafts = useMemo(() => {
+    return groupedRecaps.some(c => !c.isReported && c.items.some(i => i.status === 'draft'));
+  }, [groupedRecaps]);
+
   if (!isLoaded) return null;
 
   // Current form calculations for live preview
-  const currentAdmS = parseInt(adminSiang.replace(/\D/g, ''), 10) || 0;
-  const currentAdmM = parseInt(adminMalam.replace(/\D/g, ''), 10) || 0;
-  const currentVouS = parseInt(voucherSiang.replace(/\D/g, ''), 10) || 0;
-  const currentVouM = parseInt(voucherMalam.replace(/\D/g, ''), 10) || 0;
-  const currentExp = parseInt(expenseAmount.replace(/\D/g, ''), 10) || 0;
-  
-  const currentLabaAdm = (currentAdmS + currentAdmM) - currentExp;
-  const currentTotalVou = currentVouS + currentVouM;
 
-  // Filter recaps for the selected branch
-  const filteredRecaps = useMemo(() => {
-    if (!selectedBranchId) return [];
-    const recaps = [...voucherRecaps].filter(r => r.branchId === selectedBranchId);
-    
-    // Sort by date descending (newest first/at top, oldest at bottom)
-    recaps.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-    // Boss only sees reported recaps
-    if (role === 'bos') {
-      return recaps.filter(r => r.status === 'reported');
-    }
-    
-    return recaps;
-  }, [voucherRecaps, selectedBranchId, role]);
-
-  // Check if there are any draft recaps for the current branch
-  const hasDrafts = useMemo(() => {
-    return filteredRecaps.some(r => r.status === 'draft');
-  }, [filteredRecaps]);
-
-  // Split into Recent (last 48 hours from submission) and History
-  const { recentRecaps, historyRecaps } = useMemo(() => {
-    const now = new Date();
-    const fortyEightHoursAgo = new Date(now.getTime() - (48 * 60 * 60 * 1000));
-
-    return {
-      recentRecaps: filteredRecaps.filter(r => {
-        // Drafts are always "recent" for the employee
-        if (r.status === 'draft') return true;
-        return new Date(r.createdAt).getTime() >= fortyEightHoursAgo.getTime();
-      }),
-      historyRecaps: filteredRecaps.filter(r => {
-        if (r.status === 'draft') return false;
-        return new Date(r.createdAt).getTime() < fortyEightHoursAgo.getTime();
-      })
-    };
-  }, [filteredRecaps]);
-
-  const [showHistory, setShowHistory] = useState(false);
-  const displayRecaps = showHistory ? filteredRecaps : recentRecaps;
+  // Sync selected branch to localStorage for boss/mandor
 
   const handleNumericInput = (e: React.ChangeEvent<HTMLInputElement>, setter: (val: string) => void) => {
     const value = e.target.value.replace(/\D/g, '');
@@ -192,73 +262,32 @@ export function VoucherRecaps() {
     }
   };
 
-  // Calculations for displayRecaps (Recent by default)
-  const totalAdmS = displayRecaps.reduce((sum, r) => sum + r.adminSiang, 0);
-  const totalAdmM = displayRecaps.reduce((sum, r) => sum + r.adminMalam, 0);
-  const totalVouS = displayRecaps.reduce((sum, r) => sum + r.voucherSiang, 0);
-  const totalVouM = displayRecaps.reduce((sum, r) => sum + r.voucherMalam, 0);
-  const totalExp = displayRecaps.reduce((sum, r) => sum + (r.expenseAmount || 0), 0);
+  const totalAdmS = groupedRecaps.reduce((sum, c) => sum + c.items.reduce((s, r) => s + r.adminSiang, 0), 0);
+  const totalAdmM = groupedRecaps.reduce((sum, c) => sum + c.items.reduce((s, r) => s + r.adminMalam, 0), 0);
+  const totalVouS = groupedRecaps.reduce((sum, c) => sum + c.items.reduce((s, r) => s + r.voucherSiang, 0), 0);
+  const totalVouM = groupedRecaps.reduce((sum, c) => sum + c.items.reduce((s, r) => s + r.voucherMalam, 0), 0);
+  const totalExp = groupedRecaps.reduce((sum, c) => sum + c.totalExp, 0);
   
   const labaBersihAdm = (totalAdmS + totalAdmM) - totalExp;
   const totalVoucher = totalVouS + totalVouM;
   const grandTotal = labaBersihAdm + totalVoucher;
 
-  // Trend Analysis (Compare latest batch with previous batch)
-  const batches = useMemo(() => {
-    if (filteredRecaps.length === 0) return [];
-    
-    // Sort by createdAt DESC to group by submission time
-    const sortedByCreated = [...filteredRecaps].sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-    
-    const result: VoucherRecap[][] = [];
-    let currentBatch: VoucherRecap[] = [];
-    let batchRefTime: number | null = null;
-    
-    // Group recaps submitted within 48 hours of each other as one "batch"
-    sortedByCreated.forEach(recap => {
-      const time = new Date(recap.createdAt).getTime();
-      if (batchRefTime === null || (batchRefTime - time) < (48 * 60 * 60 * 1000)) {
-        if (batchRefTime === null) batchRefTime = time;
-        currentBatch.push(recap);
-      } else {
-        result.push(currentBatch);
-        currentBatch = [recap];
-        batchRefTime = time;
-      }
+  const monthlyReportedRecaps = useMemo(() => {
+    return reportedRecaps.filter(r => {
+      const d = new Date(r.date.replace(/ /g, 'T'));
+      return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
     });
-    
-    if (currentBatch.length > 0) result.push(currentBatch);
-    return result;
-  }, [filteredRecaps]);
+  }, [reportedRecaps, selectedMonth, selectedYear]);
 
-  const trend = useMemo(() => {
-    if (batches.length < 2) return { admin: 'neutral', voucher: 'neutral' };
-    
-    const batch1 = batches[0]; // Latest batch
-    const batch2 = batches[1]; // Previous batch
-    
-    const b1Adm = batch1.reduce((sum, r) => sum + (r.adminSiang + r.adminMalam - (r.expenseAmount || 0)), 0);
-    const b2Adm = batch2.reduce((sum, r) => sum + (r.adminSiang + r.adminMalam - (r.expenseAmount || 0)), 0);
-    
-    const b1Vou = batch1.reduce((sum, r) => sum + (r.voucherSiang + r.voucherMalam), 0);
-    const b2Vou = batch2.reduce((sum, r) => sum + (r.voucherSiang + r.voucherMalam), 0);
-    
-    return {
-      admin: b1Adm > b2Adm ? 'up' : b1Adm < b2Adm ? 'down' : 'neutral',
-      voucher: b1Vou > b2Vou ? 'up' : b1Vou < b2Vou ? 'down' : 'neutral'
-    };
-  }, [batches]);
+  const trend = { admin: 'neutral', voucher: 'neutral' };
+
+  const globalTotalAdm = monthlyReportedRecaps.reduce((sum, r) => sum + (r.adminSiang + r.adminMalam), 0);
+  const globalTotalExp = monthlyReportedRecaps.reduce((sum, r) => sum + (r.expenseAmount || 0), 0);
+  const globalTotalVou = monthlyReportedRecaps.reduce((sum, r) => sum + (r.voucherSiang + r.voucherMalam), 0);
+  const globalNetProfit = (globalTotalAdm - globalTotalExp) + globalTotalVou;
 
   // If Bos/Mandor and no branch selected, show Executive Dashboard
   if ((role === 'bos' || role === 'mandor') && !selectedBranchId) {
-    // Global Stats Calculation (All Reported Recaps)
-    const reportedRecaps = voucherRecaps.filter(r => r.status === 'reported');
-    const globalTotalAdm = reportedRecaps.reduce((sum, r) => sum + (r.adminSiang + r.adminMalam), 0);
-    const globalTotalExp = reportedRecaps.reduce((sum, r) => sum + (r.expenseAmount || 0), 0);
-    const globalTotalVou = reportedRecaps.reduce((sum, r) => sum + (r.voucherSiang + r.voucherMalam), 0);
-    const globalNetProfit = (globalTotalAdm - globalTotalExp) + globalTotalVou;
 
     // Calculate Latest Batch Stats for each branch
     const branchStats = branches.map(branch => {
@@ -292,8 +321,8 @@ export function VoucherRecaps() {
         {/* Executive Header */}
         <div className="flex items-center justify-between px-1">
           <div className="space-y-1">
-            <h2 className="text-2xl font-black text-white tracking-tighter uppercase">Board Overview</h2>
-            <p className="text-[10px] text-asphalt-text-400 font-black uppercase tracking-[0.2em] leading-none">Global Stats • All Branches</p>
+            <h2 className="text-2xl font-black text-white tracking-tighter uppercase">Pantauan Utama</h2>
+            <p className="text-[10px] text-asphalt-text-400 font-black uppercase tracking-[0.2em] leading-none">Statistik Global • Semua Cabang</p>
           </div>
           <div className="w-14 h-14 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-500 shadow-lg shadow-brand-500/10">
             <TrendingUp className="w-7 h-7 stroke-[2.5px]" />
@@ -307,31 +336,67 @@ export function VoucherRecaps() {
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-4 opacity-60">
                 <Wallet className="w-4 h-4" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Total Rekapan Baru</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Total Bersih Global</span>
               </div>
-              <h3 className="text-5xl font-black tracking-tighter mb-8 text-white">
-                {formatRupiah(globalNewRecapTotal)}
-              </h3>
-              
-              <div className="grid grid-cols-2 gap-8 pt-8 border-t border-asphalt-700">
-                <div className="space-y-1">
-                  <p className="text-[9px] text-asphalt-text-400 font-black uppercase tracking-widest leading-none">Total Laba</p>
-                  <p className="text-xl font-black text-white leading-none">{formatRupiah(globalTotalAdm + globalTotalVou)}</p>
+              <div className="flex items-center justify-between group mb-8">
+                <div>
+                  <p className="text-[10px] text-brand-400 font-black uppercase tracking-[0.2em] leading-none mb-1">Admin (Net)</p>
+                  <p className="text-3xl font-black text-white tracking-tighter">
+                    {formatRupiah(globalTotalAdm - globalTotalExp)}
+                  </p>
                 </div>
-                <div className="text-right space-y-1">
-                  <p className="text-[9px] text-asphalt-text-400 font-black uppercase tracking-widest leading-none">Total Pengeluaran</p>
-                  <p className="text-xl font-black text-rose-500 leading-none">-{formatRupiah(globalTotalExp)}</p>
+                <div className="text-right">
+                  <p className="text-[10px] text-emerald-400 font-black uppercase tracking-[0.2em] leading-none mb-1">Voucher</p>
+                  <p className="text-3xl font-black text-emerald-500 tracking-tighter">
+                    {formatRupiah(globalTotalVou)}
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-white/5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-4xl font-black tracking-tighter text-white">
+                      {formatRupiah((globalTotalAdm - globalTotalExp) + globalTotalVou)}
+                    </h3>
+                    <p className="text-[8px] text-asphalt-text-400 font-black uppercase tracking-[0.2em] mt-2">Total Bersih Semua Cabang</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] text-brand-400 font-black uppercase tracking-[0.2em] mt-3 leading-none flex items-center justify-end gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"></span>
+                      {months[selectedMonth]} {selectedYear}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
+        {/* Monthly Performance Overview */}
+        <div className="space-y-4">
+           <h3 className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-[0.2em] px-2">Kinerja Bulanan</h3>
+           <div className="grid grid-cols-1 gap-3">
+              {monthlyData.slice(0, 5).map(([key, data]) => (
+                <div key={key} className="bg-asphalt-800 p-4 rounded-2xl border border-asphalt-700/50 flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] font-black text-white uppercase tracking-tight">{data.label}</p>
+                    <p className="text-[8px] text-asphalt-text-500 font-black uppercase tracking-widest mt-1">Admin + Voucher</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs font-black text-emerald-500">{formatRupiah((data.adm - data.exp) + data.vou)}</p>
+                    <p className="text-[7px] text-rose-500 font-black uppercase tracking-widest mt-0.5">Exp: -{formatRupiah(data.exp)}</p>
+                  </div>
+                </div>
+              ))}
+           </div>
+        </div>
+
         {/* Performance Ranking Section */}
         <div className="space-y-4">
           <div className="flex items-center justify-between px-2">
-            <h3 className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-[0.2em]">Top Performance (Latest Batch)</h3>
-            <span className="text-[9px] font-black text-brand-500 bg-brand-500/10 border border-brand-500/20 px-3 py-1 rounded-xl uppercase tracking-widest">Active Pulse</span>
+            <h3 className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-[0.2em]">Peringkat Performa (Setoran Terakhir)</h3>
+            <span className="text-[9px] font-black text-brand-500 bg-brand-500/10 border border-brand-500/20 px-3 py-1 rounded-xl uppercase tracking-widest">Status Aktif</span>
           </div>
           
           <div className="grid grid-cols-1 gap-4">
@@ -359,14 +424,14 @@ export function VoucherRecaps() {
                         )}
                       </div>
                       <p className="text-[9px] text-asphalt-text-400 font-black uppercase tracking-widest leading-none">
-                        {branch.lastReportDate ? `Tgl: ${new Date(branch.lastReportDate.replace(/ /g, 'T')).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })}` : 'No Reports'}
+                        {branch.lastReportDate ? `Tgl: ${new Date(branch.lastReportDate.replace(/ /g, 'T')).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })}` : 'Belum Ada Laporan'}
                       </p>
                     </div>
                   </div>
                   
                   <div className="text-right relative z-10 space-y-1">
                     <p className="text-md font-black text-white leading-none">{formatRupiah(branch.batchTotal)}</p>
-                    <p className="text-[9px] text-brand-500 font-black uppercase tracking-widest leading-none">Current Batch</p>
+                    <p className="text-[9px] text-brand-500 font-black uppercase tracking-widest leading-none">Setoran Ini</p>
                   </div>
                 </button>
               );
@@ -382,17 +447,17 @@ export function VoucherRecaps() {
               <AlertCircle className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-[0.2em] leading-none">Quick Insights</h3>
-              <p className="text-sm font-black text-white mt-1 uppercase tracking-tight leading-none">Reporting Feed</p>
+              <h3 className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-[0.2em] leading-none">Ringkasan Cepat</h3>
+              <p className="text-sm font-black text-white mt-1 uppercase tracking-tight leading-none">Arus Pelaporan</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-5">
             <div className="bg-asphalt-900/50 p-5 rounded-2xl border border-asphalt-700 shadow-inner group">
-              <p className="text-[8px] font-black text-asphalt-text-400 uppercase tracking-widest mb-2 leading-none">Active Branches</p>
+              <p className="text-[8px] font-black text-asphalt-text-400 uppercase tracking-widest mb-2 leading-none">Cabang Aktif</p>
               <p className="text-2xl font-black text-emerald-500 tracking-tighter leading-none">{branchStats.filter(b => b.isRecentlyActive).length} <span className="text-asphalt-text-400 text-xs">/ {branches.length}</span></p>
             </div>
             <div className="bg-asphalt-900/50 p-5 rounded-2xl border border-asphalt-700 shadow-inner group">
-              <p className="text-[8px] font-black text-asphalt-text-400 uppercase tracking-widest mb-2 leading-none">Total Reports</p>
+              <p className="text-[8px] font-black text-asphalt-text-400 uppercase tracking-widest mb-2 leading-none">Total Laporan</p>
               <p className="text-2xl font-black text-brand-500 tracking-tighter leading-none">{reportedRecaps.length}</p>
             </div>
           </div>
@@ -425,7 +490,7 @@ export function VoucherRecaps() {
               <div>
                 <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-asphalt-text-400 leading-none">Financial</h3>
                 <p className="text-sm font-black text-white mt-1 uppercase tracking-tight leading-none">
-                  {role === 'bos' ? `${selectedBranch?.name}` : 'Reporting'}
+                  {role === 'bos' ? `${selectedBranch?.name}` : 'Pelaporan'}
                 </p>
               </div>
             </div>
@@ -445,14 +510,62 @@ export function VoucherRecaps() {
               </button>
             )}
           </div>
-          <div>
-            <p className="text-4xl font-black tracking-tighter text-white">
-              {formatRupiah(grandTotal)}
-            </p>
-            <p className="text-[10px] text-brand-400 font-black uppercase tracking-[0.2em] mt-3 leading-none flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"></span>
-              Total Laba {role === 'bos' ? 'Diterima' : 'Dihasilkan'}
-            </p>
+          <div className="grid grid-cols-1 gap-6 mb-7">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between group">
+                <div>
+                  <p className="text-[10px] text-brand-400 font-black uppercase tracking-[0.2em] leading-none mb-1">Total Admin (Net)</p>
+                  <p className="text-2xl font-black text-white tracking-tighter">
+                    {formatRupiah(role === 'bos' && !selectedBranchId ? (globalTotalAdm - globalTotalExp) : labaBersihAdm)}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] text-emerald-400 font-black uppercase tracking-[0.2em] leading-none mb-1">Total Voucher</p>
+                  <p className="text-2xl font-black text-emerald-500 tracking-tighter">
+                    {formatRupiah(role === 'bos' && !selectedBranchId ? globalTotalVou : totalVoucher)}
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-white/10 flex items-center justify-between">
+                <div>
+                  <p className="text-[9px] text-asphalt-text-400 font-black uppercase tracking-[0.2em] leading-none mb-1">Total Bersih</p>
+                  <p className="text-3xl font-black text-white tracking-tighter">
+                    {formatRupiah(role === 'bos' && !selectedBranchId 
+                      ? (globalTotalAdm - globalTotalExp) + globalTotalVou 
+                      : labaBersihAdm + totalVoucher)}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] text-brand-400 font-black uppercase tracking-[0.2em] mt-3 leading-none flex items-center justify-end gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"></span>
+                    {months[selectedMonth]} {selectedYear}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Month/Year Filter */}
+          <div className="flex items-center gap-3 pt-6 border-t border-white/5">
+            <select 
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+              className="flex-1 bg-asphalt-900/50 border border-asphalt-700 rounded-xl px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-white outline-none focus:ring-1 focus:ring-brand-500"
+            >
+              {months.map((m, i) => (
+                <option key={m} value={i}>{m}</option>
+              ))}
+            </select>
+            <select 
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+              className="w-24 bg-asphalt-900/50 border border-asphalt-700 rounded-xl px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-white outline-none focus:ring-1 focus:ring-brand-500"
+            >
+              {years.map(y => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
           </div>
         </div>
       </div>
@@ -591,173 +704,166 @@ export function VoucherRecaps() {
         </div>
       )}
 
-      {/* Spreadsheet Feed */}
-      <div className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden">
-        <div className="p-5 border-b border-asphalt-700/50 flex items-center justify-between bg-asphalt-900/20">
-          <div>
-            <h3 className="text-[10px] uppercase font-black tracking-[0.2em] text-asphalt-text-400 leading-none">
-              {showHistory ? 'All-Time Logs' : 'Live Reporting Feed'}
-            </h3>
-            {!showHistory && recentRecaps.length === 0 && (
-              <p className="text-[8px] text-rose-500 font-black mt-2 uppercase tracking-widest">
-                <span className="inline-block w-1 h-1 rounded-full bg-rose-500 animate-pulse mr-1"></span>
-                Archived Log System Active
-              </p>
-            )}
+      {/* Cycles Grouping */}
+      <div className="space-y-8">
+        {groupedRecaps.length === 0 ? (
+          <div className="bg-asphalt-800 rounded-[2.5rem] p-16 text-center border border-asphalt-700/50">
+            <FileText className="w-12 h-12 text-asphalt-900 mx-auto mb-4" />
+            <p className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest">Belum ada rekapan di bulan ini</p>
           </div>
-          <button 
-            onClick={() => setShowHistory(!showHistory)}
-            className={`h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-[0.1em] transition-all border shadow-lg ${
-              showHistory 
-                ? 'bg-asphalt-900 text-brand-500 border-brand-500/30' 
-                : 'bg-brand-500 text-white border-brand-400 shadow-brand-500/20'
-            }`}
-          >
-            {showHistory ? 'Active Only' : 'Show All'}
-          </button>
-        </div>
-        
-        <div className="overflow-x-auto no-scrollbar">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-asphalt-900/50 text-[9px] uppercase font-black text-asphalt-text-400 tracking-[0.1em] border-b border-asphalt-700/50">
-                <th className="pl-5 pr-2 py-3.5 font-black border-r border-asphalt-700/50">Date</th>
-                <th className="px-2 py-3.5 font-black border-r border-asphalt-700/50 text-center">Adm S</th>
-                <th className="px-2 py-3.5 font-black border-r border-asphalt-700/50 text-center">Adm M</th>
-                <th className="px-2 py-3.5 font-black border-r border-asphalt-700/50 text-center">Vou S</th>
-                <th className="px-2 py-3.5 font-black border-r border-asphalt-700/50 text-center">Vou M</th>
-                <th className="px-3 py-3.5 text-center">Act</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-asphalt-700/30">
-              {displayRecaps.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-8 py-16 text-center text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest">
-                    <FileText className="w-10 h-10 text-asphalt-900 mx-auto mb-4" />
-                    No Record Detected In This Range
-                  </td>
-                </tr>
-              ) : (
-                displayRecaps.map((recap) => (
-                  <tr key={recap.id} className={`hover:bg-asphalt-900/10 transition-colors group ${recap.status === 'draft' ? 'bg-brand-500/[0.03]' : ''}`}>
-                    <td className="pl-5 pr-2 py-3.5 border-r border-asphalt-700/30">
-                      <div className="flex flex-col gap-0.5">
-                        <div className="flex items-center gap-1">
-                          <p className="text-[10px] font-black text-white leading-none uppercase tracking-tight">
-                            {new Date(recap.date.replace(/ /g, 'T')).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })}
-                          </p>
-                          {recap.status === 'draft' && (
-                            <span className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse border border-asphalt-800 shadow-lg shadow-brand-500/40"></span>
-                          )}
-                        </div>
-                        <p className="text-[7px] text-brand-500 font-black uppercase tracking-widest truncate max-w-[40px] leading-none mt-1 opacity-70">
-                          {recap.createdByName || 'USER'}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="px-2 py-3.5 text-[10px] font-black text-white/80 border-r border-asphalt-700/30 text-center shadow-inner">
-                      {recap.adminSiang.toLocaleString('id-ID')}
-                    </td>
-                    <td className="px-2 py-3.5 text-[10px] font-black text-white/80 border-r border-asphalt-700/30 text-center">
-                      {recap.adminMalam.toLocaleString('id-ID')}
-                    </td>
-                    <td className="px-2 py-3.5 text-[10px] font-black text-emerald-500 border-r border-asphalt-700/30 text-center bg-emerald-500/[0.02]">
-                      {recap.voucherSiang.toLocaleString('id-ID')}
-                    </td>
-                    <td className="px-2 py-3.5 text-[10px] font-black text-emerald-500 border-r border-asphalt-700/30 text-center bg-emerald-500/[0.02]">
-                      {recap.voucherMalam.toLocaleString('id-ID')}
-                    </td>
-                    <td className="px-3 py-3.5 text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        {recap.status === 'draft' && role === 'karyawan' && (
-                          <>
-                            <button 
-                              onClick={() => handleEdit(recap)}
-                              className="w-7 h-7 flex items-center justify-center text-asphalt-text-400 hover:text-brand-500 hover:bg-brand-500/10 rounded-lg transition-all"
-                            >
-                              <Edit2 className="w-3 h-3" />
-                            </button>
-                            <button 
-                              onClick={() => setDeleteConfirm({ isOpen: true, id: recap.id, date: recap.date })}
-                              className="w-7 h-7 flex items-center justify-center text-asphalt-text-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </button>
-                          </>
+        ) : (
+          groupedRecaps.map((cycle) => (
+            <div key={cycle.id} className="space-y-4">
+              <div className="flex items-center justify-between px-2">
+                <div className="flex items-center gap-3">
+                  <div className={`w-2 h-8 rounded-full ${cycle.isReported ? 'bg-emerald-500' : 'bg-brand-500 animate-pulse'}`}></div>
+                  <div>
+                    <h3 className="text-sm font-black text-white uppercase tracking-tight">{cycle.label}</h3>
+                    <p className="text-[9px] font-black text-asphalt-text-400 uppercase tracking-[0.15em] mt-0.5">
+                      {cycle.isReported ? 'Setoran Selesai' : 'Sedang Berjalan / Draf'}
+                    </p>
+                  </div>
+                </div>
+                {role === 'karyawan' && !cycle.isReported && (
+                  <button
+                    onClick={() => {
+                      // Final logic for cycle reporting can be triggered here if needed
+                      // For now we use the global submission, but we can filter here
+                      setIsConfirmingReport(true);
+                    }}
+                    className="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all shadow-lg active:scale-95"
+                  >
+                    Setor Siklus
+                  </button>
+                )}
+              </div>
+
+              {/* Cycle Detail Card */}
+              <div className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden">
+                <div className="overflow-x-auto no-scrollbar">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-asphalt-900/50 text-[8px] uppercase font-black text-asphalt-text-400 tracking-[0.1em] border-b border-asphalt-700/50">
+                        <th className="pl-6 pr-2 py-3.5 font-black border-r border-asphalt-700/50">Tgl</th>
+                        <th className="px-2 py-3.5 font-black border-r border-asphalt-700/50 text-center">Adm Siang</th>
+                        <th className="px-2 py-3.5 font-black border-r border-asphalt-700/50 text-center">Adm Malam</th>
+                        <th className="px-2 py-3.5 font-black border-r border-asphalt-700/50 text-center">Vou Siang</th>
+                        <th className="px-2 py-3.5 font-black border-r border-asphalt-700/50 text-center">Vou Malam</th>
+                        {(role !== 'bos' || cycle.items.some(r => r.status === 'reported')) && (
+                          <th className="px-3 py-3.5 text-center">Aksi</th>
                         )}
-                        {role === 'bos' && (
-                          <button 
-                            onClick={() => setDeleteConfirm({ isOpen: true, id: recap.id, date: recap.date })}
-                            className="w-7 h-7 flex items-center justify-center text-asphalt-text-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-            {displayRecaps.length > 0 && (
-              <tfoot>
-                <tr className="bg-asphalt-900/80 text-white text-[9px] font-black uppercase tracking-widest">
-                  <td className="pl-5 pr-2 py-4 border-r border-white/5">TOTAL</td>
-                  <td className="px-2 py-4 border-r border-white/5 text-center group-hover:text-brand-500">{(totalAdmS).toLocaleString('id-ID')}</td>
-                  <td className="px-2 py-4 border-r border-white/5 text-center">{(totalAdmM).toLocaleString('id-ID')}</td>
-                  <td className="px-2 py-4 border-r border-white/5 text-center text-emerald-500 bg-emerald-500/10">{(totalVouS).toLocaleString('id-ID')}</td>
-                  <td className="px-2 py-4 border-r border-white/5 text-center text-emerald-500 bg-emerald-500/10">{(totalVouM).toLocaleString('id-ID')}</td>
-                  <td className="px-3 py-4 text-center bg-asphalt-900 shadow-xl">
-                    <ChevronRight className="w-3 h-3 text-brand-500 mx-auto" />
-                  </td>
-                </tr>
-              </tfoot>
-            )}
-          </table>
-        </div>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-asphalt-700/30">
+                      {cycle.items.map((recap) => (
+                        <tr key={recap.id} className={`hover:bg-asphalt-900/10 transition-colors group ${recap.status === 'draft' ? 'bg-brand-500/[0.03]' : ''}`}>
+                          <td className="pl-6 pr-2 py-4 border-r border-asphalt-700/30">
+                            <div className="flex flex-col">
+                              <span className="text-[11px] font-black text-white">{new Date(recap.date.replace(/ /g, 'T')).getDate()}</span>
+                              <span className="text-[7px] text-asphalt-text-500 font-black uppercase tracking-widest">{months[new Date(recap.date.replace(/ /g, 'T')).getMonth()].slice(0, 3)}</span>
+                            </div>
+                          </td>
+                          <td className="px-2 py-4 text-[10px] font-black text-white/70 border-r border-asphalt-700/30 text-center">
+                            {recap.adminSiang.toLocaleString('id-ID')}
+                          </td>
+                          <td className="px-2 py-4 text-[10px] font-black text-white/70 border-r border-asphalt-700/30 text-center">
+                            {recap.adminMalam.toLocaleString('id-ID')}
+                          </td>
+                          <td className="px-2 py-4 text-[10px] font-black text-emerald-500/80 border-r border-asphalt-700/30 text-center">
+                            {recap.voucherSiang.toLocaleString('id-ID')}
+                          </td>
+                          <td className="px-2 py-4 text-[10px] font-black text-emerald-500/80 border-r border-asphalt-700/30 text-center">
+                            {recap.voucherMalam.toLocaleString('id-ID')}
+                          </td>
+                          <td className="px-3 py-4 text-center">
+                            <div className="flex items-center justify-center gap-1">
+                              {recap.status === 'draft' && role === 'karyawan' && (
+                                <>
+                                  <button onClick={() => handleEdit(recap)} className="p-1.5 text-asphalt-text-400 hover:text-brand-500"><Edit2 className="w-3.5 h-3.5" /></button>
+                                  <button onClick={() => setDeleteConfirm({ isOpen: true, id: recap.id, date: recap.date })} className="p-1.5 text-asphalt-text-400 hover:text-rose-500"><Trash2 className="w-3.5 h-3.5" /></button>
+                                </>
+                              )}
+                              {recap.status === 'reported' && (
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500/30" />
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr className="bg-asphalt-900 border-t border-asphalt-700/50">
+                        <td className="pl-6 py-4 text-[9px] font-black text-white uppercase border-r border-asphalt-700/30">Total</td>
+                        <td colSpan={2} className="px-2 py-4 text-center text-[10px] font-black text-white border-r border-asphalt-700/30">
+                          {formatRupiah(cycle.totalAdm)}
+                        </td>
+                        <td colSpan={2} className="px-2 py-4 text-center text-[10px] font-black text-emerald-500 border-r border-asphalt-700/30">
+                          {formatRupiah(cycle.totalVou)}
+                        </td>
+                        <td className="px-2 py-4 text-center font-black text-asphalt-text-400 text-[8px]">
+                           {cycle.totalExp > 0 && <span className="text-rose-500">Ex: -{formatRupiah(cycle.totalExp)}</span>}
+                        </td>
+                      </tr>
+                      <tr className="bg-asphalt-900/40">
+                         <td colSpan={6} className="px-6 py-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[8px] font-black text-asphalt-text-400 uppercase tracking-widest leading-none">Admin Bersih Siklus</span>
+                              <span className="text-[12px] font-black text-brand-500 leading-none">{formatRupiah(cycle.totalAdm + cycle.totalVou - cycle.totalExp)}</span>
+                            </div>
+                         </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {/* Detail Pengeluaran Section */}
       <div className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden">
         <div className="p-5 border-b border-asphalt-700/50 bg-rose-500/[0.03]">
           <h3 className="text-[10px] uppercase font-black tracking-[0.2em] text-rose-500 leading-none">
-            {showHistory ? 'Expense Archive' : 'Active Burn Logs'}
+            Rincian Pengeluaran Bulan Ini
           </h3>
         </div>
         <div className="divide-y divide-asphalt-700/30">
-          {displayRecaps.filter(r => r.expenseAmount > 0).length === 0 ? (
+          {groupedRecaps.every(c => c.items.every(r => r.expenseAmount === 0)) ? (
             <div className="p-10 text-center">
               <TrendingDown className="w-8 h-8 text-asphalt-900 mx-auto mb-4" />
-              <p className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest">No Operational Expenses Logged</p>
+              <p className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest">Tidak ada pengeluaran tercatat</p>
             </div>
           ) : (
-            displayRecaps.filter(r => r.expenseAmount > 0).map(recap => (
-              <div key={`exp-${recap.id}`} className="p-5 flex items-center justify-between hover:bg-asphalt-900/20 transition-all group">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 shadow-inner group-hover:scale-110 transition-transform">
-                    <ArrowDownCircle className="w-5 h-5 stroke-[1.5px]" />
-                  </div>
-                  <div>
-                    <p className="text-[11px] font-black text-white uppercase tracking-tight leading-tight">{recap.expenseDescription || 'GENERAL EXPENSE'}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <p className="text-[8px] font-black text-asphalt-text-400 uppercase tracking-widest">
-                        {new Date(recap.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })}
-                      </p>
-                      <span className="w-1 h-1 rounded-full bg-asphalt-700"></span>
-                      <p className="text-[8px] font-black text-brand-500 uppercase tracking-widest">{recap.createdByName.split(' ')[0]}</p>
+            groupedRecaps.map(cycle => 
+              cycle.items.filter(r => r.expenseAmount > 0).map(recap => (
+                <div key={`exp-${recap.id}`} className="p-5 flex items-center justify-between hover:bg-asphalt-900/20 transition-all group">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 shadow-inner group-hover:scale-110 transition-transform">
+                      <ArrowDownCircle className="w-5 h-5 stroke-[1.5px]" />
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-black text-white uppercase tracking-tight leading-tight">{recap.expenseDescription || 'PENGELUARAN UMUM'}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <p className="text-[8px] font-black text-asphalt-text-400 uppercase tracking-widest">
+                          Tgl {new Date(recap.date.replace(/ /g, 'T')).getDate()} {months[new Date(recap.date.replace(/ /g, 'T')).getMonth()]}
+                        </p>
+                        <span className="w-1 h-1 rounded-full bg-asphalt-700"></span>
+                        <p className="text-[8px] font-black text-brand-500 uppercase tracking-widest">{recap.createdByName.split(' ')[0]}</p>
+                      </div>
                     </div>
                   </div>
+                  <div className="text-right">
+                    <p className="text-sm font-black text-rose-500 tracking-tight">-{formatRupiah(recap.expenseAmount)}</p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-black text-rose-500 tracking-tight">-{formatRupiah(recap.expenseAmount)}</p>
-                </div>
-              </div>
-            ))
+              ))
+            )
           )}
         </div>
         <div className="bg-rose-500 p-5 text-white flex justify-between items-center shadow-inner relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:bg-white/20 transition-all duration-700"></div>
-          <span className="text-[9px] font-black uppercase tracking-[0.2em] relative z-10">Burn Rate Total</span>
+          <span className="text-[9px] font-black uppercase tracking-[0.2em] relative z-10">Total Pengeluaran Bulan Ini</span>
           <span className="text-lg font-black tracking-tighter relative z-10">{formatRupiah(totalExp)}</span>
         </div>
       </div>
@@ -769,7 +875,7 @@ export function VoucherRecaps() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2 opacity-40">
               <TrendingUp className="w-3.5 h-3.5" />
-              <span className="text-[9px] font-black uppercase tracking-widest group-hover:opacity-100 transition-opacity">Net Laba</span>
+              <span className="text-[9px] font-black uppercase tracking-widest group-hover:opacity-100 transition-opacity">Admin Bersih</span>
             </div>
             {trend.admin === 'up' && <TrendingUp className="w-4 h-4 text-emerald-500 stroke-[2.5px]" />}
             {trend.admin === 'down' && <TrendingDown className="w-4 h-4 text-rose-500 stroke-[2.5px]" />}
@@ -802,13 +908,13 @@ export function VoucherRecaps() {
               className="w-full bg-brand-500 text-white py-6 rounded-[2.5rem] text-[11px] font-black uppercase tracking-[0.3em] hover:bg-brand-600 active:scale-[0.98] transition-all flex items-center justify-center gap-4 shadow-xl group-hover:shadow-brand-500/40"
             >
               <Send className="w-6 h-6 stroke-[2.5px]" />
-              {isSubmitting ? 'UPLOADING...' : 'SAVE & PUBLISH TO BOS'}
+              {isSubmitting ? 'MENGIRIM...' : 'SETOR SEMUA DRAF KE BOS'}
             </button>
           </div>
           <div className="mt-6 flex items-start gap-3 px-8">
             <AlertCircle className="w-4 h-4 text-asphalt-text-400 shrink-0 mt-0.5" />
             <p className="text-[9px] text-asphalt-text-400 font-bold uppercase tracking-[0.1em] leading-relaxed">
-              Pesan Penting: Laporan yang dipublikasikan tidak dapat ditarik kembali. Periksa akurasi data sebelum mengirim.
+              Pesan Penting: Laporan yang dikirim tidak dapat ditarik kembali. Pastikan akurasi data sebelum setor.
             </p>
           </div>
         </div>
@@ -818,18 +924,18 @@ export function VoucherRecaps() {
 
       <ConfirmModal
         isOpen={isConfirmingReport}
-        title="Publish Laporan"
+        title="Setor Laporan Ke Bos"
         message={
           <div className="space-y-6">
             <div className="bg-rose-500/10 border border-rose-500/20 p-5 rounded-[2rem] flex items-start gap-4 shadow-inner">
               <AlertCircle className="w-7 h-7 text-rose-500 shrink-0" />
               <p className="text-[12px] font-black text-rose-500 leading-relaxed uppercase tracking-tight">
-                Seluruh data draft akan dipublikasikan dan <span className="underline">dikunci permanen</span>. Lanjutkan?
+                Seluruh data draf akan disetorkan dan <span className="underline">dikunci permanen</span>. Lanjutkan proses setoran?
               </p>
             </div>
           </div>
         }
-        confirmText="YA, PUBLISH"
+        confirmText="YA, SETORKAN"
         confirmVariant="primary"
         onConfirm={handleReportToBos}
         onCancel={() => setIsConfirmingReport(false)}
@@ -837,7 +943,7 @@ export function VoucherRecaps() {
 
       <ConfirmModal
         isOpen={deleteConfirm.isOpen}
-        title="Drop Record"
+        title="Hapus Data Draf"
         message={`Hapus data rekap tanggal ${new Date(deleteConfirm.date || new Date().toISOString()).toLocaleDateString('id-ID')} secara permanen dari basis data?`}
         confirmText="HAPUS"
         confirmVariant="danger"

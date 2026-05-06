@@ -442,18 +442,18 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-[8px] text-asphalt-text-400 uppercase font-black tracking-[0.2em] mb-0.5">Physical Cash</p>
+                      <p className="text-[8px] text-asphalt-text-400 uppercase font-black tracking-[0.2em] mb-0.5">Saldo Tunai Fisik</p>
                       <p className="text-sm font-black text-brand-500">{formatRupiah(currentBranchData.branchCash)}</p>
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-asphalt-900/50 p-3 rounded-2xl border border-asphalt-700/30">
-                      <p className="text-[8px] text-asphalt-text-400 uppercase font-black tracking-widest mb-1.5 text-center">Digital Capital</p>
+                      <p className="text-[8px] text-asphalt-text-400 uppercase font-black tracking-widest mb-1.5 text-center">Modal Digital</p>
                       <p className="text-xs font-black text-asphalt-text-100 text-center">{formatRupiah(currentBranchData.branchNonPhysicalCapital)}</p>
                     </div>
                     <div className="bg-asphalt-900/50 p-3 rounded-2xl border border-asphalt-700/30">
-                      <p className="text-[8px] text-asphalt-text-400 uppercase font-black tracking-widest mb-1.5 text-center">Physical Capital</p>
+                      <p className="text-[8px] text-asphalt-text-400 uppercase font-black tracking-widest mb-1.5 text-center">Modal Fisik</p>
                       <p className="text-xs font-black text-amber-500 text-center">{formatRupiah(currentBranchData.branchPhysicalCapital)}</p>
                     </div>
                   </div>
