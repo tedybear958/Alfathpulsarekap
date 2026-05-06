@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useFinanceStore } from '../hooks/useFinanceStore';
 import { useAuthStore } from '../store/authStore';
 import { checkIsBos } from '../utils/authUtils';
@@ -12,15 +13,24 @@ interface ServiceIconProps {
   label: string;
   onClick: () => void;
   badge?: string;
+  index: number;
 }
 
-function ServiceIcon({ icon, label, onClick, badge }: ServiceIconProps) {
+function ServiceIcon({ icon, label, onClick, badge, index }: ServiceIconProps) {
   return (
-    <button 
+    <motion.button 
+      initial={{ opacity: 0, scale: 0.8, y: 10 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ 
+        duration: 0.4, 
+        delay: index * 0.05,
+        ease: [0.22, 1, 0.36, 1]
+      }}
+      whileTap={{ scale: 0.9 }}
       onClick={onClick}
       className="flex flex-col items-center gap-2.5 group relative"
     >
-      <div className="w-16 h-16 bg-asphalt-900/50 border border-asphalt-700/50 rounded-[1.5rem] flex items-center justify-center transition-all group-active:scale-90 group-hover:bg-asphalt-700/50 shadow-lg relative overflow-hidden">
+      <div className="w-16 h-16 bg-asphalt-900/50 border border-asphalt-700/50 rounded-[1.5rem] flex items-center justify-center transition-all group-hover:bg-asphalt-700/50 shadow-lg relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
         <div className="text-brand-500 group-hover:scale-110 transition-transform duration-300">
           {icon}
@@ -30,13 +40,17 @@ function ServiceIcon({ icon, label, onClick, badge }: ServiceIconProps) {
         {label}
       </span>
       {badge && (
-        <div className="absolute top-0 right-1 pointer-events-none z-10">
+        <motion.div 
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          className="absolute top-0 right-1 pointer-events-none z-10"
+        >
           <div className="bg-rose-500 text-white text-[7px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-tighter leading-none shadow-lg shadow-rose-500/20 border-2 border-[#0B111D]">
             {badge}
           </div>
-        </div>
+        </motion.div>
       )}
-    </button>
+    </motion.button>
   );
 }
 
@@ -293,7 +307,12 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
       )}
 
       {/* Main Balance Card (GoPay Inspired Card) */}
-      <div className="bg-asphalt-800 rounded-[2.5rem] p-6 border border-asphalt-700/50 shadow-2xl relative overflow-hidden group">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+        className="bg-asphalt-800 rounded-[2.5rem] p-6 border border-asphalt-700/50 shadow-2xl relative overflow-hidden group"
+      >
         <div className="absolute top-0 right-0 w-48 h-48 bg-brand-500/10 rounded-full -mr-24 -mt-24 blur-[80px] group-hover:bg-brand-500/20 transition-all duration-700"></div>
         <div className="relative z-10 space-y-6">
           <div className="space-y-1">
@@ -366,47 +385,55 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Grid Services - Asphalt Style Menu */}
       <div className="bg-asphalt-800 rounded-[2.5rem] p-5 border border-asphalt-700/50 shadow-2xl">
         <div className="grid grid-cols-4 gap-y-7">
           <ServiceIcon 
+            index={0}
             icon={<Users className="w-6 h-6 text-brand-500" />} 
             label="Hutang / Bon" 
             onClick={() => onNavigate?.('debts')}
           />
           <ServiceIcon 
+            index={1}
             icon={<PiggyBank className="w-6 h-6 text-brand-500" />} 
             label="Tabungan" 
             onClick={() => onNavigate?.('savings')}
           />
           <ServiceIcon 
+            index={2}
             icon={<Store className="w-6 h-6 text-brand-500" />} 
             label="Setoran" 
             onClick={() => onNavigate?.('deposits')}
           />
           <ServiceIcon 
+            index={3}
             icon={<Ticket className="w-6 h-6 text-brand-500" />} 
             label="Rekap Data" 
             onClick={() => onNavigate?.('vouchers')}
           />
           <ServiceIcon 
+            index={4}
             icon={<BookOpen className="w-6 h-6 text-brand-500" />} 
             label="Info SOP" 
             onClick={() => onNavigate?.('sop')}
           />
           <ServiceIcon 
+            index={5}
             icon={<HistoryIcon className="w-6 h-6 text-brand-500" />} 
             label="Log Aktivitas" 
             onClick={() => {}} 
           />
           <ServiceIcon 
+            index={6}
             icon={<UserCog className="w-6 h-6 text-brand-500" />} 
             label="Kelola Tim" 
             onClick={() => onNavigate?.('team')}
           />
           <ServiceIcon 
+            index={7}
             icon={<FileText className="w-6 h-6 text-brand-500" />} 
             label="Slip Gaji" 
             onClick={() => onNavigate?.('salary-slips')}

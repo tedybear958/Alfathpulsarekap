@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useFinanceStore } from '../hooks/useFinanceStore';
 import { useAuthStore } from '../store/authStore';
 import { formatRupiah, formatNumberInput } from '../utils/formatters';
@@ -425,8 +426,11 @@ export function VoucherRecaps() {
           <div className="grid grid-cols-1 gap-4">
             {topBranches.map((branch, index) => {
               return (
-                <button
+                <motion.button
                   key={branch.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.05, ease: [0.22, 1, 0.36, 1] }}
                   onClick={() => setSelectedBranchId(branch.id)}
                   className="group relative bg-asphalt-800 rounded-[2.5rem] p-5 flex items-center justify-between shadow-2xl border border-asphalt-700/50 hover:bg-asphalt-900/40 hover:border-brand-500/40 transition-all duration-300 active:scale-[0.98] overflow-hidden"
                 >
@@ -456,7 +460,7 @@ export function VoucherRecaps() {
                     <p className="text-md font-black text-white leading-none">{formatRupiah(branch.batchTotal)}</p>
                     <p className="text-[9px] text-brand-500 font-black uppercase tracking-widest leading-none">Setoran Ini</p>
                   </div>
-                </button>
+                </motion.button>
               );
             })}
           </div>
@@ -735,8 +739,14 @@ export function VoucherRecaps() {
             <p className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest">Belum ada rekapan di bulan ini</p>
           </div>
         ) : (
-          groupedRecaps.map((cycle) => (
-            <div key={cycle.id} className="space-y-4">
+          groupedRecaps.map((cycle, index) => (
+            <motion.div 
+              key={cycle.id} 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+              className="space-y-4"
+            >
               <div className="flex items-center justify-between px-2">
                 <div className="flex items-center gap-3">
                   <div className={`w-2 h-8 rounded-full ${cycle.isReported ? 'bg-emerald-500' : 'bg-brand-500 animate-pulse'}`}></div>
@@ -839,7 +849,7 @@ export function VoucherRecaps() {
                   </table>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))
         )}
       </div>
@@ -893,7 +903,12 @@ export function VoucherRecaps() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="bg-asphalt-800 rounded-[2.5rem] p-5 text-white shadow-2xl border border-asphalt-700 relative overflow-hidden group">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="bg-asphalt-800 rounded-[2.5rem] p-5 text-white shadow-2xl border border-asphalt-700 relative overflow-hidden group"
+        >
           <div className="absolute top-0 right-0 w-24 h-24 bg-brand-500/5 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-brand-500/10 transition-all duration-700"></div>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2 opacity-40">
@@ -905,8 +920,13 @@ export function VoucherRecaps() {
           </div>
           <p className="text-lg font-black text-white tracking-tighter">{formatRupiah(labaBersihAdm)}</p>
           <p className="text-[8px] text-asphalt-text-400 font-black uppercase tracking-widest mt-1.5 leading-tight">After Deductions</p>
-        </div>
-        <div className="bg-asphalt-800 rounded-[2.5rem] p-5 text-white shadow-2xl border border-asphalt-700 relative overflow-hidden group">
+        </motion.div>
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="bg-asphalt-800 rounded-[2.5rem] p-5 text-white shadow-2xl border border-asphalt-700 relative overflow-hidden group"
+        >
           <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-emerald-500/10 transition-all duration-700"></div>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2 opacity-40">
@@ -918,7 +938,7 @@ export function VoucherRecaps() {
           </div>
           <p className="text-lg font-black text-emerald-500 tracking-tighter">{formatRupiah(totalVoucher)}</p>
           <p className="text-[8px] text-asphalt-text-400 font-black uppercase tracking-widest mt-1.5 leading-tight">In Circulation</p>
-        </div>
+        </motion.div>
       </div>
 
       {/* Fixed Bottom Action Button */}

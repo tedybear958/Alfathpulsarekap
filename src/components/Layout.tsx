@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { LayoutDashboard, Users, Store, Download, LogOut, UserCog, PiggyBank, Ticket, ShoppingBag, AlertCircle, X, Palette, Check, BookOpen, FileText } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 import { logout } from '../firebase';
 
@@ -162,80 +163,134 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
         )}
 
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto pb-24 scroll-smooth no-scrollbar">
-          {children}
+        <main className="flex-1 overflow-y-auto pb-24 scroll-smooth no-scrollbar relative">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 15, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 1.02 }}
+              transition={{ 
+                duration: 0.4, 
+                ease: [0.22, 1, 0.36, 1] // Custom cubic-bezier for a "luxurious" feel
+              }}
+              className="w-full flex flex-col"
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
           <div className="px-5 py-6 text-center">
             <p className="text-[9px] text-asphalt-text-400 font-black uppercase tracking-[0.4em] opacity-30">AlfathPulsa v2.0</p>
           </div>
         </main>
 
         {/* Bottom Navigation */}
-        <nav className="fixed bottom-0 max-w-md w-full bg-[#0B111D]/90 backdrop-blur-xl border-t border-asphalt-800/30 z-30 pb-safe shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
-          <div className="flex justify-around items-center h-20 px-2">
+        <nav className="fixed bottom-0 max-w-md w-full bg-[#0B111D]/80 backdrop-blur-2xl border-t border-asphalt-800/30 z-30 pb-safe shadow-[0_-15px_50px_rgba(0,0,0,0.6)]">
+          <div className="flex justify-around items-center h-[4.5rem] px-3 relative">
             
+            {/* Nav background indicator */}
+            {/* We'll use layoutId for smooth sliding effect if we wanted a shared background, 
+                but here we'll animate individual items for a more "clickable" feel */}
+
             {/* Beranda */}
             <button
               onClick={() => setActiveTab('dashboard')}
-              className={`flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all active:scale-90 ${
-                activeTab === 'dashboard' ? 'text-brand-500' : 'text-asphalt-text-400 hover:text-asphalt-text-100'
-              }`}
+              className={`relative flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all group`}
             >
-              <div className="relative">
-                <LayoutDashboard className={`w-6 h-6 ${activeTab === 'dashboard' ? 'stroke-[2.5px]' : 'stroke-2'}`} />
-                {activeTab === 'dashboard' && (
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand-500 rounded-full"></div>
-                )}
-              </div>
-              <span className={`text-[10px] font-black tracking-tight uppercase ${activeTab === 'dashboard' ? 'text-brand-500' : 'opacity-70'}`}>Beranda</span>
+              {activeTab === 'dashboard' && (
+                <motion.div 
+                  layoutId="nav-bg"
+                  className="absolute inset-x-1 inset-y-2 bg-brand-500/10 rounded-2xl -z-10"
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+              )}
+              <motion.div 
+                whileTap={{ scale: 0.85 }}
+                className="relative"
+              >
+                <LayoutDashboard 
+                  className={`w-5.5 h-5.5 transition-colors duration-300 ${activeTab === 'dashboard' ? 'text-brand-500 stroke-[2.5px]' : 'text-asphalt-text-400 group-hover:text-asphalt-text-200 stroke-2'}`} 
+                />
+              </motion.div>
+              <span className={`text-[9px] font-black tracking-widest uppercase transition-colors duration-300 ${activeTab === 'dashboard' ? 'text-brand-500' : 'text-asphalt-text-400 opacity-60'}`}>
+                Beranda
+              </span>
             </button>
             
-            {/* Dompet */}
+            {/* Dompet / Tabungan */}
             <button
               onClick={() => setActiveTab('savings')}
-              className={`flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all active:scale-90 ${
-                activeTab === 'savings' || activeTab === 'debts' ? 'text-brand-500' : 'text-asphalt-text-400 hover:text-asphalt-text-100'
-              }`}
+              className={`relative flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all group`}
             >
-              <div className="relative">
-                <PiggyBank className={`w-6 h-6 ${activeTab === 'savings' || activeTab === 'debts' ? 'stroke-[2.5px]' : 'stroke-2'}`} />
-                {(activeTab === 'savings' || activeTab === 'debts') && (
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand-500 rounded-full"></div>
-                )}
-              </div>
-              <span className={`text-[10px] font-black tracking-tight uppercase ${activeTab === 'savings' || activeTab === 'debts' ? 'text-brand-500' : 'opacity-70'}`}>Tabungan</span>
+              {(activeTab === 'savings' || activeTab === 'debts') && (
+                <motion.div 
+                  layoutId="nav-bg"
+                  className="absolute inset-x-1 inset-y-2 bg-brand-500/10 rounded-2xl -z-10"
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+              )}
+              <motion.div 
+                whileTap={{ scale: 0.85 }}
+                className="relative"
+              >
+                <PiggyBank 
+                  className={`w-5.5 h-5.5 transition-colors duration-300 ${activeTab === 'savings' || activeTab === 'debts' ? 'text-brand-500 stroke-[2.5px]' : 'text-asphalt-text-400 group-hover:text-asphalt-text-200 stroke-2'}`} 
+                />
+              </motion.div>
+              <span className={`text-[9px] font-black tracking-widest uppercase transition-colors duration-300 ${activeTab === 'savings' || activeTab === 'debts' ? 'text-brand-500' : 'text-asphalt-text-400 opacity-60'}`}>
+                Tabungan
+              </span>
             </button>
 
-            {/* Aktivitas (Riwayat) */}
+            {/* Rekapan */}
             <button
               onClick={() => setActiveTab('vouchers')}
-              className={`flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all active:scale-90 ${
-                activeTab === 'vouchers' ? 'text-brand-500' : 'text-asphalt-text-400 hover:text-asphalt-text-100'
-              }`}
+              className={`relative flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all group`}
             >
-              <div className="relative">
-                <Ticket className={`w-6 h-6 ${activeTab === 'vouchers' ? 'stroke-[2.5px]' : 'stroke-2'}`} />
-                {activeTab === 'vouchers' && (
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand-500 rounded-full"></div>
-                )}
-              </div>
-              <span className={`text-[10px] font-black tracking-tight uppercase ${activeTab === 'vouchers' ? 'text-brand-500' : 'opacity-70'}`}>Rekapan</span>
+              {activeTab === 'vouchers' && (
+                <motion.div 
+                  layoutId="nav-bg"
+                  className="absolute inset-x-1 inset-y-2 bg-brand-500/10 rounded-2xl -z-10"
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+              )}
+              <motion.div 
+                whileTap={{ scale: 0.85 }}
+                className="relative"
+              >
+                <Ticket 
+                  className={`w-5.5 h-5.5 transition-colors duration-300 ${activeTab === 'vouchers' ? 'text-brand-500 stroke-[2.5px]' : 'text-asphalt-text-400 group-hover:text-asphalt-text-200 stroke-2'}`} 
+                />
+              </motion.div>
+              <span className={`text-[9px] font-black tracking-widest uppercase transition-colors duration-300 ${activeTab === 'vouchers' ? 'text-brand-500' : 'text-asphalt-text-400 opacity-60'}`}>
+                Rekapan
+              </span>
             </button>
 
-            {/* Akun/Tim */}
+            {/* Akun */}
             {checkIsBos(user, role) && (
               <button
                 onClick={() => setActiveTab('team')}
-                className={`flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all active:scale-90 ${
-                  activeTab === 'team' || activeTab === 'sop' ? 'text-brand-500' : 'text-asphalt-text-400 hover:text-asphalt-text-100'
-                }`}
+                className={`relative flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all group`}
               >
-                <div className="relative">
-                  <Users className={`w-6 h-6 ${activeTab === 'team' || activeTab === 'sop' ? 'stroke-[2.5px]' : 'stroke-2'}`} />
-                  {(activeTab === 'team' || activeTab === 'sop') && (
-                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand-500 rounded-full"></div>
-                  )}
-                </div>
-                <span className={`text-[10px] font-black tracking-tight uppercase ${activeTab === 'team' || activeTab === 'sop' ? 'text-brand-500' : 'opacity-70'}`}>Akun</span>
+                {(activeTab === 'team' || activeTab === 'sop') && (
+                  <motion.div 
+                    layoutId="nav-bg"
+                    className="absolute inset-x-1 inset-y-2 bg-brand-500/10 rounded-2xl -z-10"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  />
+                )}
+                <motion.div 
+                  whileTap={{ scale: 0.85 }}
+                  className="relative"
+                >
+                  <Users 
+                    className={`w-5.5 h-5.5 transition-colors duration-300 ${activeTab === 'team' || activeTab === 'sop' ? 'text-brand-500 stroke-[2.5px]' : 'text-asphalt-text-400 group-hover:text-asphalt-text-200 stroke-2'}`} 
+                  />
+                </motion.div>
+                <span className={`text-[9px] font-black tracking-widest uppercase transition-colors duration-300 ${activeTab === 'team' || activeTab === 'sop' ? 'text-brand-500' : 'text-asphalt-text-400 opacity-60'}`}>
+                  Akun
+                </span>
               </button>
             )}
             
