@@ -324,49 +324,72 @@ export function VoucherRecaps() {
             <h2 className="text-2xl font-black text-white tracking-tighter uppercase">Pantauan Utama</h2>
             <p className="text-[10px] text-asphalt-text-400 font-black uppercase tracking-[0.2em] leading-none">Statistik Global • Semua Cabang</p>
           </div>
-          <div className="w-14 h-14 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-500 shadow-lg shadow-brand-500/10">
-            <TrendingUp className="w-7 h-7 stroke-[2.5px]" />
+          <div className="w-12 h-12 rounded-xl bg-asphalt-800 border border-asphalt-700 flex items-center justify-center text-brand-500 shadow-xl shadow-brand-500/10">
+            <TrendingUp className="w-6 h-6 stroke-[2.5px]" />
           </div>
         </div>
 
-        {/* Global Summary Cards */}
-        <div className="grid grid-cols-1 gap-5">
-          <div className="bg-asphalt-800 rounded-[2.5rem] p-8 text-white shadow-2xl relative overflow-hidden group border border-asphalt-700">
-            <div className="absolute top-0 right-0 w-80 h-80 bg-brand-500/10 rounded-full -mr-32 -mt-32 blur-[100px] group-hover:bg-brand-500/20 transition-all duration-1000"></div>
-            <div className="relative z-10">
-              <div className="flex items-center gap-2 mb-4 opacity-60">
-                <Wallet className="w-4 h-4" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Total Bersih Global</span>
+        {/* Global Summary & Filter */}
+        <div className="space-y-6">
+          <div className="bg-asphalt-800 rounded-[2.5rem] p-7 text-white shadow-2xl border border-asphalt-700 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-brand-500/5 rounded-full -mr-48 -mt-48 blur-[120px] group-hover:bg-brand-500/10 transition-all duration-1000"></div>
+            <div className="relative z-10 space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 opacity-60">
+                  <Wallet className="w-4 h-4" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">Total Laba Bersih Global</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
+                  <span className="text-[10px] font-black uppercase text-brand-400 tracking-widest">{months[selectedMonth]} {selectedYear}</span>
+                </div>
               </div>
-              <div className="flex items-center justify-between group mb-8">
-                <div>
-                  <p className="text-[10px] text-brand-400 font-black uppercase tracking-[0.2em] leading-none mb-1">Admin (Net)</p>
-                  <p className="text-3xl font-black text-white tracking-tighter">
+
+              {/* Stats Grid - Vertical Focus */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-asphalt-900/40 p-5 rounded-2xl border border-asphalt-700/30">
+                  <p className="text-[9px] text-brand-400 font-black uppercase tracking-widest mb-1 leading-none">Admin (Net)</p>
+                  <p className="text-2xl font-black text-white tracking-tight">
                     {formatRupiah(globalTotalAdm - globalTotalExp)}
                   </p>
                 </div>
-                <div className="text-right">
-                  <p className="text-[10px] text-emerald-400 font-black uppercase tracking-[0.2em] leading-none mb-1">Voucher</p>
-                  <p className="text-3xl font-black text-emerald-500 tracking-tighter">
+                <div className="bg-asphalt-900/40 p-5 rounded-2xl border border-asphalt-700/30">
+                  <p className="text-[9px] text-emerald-400 font-black uppercase tracking-widest mb-1 leading-none">Voucher</p>
+                  <p className="text-2xl font-black text-emerald-500 tracking-tight">
                     {formatRupiah(globalTotalVou)}
                   </p>
                 </div>
               </div>
 
-              <div className="pt-6 border-t border-white/5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-4xl font-black tracking-tighter text-white">
-                      {formatRupiah((globalTotalAdm - globalTotalExp) + globalTotalVou)}
-                    </h3>
-                    <p className="text-[8px] text-asphalt-text-400 font-black uppercase tracking-[0.2em] mt-2">Total Bersih Semua Cabang</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] text-brand-400 font-black uppercase tracking-[0.2em] mt-3 leading-none flex items-center justify-end gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"></span>
-                      {months[selectedMonth]} {selectedYear}
-                    </p>
-                  </div>
+              {/* Grand Total Area */}
+              <div className="pt-6 border-t border-white/5 space-y-4">
+                <div>
+                  <h3 className="text-4xl font-black tracking-tighter text-white">
+                    {formatRupiah(globalNetProfit)}
+                  </h3>
+                  <p className="text-[9px] text-asphalt-text-400 font-black uppercase tracking-[0.2em] mt-2">Total Bersih Semua Cabang</p>
+                </div>
+
+                {/* Filter Controls for Global View */}
+                <div className="flex items-center gap-2 pt-2">
+                  <select 
+                    value={selectedMonth}
+                    onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+                    className="flex-1 bg-asphalt-900/50 border border-asphalt-700 rounded-xl px-4 py-2.5 text-[9px] font-black uppercase tracking-widest text-white outline-none focus:ring-1 focus:ring-brand-500"
+                  >
+                    {months.map((m, i) => (
+                      <option key={m} value={i}>{m}</option>
+                    ))}
+                  </select>
+                  <select 
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                    className="w-24 bg-asphalt-900/50 border border-asphalt-700 rounded-xl px-4 py-2.5 text-[9px] font-black uppercase tracking-widest text-white outline-none focus:ring-1 focus:ring-brand-500"
+                  >
+                    {years.map(y => (
+                      <option key={y} value={y}>{y}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>
