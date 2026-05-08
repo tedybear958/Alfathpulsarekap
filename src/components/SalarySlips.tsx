@@ -495,66 +495,14 @@ export function SalarySlips() {
             </div>
           ) : (
             slips.map((slip) => (
-              <div key={slip.id} className="bg-asphalt-800 rounded-3xl border border-asphalt-700/50 shadow-xl overflow-hidden group">
-                <div className="p-5 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-lg border border-white/10 ${
-                        slip.status === 'paid' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-amber-500/10 text-amber-500'
-                      }`}>
-                        {slip.status === 'paid' ? <Check className="w-5 h-5 stroke-[3px]" /> : <Clock className="w-5 h-5" />}
-                      </div>
-                      <div>
-                        <h4 className="text-xs font-black text-white uppercase tracking-tight">{slip.userName || 'Karyawan'}</h4>
-                        <p className="text-[9px] text-asphalt-text-400 font-bold uppercase tracking-widest mt-0.5">
-                          {getMonthName(slip.month)} {slip.year}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {isBos && (
-                        <button
-                          onClick={() => setDeleteConfirm({ isOpen: true, id: slip.id, name: `${slip.userName} (${getMonthName(slip.month)})` })}
-                          className="p-2 text-asphalt-text-400 hover:text-rose-500 transition-all"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-asphalt-900/40 p-3 rounded-xl border border-asphalt-700 shadow-inner">
-                      <p className="text-[7px] text-asphalt-text-400 uppercase font-black tracking-widest mb-1 opacity-60">Gaji Pokok</p>
-                      <p className="text-[11px] font-black text-white">{formatRupiah(slip.baseSalary)}</p>
-                    </div>
-                    <div className="bg-asphalt-900/40 p-3 rounded-xl border border-asphalt-700 shadow-inner">
-                      <p className="text-[7px] text-asphalt-text-400 uppercase font-black tracking-widest mb-1 opacity-60">Diterima</p>
-                      <p className="text-[11px] font-black text-emerald-500">{formatRupiah(slip.netSalary)}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-1">
-                    <div className="flex items-center gap-2">
-                      <span className={`px-2 py-0.5 rounded-lg text-[7px] font-black uppercase tracking-widest border ${
-                        slip.status === 'paid' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-amber-500/10 text-amber-500 border-amber-500/20'
-                      }`}>
-                        {slip.status === 'paid' ? 'LUNAS' : 'PENDING'}
-                      </span>
-                    </div>
-                    
-                    {isBos && slip.status === 'pending' && (
-                      <button
-                        onClick={() => handleStatusChange(slip.id, 'paid')}
-                        className="px-3 py-1.5 bg-emerald-500 text-white rounded-lg text-[8px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all flex items-center gap-1.5"
-                      >
-                       <Check className="w-3 h-3 stroke-[3px]" />
-                       BAYAR
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <SlipCard 
+                key={slip.id} 
+                slip={slip} 
+                isBos={isBos} 
+                getMonthName={getMonthName} 
+                handleStatusChange={handleStatusChange} 
+                setDeleteConfirm={setDeleteConfirm} 
+              />
             ))
           )}
         </div>
@@ -568,6 +516,124 @@ export function SalarySlips() {
         onCancel={() => setDeleteConfirm({ isOpen: false, id: '', name: '' })}
       />
       {showSuccess && <SuccessToast show={showSuccess} message={successMessage} onClose={() => setShowSuccess(false)} />}
+    </div>
+  );
+}
+
+function SlipCard({ 
+  slip, 
+  isBos, 
+  getMonthName, 
+  handleStatusChange, 
+  setDeleteConfirm 
+}: { 
+  slip: SalarySlip, 
+  isBos: boolean, 
+  getMonthName: (m: number) => string, 
+  handleStatusChange: (id: string, status: 'paid') => void, 
+  setDeleteConfirm: (conf: any) => void 
+}) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="bg-asphalt-800 rounded-3xl border border-asphalt-700/50 shadow-xl overflow-hidden group">
+      <div 
+        className="p-5 cursor-pointer hover:bg-asphalt-700/20 transition-all"
+        onClick={() => setExpanded(!expanded)}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-lg border border-white/10 ${
+              slip.status === 'paid' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-amber-500/10 text-amber-500'
+            }`}>
+              {slip.status === 'paid' ? <Check className="w-5 h-5 stroke-[3px]" /> : <Clock className="w-5 h-5" />}
+            </div>
+            <div>
+              <h4 className="text-xs font-black text-white uppercase tracking-tight">{slip.userName || 'Karyawan'}</h4>
+              <p className="text-[9px] text-asphalt-text-400 font-bold uppercase tracking-widest mt-0.5">
+                {getMonthName(slip.month)} {slip.year}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[8px] font-black text-asphalt-text-400 uppercase tracking-widest">
+              {expanded ? 'TUTUP DETAIL' : 'LIHAT DETAIL'}
+            </span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 mt-4">
+          <div className="bg-asphalt-900/40 p-3 rounded-xl border border-asphalt-700 shadow-inner">
+            <p className="text-[7px] text-asphalt-text-400 uppercase font-black tracking-widest mb-1 opacity-60">Gaji Pokok</p>
+            <p className="text-[11px] font-black text-white">{formatRupiah(slip.baseSalary)}</p>
+          </div>
+          <div className="bg-asphalt-900/40 p-3 rounded-xl border border-asphalt-700 shadow-inner">
+            <p className="text-[7px] text-asphalt-text-400 uppercase font-black tracking-widest mb-1 opacity-60">Diterima</p>
+            <p className="text-[11px] font-black text-emerald-500">{formatRupiah(slip.netSalary)}</p>
+          </div>
+        </div>
+      </div>
+
+      {expanded && (
+        <div className="px-5 pb-5 pt-2 border-t border-asphalt-700/50 bg-asphalt-900/40 space-y-4">
+          <div className="space-y-3">
+            <h5 className="text-[9px] font-black text-white uppercase tracking-widest border-b border-asphalt-700 pb-2">Rincian Slip Gaji</h5>
+            <div className="flex justify-between items-center text-[10px]">
+              <span className="text-asphalt-text-400 font-bold uppercase">Gaji Pokok</span>
+              <span className="font-black text-white">{formatRupiah(slip.baseSalary)}</span>
+            </div>
+            <div className="flex justify-between items-center text-[10px]">
+              <span className="text-asphalt-text-400 font-bold uppercase">Bonus</span>
+              <span className="font-black text-emerald-500">+{formatRupiah(slip.bonus)}</span>
+            </div>
+            <div className="flex justify-between items-center text-[10px]">
+              <span className="text-asphalt-text-400 font-bold uppercase">Potongan</span>
+              <span className="font-black text-rose-500">-{formatRupiah(slip.deductions)}</span>
+            </div>
+            <div className="flex justify-between items-center text-[11px] pt-3 border-t border-asphalt-700 border-dashed">
+              <span className="text-white font-black uppercase">TOTAL DITERIMA</span>
+              <span className="font-black text-emerald-500">{formatRupiah(slip.netSalary)}</span>
+            </div>
+          </div>
+          
+          <div className="flex items-center justify-between pt-2 px-1">
+            <div className="flex items-center gap-2">
+              <span className={`px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest border ${
+                slip.status === 'paid' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+              }`}>
+                STATUS: {slip.status === 'paid' ? 'LUNAS DIBAYARKAN' : 'PENDING'}
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <button
+                onClick={(e) => { e.stopPropagation(); window.print(); }}
+                className="p-1.5 text-asphalt-text-400 hover:text-brand-500 bg-asphalt-800 rounded-lg border border-asphalt-700 transition-all flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                <span className="text-[8px] font-black uppercase tracking-widest hidden sm:inline">CETAK</span>
+              </button>
+              {isBos && slip.status === 'pending' && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleStatusChange(slip.id, 'paid'); }}
+                  className="px-3 py-1.5 bg-emerald-500 text-white rounded-lg text-[8px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all flex items-center gap-1.5"
+                >
+                 <Check className="w-3 h-3 stroke-[3px]" />
+                 BAYAR
+                </button>
+              )}
+              {isBos && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); setDeleteConfirm({ isOpen: true, id: slip.id, name: `${slip.userName} (${getMonthName(slip.month)})` }); }}
+                  className="p-1.5 text-asphalt-text-400 hover:text-rose-500 bg-asphalt-800 rounded-lg border border-asphalt-700 transition-all"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

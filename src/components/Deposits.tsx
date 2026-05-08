@@ -132,7 +132,7 @@ export function Deposits() {
 
   return (
     <div className="p-5 space-y-7 bg-asphalt-900 min-h-screen pb-32">
-      <DepositAnalytics />
+      {role === 'bos' && <DepositAnalytics />}
 
       {/* Summary Header */}
       <div className={`bg-asphalt-800 rounded-[2.5rem] p-7 border border-asphalt-700/50 shadow-2xl relative overflow-hidden group transition-all duration-500 ${role === 'mandor' && stats.sisaSetor > 0 ? 'ring-2 ring-emerald-500 ring-offset-4 ring-offset-asphalt-900' : ''}`}>

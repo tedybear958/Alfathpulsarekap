@@ -140,3 +140,44 @@ body {
   display: none !important;
 }
 
+@media print {
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+  
+  /* Hide the layout header and nav */
+  header, nav, button:not(.print-visible) {
+    display: none !important;
+  }
+  
+  /* Make the main content take full screen for printing */
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+  
+  /* Ensure backgrounds render on print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  /* Make cards look good on paper */
+  .bg-asphalt-800, .bg-asphalt-900 {
+    background-color: #f7f7f7 !important;
+    border: 1px solid #ddd !important;
+    color: #111 !important;
+  }
+  
+  .text-white {
+    color: black !important;
+  }
+  
+  .text-asphalt-text-400 {
+    color: #555 !important;
+  }
+}
+

@@ -63,7 +63,11 @@ service cloud.firestore {
 
     // Collection: salarySlips
     match /salarySlips/{slipId} {
-      allow read: if isAuthenticated();
+      allow read: if isAuthenticated() && (
+        isBosGlobal() ||
+        isAssignedToBranch(resource.data.branchId) ||
+        resource.data.userId == request.auth.uid
+      );
       allow create, update, delete: if isBos();
     }
 

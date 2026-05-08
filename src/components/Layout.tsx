@@ -228,7 +228,26 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
               </span>
             </button>
 
-            {/* Akun */}
+            {/* Slip Gaji (For Karyawan/Mandor only) */}
+            {!checkIsBos(user, role) && (
+              <button
+                onClick={() => setActiveTab('salary-slips')}
+                className={`flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all group active:scale-90 ${
+                  activeTab === 'salary-slips' ? 'text-brand-500' : 'text-asphalt-text-400 opacity-60'
+                }`}
+              >
+                <div className="relative">
+                  <FileText 
+                    className={`w-5.5 h-5.5 transition-colors duration-300 ${activeTab === 'salary-slips' ? 'stroke-[2.5px]' : 'stroke-2'}`} 
+                  />
+                </div>
+                <span className={`text-[9px] font-black tracking-widest uppercase`}>
+                  Gaji
+                </span>
+              </button>
+            )}
+
+            {/* Akun (For Bos) */}
             {checkIsBos(user, role) && (
               <button
                 onClick={() => setActiveTab('team')}
