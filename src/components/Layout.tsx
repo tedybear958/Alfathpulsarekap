@@ -195,21 +195,23 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
             </button>
             
             {/* Dompet / Tabungan */}
-            <button
-              onClick={() => setActiveTab('savings')}
-              className={`flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all group active:scale-90 ${
-                activeTab === 'savings' || activeTab === 'debts' ? 'text-brand-500' : 'text-asphalt-text-400 opacity-60'
-              }`}
-            >
-              <div className="relative">
-                <PiggyBank 
-                  className={`w-5.5 h-5.5 transition-colors duration-300 ${activeTab === 'savings' || activeTab === 'debts' ? 'stroke-[2.5px]' : 'stroke-2'}`} 
-                />
-              </div>
-              <span className={`text-[9px] font-black tracking-widest uppercase`}>
-                Tabungan
-              </span>
-            </button>
+            {role !== 'mandor' && (
+              <button
+                onClick={() => setActiveTab('savings')}
+                className={`flex flex-col items-center justify-center flex-1 h-full space-y-1.5 transition-all group active:scale-90 ${
+                  activeTab === 'savings' || activeTab === 'debts' ? 'text-brand-500' : 'text-asphalt-text-400 opacity-60'
+                }`}
+              >
+                <div className="relative">
+                  <PiggyBank 
+                    className={`w-5.5 h-5.5 transition-colors duration-300 ${activeTab === 'savings' || activeTab === 'debts' ? 'stroke-[2.5px]' : 'stroke-2'}`} 
+                  />
+                </div>
+                <span className={`text-[9px] font-black tracking-widest uppercase`}>
+                  Tabungan
+                </span>
+              </button>
+            )}
 
             {/* Rekapan */}
             <button

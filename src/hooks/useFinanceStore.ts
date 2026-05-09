@@ -555,6 +555,7 @@ const clearSubListeners = () => {
 
 export const initFinanceStoreListeners = () => {
   const authState = useAuthStore.getState();
+  if (!authState.user) return;
   
   useFinanceStore.setState({ error: null });
   
@@ -593,10 +594,11 @@ export const initFinanceStoreListeners = () => {
   }
 
   // Customers & Debts
-  if (authState.role) {
+  if (authState.role && authState.role !== 'mandor') {
+    const isGlobal = !authState.branchId && authState.role === 'bos';
     const customersQuery = authState.branchId 
       ? query(collection(db, 'customers'), where('branchId', '==', authState.branchId))
-      : (authState.role === 'bos' ? query(collection(db, 'customers')) : query(collection(db, 'customers'), where('branchId', '==', null)));
+      : (isGlobal ? query(collection(db, 'customers')) : query(collection(db, 'customers'), where('branchId', '==', null)));
 
     unsubscribers.push(
       onSnapshot(customersQuery, (snapshot) => {
@@ -650,10 +652,11 @@ export const initFinanceStoreListeners = () => {
   }
 
   // Savings
-  if (authState.role) {
+  if (authState.role && authState.role !== 'mandor') {
+    const isGlobal = !authState.branchId && authState.role === 'bos';
     const savingsQuery = authState.branchId
       ? query(collection(db, 'savings'), where('branchId', '==', authState.branchId))
-      : (authState.role === 'bos' ? query(collection(db, 'savings')) : query(collection(db, 'savings'), where('branchId', '==', null)));
+      : (isGlobal ? query(collection(db, 'savings')) : query(collection(db, 'savings'), where('branchId', '==', null)));
 
     unsubscribers.push(
       onSnapshot(savingsQuery, (snapshot) => {

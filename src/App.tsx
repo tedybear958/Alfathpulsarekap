@@ -28,8 +28,11 @@ export default function App() {
   useEffect(() => {
     if (user && role) {
       initFinanceStoreListeners();
+    } else if (isAuthLoaded && !user) {
+      // Clear listeners if not logged in
+      import('./hooks/useFinanceStore').then(m => m.stopFinanceStoreListeners());
     }
-  }, [user, role]);
+  }, [user, role, isAuthLoaded]);
 
   if (!isAuthLoaded) {
     return (
@@ -104,8 +107,8 @@ export default function App() {
           onNavigate={(tab) => setActiveTab(tab as any)} 
         />
       )}
-      {activeTab === 'debts' && <Debts />}
-      {activeTab === 'savings' && <Savings />}
+      {activeTab === 'debts' && role !== 'mandor' && <Debts />}
+      {activeTab === 'savings' && role !== 'mandor' && <Savings />}
       {activeTab === 'deposits' && <Deposits />}
       {activeTab === 'vouchers' && <VoucherRecaps />}
       {activeTab === 'team' && isBos && <Team />}

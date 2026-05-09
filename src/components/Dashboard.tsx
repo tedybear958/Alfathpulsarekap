@@ -374,18 +374,22 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
       {/* Grid Services - Asphalt Style Menu */}
       <div className="bg-asphalt-800 rounded-[2.5rem] p-5 border border-asphalt-700/50 shadow-2xl">
         <div className="grid grid-cols-4 gap-y-7">
-          <ServiceIcon 
-            index={0}
-            icon={<Users className="w-6 h-6 text-brand-500" />} 
-            label="Hutang / Bon" 
-            onClick={() => onNavigate?.('debts')}
-          />
-          <ServiceIcon 
-            index={1}
-            icon={<PiggyBank className="w-6 h-6 text-brand-500" />} 
-            label="Tabungan" 
-            onClick={() => onNavigate?.('savings')}
-          />
+          {role !== 'mandor' && (
+            <>
+              <ServiceIcon 
+                index={0}
+                icon={<Users className="w-6 h-6 text-brand-500" />} 
+                label="Hutang / Bon" 
+                onClick={() => onNavigate?.('debts')}
+              />
+              <ServiceIcon 
+                index={1}
+                icon={<PiggyBank className="w-6 h-6 text-brand-500" />} 
+                label="Tabungan" 
+                onClick={() => onNavigate?.('savings')}
+              />
+            </>
+          )}
           <ServiceIcon 
             index={2}
             icon={<Store className="w-6 h-6 text-brand-500" />} 
@@ -478,7 +482,7 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
       {/* Mini Stats - Hidden for Bos Global as requested */}
       {!isBosGlobal && (
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-asphalt-800 p-4 rounded-3xl border border-asphalt-700/50 shadow-xl flex flex-col justify-center space-y-2 group hover:border-emerald-500/30 transition-all">
+          <div className="bg-asphalt-800 p-4 rounded-3xl border border-asphalt-700/50 shadow-xl flex flex-col justify-center space-y-2 group hover:border-emerald-500/30 transition-all col-span-2">
             <div className="flex items-center gap-2 text-emerald-500">
               <div className="p-1.5 bg-emerald-500/10 rounded-lg">
                 <Landmark className="w-4 h-4" />
@@ -487,22 +491,27 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
             </div>
             <p className="text-base font-black text-white">{formatRupiah(currentBankTotal)}</p>
           </div>
-          <div className="bg-asphalt-800 p-4 rounded-3xl border border-asphalt-700/50 shadow-xl flex flex-col justify-center space-y-2 group hover:border-rose-500/30 transition-all">
-            <div className="flex items-center gap-2 text-rose-500">
-              <div className="p-1.5 bg-rose-500/10 rounded-lg">
-                <Receipt className="w-4 h-4" />
+          
+          {role !== 'mandor' && (
+            <>
+              <div className="bg-asphalt-800 p-4 rounded-3xl border border-asphalt-700/50 shadow-xl flex flex-col justify-center space-y-2 group hover:border-rose-500/30 transition-all">
+                <div className="flex items-center gap-2 text-rose-500">
+                  <div className="p-1.5 bg-rose-500/10 rounded-lg">
+                    <Receipt className="w-4 h-4" />
+                  </div>
+                  <span className="text-[9px] font-black uppercase tracking-[0.2em]">Total Bon</span>
+                </div>
+                <p className="text-base font-black text-white">{formatRupiah(currentDebtTotal)}</p>
               </div>
-              <span className="text-[9px] font-black uppercase tracking-[0.2em]">Total Bon</span>
-            </div>
-            <p className="text-base font-black text-white">{formatRupiah(currentDebtTotal)}</p>
-          </div>
-          <div className="bg-brand-500 p-4 rounded-[2rem] shadow-xl shadow-brand-500/20 flex flex-col justify-center col-span-2 space-y-2">
-            <div className="flex items-center gap-2 text-white/80">
-              <PiggyBank className="w-5 h-5 text-white" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em]">Tabungan Karyawan</span>
-            </div>
-            <p className="text-2xl font-black text-white">{formatRupiah(totalSavings)}</p>
-          </div>
+              <div className="bg-brand-500 p-4 rounded-[2rem] shadow-xl shadow-brand-500/20 flex flex-col justify-center space-y-2">
+                <div className="flex items-center gap-2 text-white/80">
+                  <PiggyBank className="w-5 h-5 text-white" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">Tabungan Karyawan</span>
+                </div>
+                <p className="text-base font-black text-white leading-none mt-1">{formatRupiah(totalSavings)}</p>
+              </div>
+            </>
+          )}
         </div>
       )}
 

@@ -52,8 +52,15 @@ export function SalarySlips() {
   };
 
   const isBos = checkIsBos(user, role);
+  const isMandor = role === 'mandor';
+  const canSeeBatch = isBos || isMandor;
+  
   // Bos Pusat (Global) adalah Bos tanpa branchId
   const isGlobalBos = isBos && !currentUserBranchId;
+
+  const [filterMonth, setFilterMonth] = useState(new Date().getMonth() + 1);
+  const [filterYear, setFilterYear] = useState(new Date().getFullYear());
+  const [showAllHistory, setShowAllHistory] = useState(false);
 
   const [batchMonth, setBatchMonth] = useState(new Date().getMonth() + 1);
   const [batchYear, setBatchYear] = useState(new Date().getFullYear());
@@ -69,21 +76,38 @@ export function SalarySlips() {
     let isMounted = true;
     let q;
     
+    // Determine query based on role
     if (isBos) {
       if (isGlobalBos) {
         q = query(collection(db, 'salarySlips'));
       } else {
         q = query(collection(db, 'salarySlips'), where('branchId', '==', currentUserBranchId));
       }
+    } else if (isMandor) {
+      if (!currentUserBranchId) {
+        // Global Mandor can see all
+        q = query(collection(db, 'salarySlips'));
+      } else {
+        // Branch Mandor only see their branch
+        q = query(collection(db, 'salarySlips'), where('branchId', '==', currentUserBranchId));
+      }
     } else {
+      // Regular user only see their own
       q = query(collection(db, 'salarySlips'), where('userId', '==', uid));
     }
 
     const unsub = onSnapshot(q, (snapshot) => {
       if (!isMounted) return;
       const slipsData = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as SalarySlip));
+      
+      // Filter by month/year if not "showAllHistory"
+      let filtered = slipsData;
+      if (!showAllHistory) {
+        filtered = slipsData.filter(s => s.month === filterMonth && s.year === filterYear);
+      }
+      
       // Sort by year desc, then month desc
-      const sortedData = [...slipsData].sort((a, b) => {
+      const sortedData = [...filtered].sort((a, b) => {
         if (b.year !== a.year) return b.year - a.year;
         return b.month - a.month;
       });
@@ -96,9 +120,9 @@ export function SalarySlips() {
       setIsLoading(false);
     });
 
-    if (isBos) {
+    if (isBos || isMandor) {
       let usersQuery;
-      if (isGlobalBos) {
+      if (isGlobalBos || (isMandor && !currentUserBranchId)) {
         usersQuery = query(collection(db, 'users'));
       } else {
         usersQuery = query(collection(db, 'users'), where('branchId', '==', currentUserBranchId));
@@ -117,7 +141,7 @@ export function SalarySlips() {
     }
 
     return () => { isMounted = false; unsub(); };
-  }, [isBos, isGlobalBos, currentUserBranchId, uid, isAuthLoaded]);
+  }, [isBos, isMandor, isGlobalBos, currentUserBranchId, uid, isAuthLoaded, filterMonth, filterYear, showAllHistory]);
 
   // Auto-fill base salary when user selected
   useEffect(() => {
@@ -482,9 +506,48 @@ export function SalarySlips() {
 
       {/* Slips List */}
       <div className="space-y-4">
-        <div className="flex items-center gap-3 px-2">
-          <Calendar className="w-5 h-5 text-brand-500" />
-          <h3 className="text-sm font-black text-white uppercase tracking-tight">Riwayat Gaji</h3>
+        <div className="flex flex-col gap-4 px-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Calendar className="w-5 h-5 text-brand-500" />
+              <h3 className="text-sm font-black text-white uppercase tracking-tight">Riwayat Gaji</h3>
+            </div>
+            <button 
+              onClick={() => setShowAllHistory(!showAllHistory)}
+              className="text-[9px] font-black text-brand-500 uppercase tracking-widest bg-brand-500/10 px-3 py-1.5 rounded-lg border border-brand-500/20"
+            >
+              {showAllHistory ? 'Tampilkan Berdasarkan Filter' : 'Tampilkan Semua'}
+            </button>
+          </div>
+
+          {!showAllHistory && (
+             <div className="bg-asphalt-800 p-4 rounded-2xl border border-asphalt-700 flex items-center gap-3 animate-in fade-in slide-in-from-top-1">
+              <div className="flex-1 space-y-1">
+                <span className="text-[8px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Bulan</span>
+                <select
+                  value={filterMonth}
+                  onChange={(e) => setFilterMonth(parseInt(e.target.value))}
+                  className="w-full bg-asphalt-900 border border-asphalt-700/50 rounded-xl px-3 py-2 text-xs text-white font-bold outline-none uppercase"
+                >
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
+                    <option key={m} value={m}>{getMonthName(m)}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex-1 space-y-1">
+                <span className="text-[8px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Tahun</span>
+                <select
+                  value={filterYear}
+                  onChange={(e) => setFilterYear(parseInt(e.target.value))}
+                  className="w-full bg-asphalt-900 border border-asphalt-700/50 rounded-xl px-3 py-2 text-xs text-white font-bold outline-none capitalize"
+                >
+                  {[filterYear - 1, filterYear, filterYear + 1].map(y => (
+                    <option key={y} value={y}>{y}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="space-y-4">

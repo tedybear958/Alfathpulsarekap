@@ -131,6 +131,7 @@ export function Savings() {
 
   const canEdit = role !== 'bos' && !!branchId;
   const canDelete = role !== 'bos' && !!branchId;
+  const canFilterBranches = (role === 'bos' || role === 'mandor') && !branchId;
 
   if (selectedPerson) {
     const totalSavings = store.getPersonTotalSavings(selectedPerson);
@@ -422,8 +423,8 @@ export function Savings() {
             </button>
           </div>
           
-          {/* Branch Filter for Owner */}
-          {role === 'bos' && (
+          {/* Branch Filter for Owner / Global Mandor */}
+          {canFilterBranches && (
             <div className="space-y-2">
               <p className="text-[8px] font-black text-brand-500 uppercase tracking-[0.2em] ml-1">Filter Cabang</p>
               <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">

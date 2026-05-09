@@ -12,6 +12,7 @@ export function Debts() {
   const [newPersonName, setNewPersonName] = useState('');
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedBranchId, setSelectedBranchId] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'name' | 'amount' | 'latest'>('latest');
 
   const [amountInput, setAmountInput] = useState('');
@@ -46,14 +47,20 @@ export function Debts() {
   }, [store.debts, store.getPersonTotalDebt]);
 
   const filteredDebts = useMemo(() => {
-    return debtsWithTotals
-      .filter(d => d.personName.toLowerCase().includes(searchQuery.toLowerCase()))
-      .sort((a, b) => {
-        if (sortBy === 'name') return a.personName.localeCompare(b.personName);
-        if (sortBy === 'amount') return b.totalDebt - a.totalDebt;
-        return 0; 
-      });
-  }, [debtsWithTotals, searchQuery, sortBy]);
+    let result = debtsWithTotals.filter(d => 
+      d.personName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    if (selectedBranchId !== 'all') {
+      result = result.filter(d => d.branchId === selectedBranchId);
+    }
+
+    return result.sort((a, b) => {
+      if (sortBy === 'name') return a.personName.localeCompare(b.personName);
+      if (sortBy === 'amount') return b.totalDebt - a.totalDebt;
+      return 0; 
+    });
+  }, [debtsWithTotals, searchQuery, sortBy, selectedBranchId]);
 
   const branchDebtData = useMemo(() => {
     if (role !== 'bos' || branchId) return [];
@@ -68,6 +75,7 @@ export function Debts() {
   }, [role, branchId, store.branches, debtsWithTotals]);
 
   const isBosGlobal = role === 'bos' && !branchId;
+  const canFilterBranches = (role === 'bos' || role === 'mandor') && !branchId;
   const totalDebtAll = useMemo(() => 
     filteredDebts.reduce((sum, p) => sum + p.totalDebt, 0)
   , [filteredDebts]);
@@ -306,7 +314,7 @@ export function Debts() {
           
           <div className="space-y-1">
             <h3 className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-[0.25em]">
-              {isBosGlobal ? 'Piutang Global' : 'Piutang Cabang'}
+              {canFilterBranches ? (selectedBranchId === 'all' ? 'Piutang Global' : `Piutang ${store.branches.find(b => b.id === selectedBranchId)?.name || 'Cabang'}`) : 'Piutang Cabang'}
             </h3>
             <div className="flex items-baseline gap-2">
               <span className="text-xl font-black text-rose-500">Rp</span>
@@ -357,6 +365,29 @@ export function Debts() {
 
         <div className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden">
           <div className="p-5 bg-asphalt-900/40 border-b border-asphalt-700/50 space-y-5">
+            {canFilterBranches && (
+              <div className="space-y-2">
+                <p className="text-[8px] font-black text-brand-500 uppercase tracking-[0.2em] ml-1">Filter Cabang</p>
+                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+                  <button
+                    onClick={() => setSelectedBranchId('all')}
+                    className={`px-4 py-2 rounded-xl text-[9px] font-black transition-all uppercase tracking-wider border whitespace-nowrap ${selectedBranchId === 'all' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20 border-brand-500' : 'bg-asphalt-800 border-asphalt-700 text-asphalt-text-400 hover:border-asphalt-600'}`}
+                  >
+                    Global
+                  </button>
+                  {store.branches.map(b => (
+                    <button
+                      key={b.id}
+                      onClick={() => setSelectedBranchId(b.id)}
+                      className={`px-4 py-2 rounded-xl text-[9px] font-black transition-all uppercase tracking-wider border whitespace-nowrap ${selectedBranchId === b.id ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20 border-brand-500' : 'bg-asphalt-800 border-asphalt-700 text-asphalt-text-400 hover:border-asphalt-600'}`}
+                    >
+                      {b.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {canEdit && (
               <form onSubmit={handleAddPerson} className="flex gap-3">
                 <div className="relative flex-1">
