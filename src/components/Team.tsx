@@ -308,13 +308,21 @@ export function Team() {
                     <div className="bg-asphalt-900/40 p-3 rounded-2xl border border-asphalt-700/50">
                       <p className="text-[8px] text-asphalt-text-400 uppercase font-black tracking-widest mb-1">Modal Non-Fisik</p>
                       {editingBranch?.id === branch.id ? (
-                        <input
-                          type="text"
-                          className="w-full bg-asphalt-800 border border-brand-500/30 rounded-lg px-2 py-1 text-xs font-black text-white focus:outline-none focus:ring-1 focus:ring-brand-500"
-                          value={editingBranch.capital.replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
-                          onChange={(e) => setEditingBranch({ ...editingBranch, capital: e.target.value.replace(/\D/g, '') })}
-                          autoFocus
-                        />
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            className="w-full bg-asphalt-800 border border-brand-500/30 rounded-lg px-2 py-1 text-xs font-black text-white focus:outline-none focus:ring-1 focus:ring-brand-500"
+                            value={editingBranch.capital.replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
+                            onChange={(e) => setEditingBranch({ ...editingBranch, capital: e.target.value.replace(/\D/g, '') })}
+                            autoFocus
+                          />
+                          <button 
+                            onClick={() => handleUpdateBranchCapital(branch.id, editingBranch.capital, editingBranch.physicalCapital)} 
+                            className="p-1 bg-brand-500 text-white rounded-lg shadow-lg active:scale-90 transition-all"
+                          >
+                            <Check className="w-3 h-3 stroke-[3px]" />
+                          </button>
+                        </div>
                       ) : (
                         <p className="text-xs font-black text-brand-500 tracking-tight">
                           {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(branch.capital || 0)}
