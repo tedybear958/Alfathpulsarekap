@@ -306,41 +306,41 @@ export function Team() {
                   
                   <div className="grid grid-cols-2 gap-4 pl-14">
                     <div className="bg-asphalt-900/40 p-3 rounded-2xl border border-asphalt-700/50">
-                      <p className="text-[9px] text-asphalt-text-400 uppercase font-black tracking-widest mb-1.5">Modal Non-Fisik</p>
+                      <p className="text-[8px] text-asphalt-text-400 uppercase font-black tracking-widest mb-1">Modal Non-Fisik</p>
                       {editingBranch?.id === branch.id ? (
                         <input
                           type="text"
-                          className="w-full bg-asphalt-800 border border-brand-500/30 rounded-lg px-2 py-1 text-sm font-black text-white focus:outline-none focus:ring-1 focus:ring-brand-500"
+                          className="w-full bg-asphalt-800 border border-brand-500/30 rounded-lg px-2 py-1 text-xs font-black text-white focus:outline-none focus:ring-1 focus:ring-brand-500"
                           value={editingBranch.capital.replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
                           onChange={(e) => setEditingBranch({ ...editingBranch, capital: e.target.value.replace(/\D/g, '') })}
                           autoFocus
                         />
                       ) : (
-                        <p className="text-sm font-black text-brand-500 tracking-tight">
+                        <p className="text-xs font-black text-brand-500 tracking-tight">
                           {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(branch.capital || 0)}
                         </p>
                       )}
                     </div>
 
                     <div className="bg-asphalt-900/40 p-3 rounded-2xl border border-asphalt-700/50 relative overflow-hidden">
-                      <p className="text-[9px] text-asphalt-text-400 uppercase font-black tracking-widest mb-1.5">Modal Fisik</p>
+                      <p className="text-[8px] text-asphalt-text-400 uppercase font-black tracking-widest mb-1">Modal Fisik</p>
                       {editingBranch?.id === branch.id ? (
                         <div className="flex items-center gap-2">
                           <input
                             type="text"
-                            className="flex-1 bg-asphalt-800 border border-brand-500/30 rounded-lg px-2 py-1 text-sm font-black text-white focus:outline-none focus:ring-1 focus:ring-brand-500"
+                            className="flex-1 bg-asphalt-800 border border-brand-500/30 rounded-lg px-2 py-1 text-xs font-black text-white focus:outline-none focus:ring-1 focus:ring-brand-500"
                             value={editingBranch.physicalCapital.replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
                             onChange={(e) => setEditingBranch({ ...editingBranch, physicalCapital: e.target.value.replace(/\D/g, '') })}
                           />
                           <button 
                             onClick={() => handleUpdateBranchCapital(branch.id, editingBranch.capital, editingBranch.physicalCapital)} 
-                            className="p-1.5 bg-brand-500 text-white rounded-lg shadow-lg active:scale-90 transition-all"
+                            className="p-1 bg-brand-500 text-white rounded-lg shadow-lg active:scale-90 transition-all"
                           >
-                            <Check className="w-4 h-4 stroke-[3px]" />
+                            <Check className="w-3 h-3 stroke-[3px]" />
                           </button>
                         </div>
                       ) : (
-                        <p className="text-sm font-black text-emerald-500 tracking-tight">
+                        <p className="text-xs font-black text-emerald-500 tracking-tight">
                           {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(branch.physicalCapital || 0)}
                         </p>
                       )}
