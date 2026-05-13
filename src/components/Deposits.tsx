@@ -24,6 +24,9 @@ export function Deposits() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
 
+  const [transferAmount, setTransferAmount] = useState('');
+  const [isTransferring, setIsTransferring] = useState(false);
+
   const handleNumericInput = (e: React.ChangeEvent<HTMLInputElement>, setter: (val: string) => void) => {
     const value = e.target.value.replace(/\D/g, '');
     setter(value);
@@ -316,6 +319,150 @@ export function Deposits() {
                 )}
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Transfer Saldo Section for Employees/Mandors */}
+      {(role === 'karyawan' || role === 'mandor') && myBranch && (
+        <div className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden mt-7">
+          <div className="p-6 border-b border-asphalt-700/50 flex items-center gap-4 bg-asphalt-900/40">
+            <div className="w-12 h-12 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-500 shadow-inner">
+              <Filter className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-sm font-black text-white uppercase tracking-tight">Transfer Saldo Internal</h3>
+              <p className="text-[10px] text-asphalt-text-400 font-black uppercase tracking-widest leading-none mt-1">Pindahkan antara Fisik & Non-Fisik</p>
+            </div>
+          </div>
+          
+          <div className="p-7 space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-asphalt-900/60 p-4 rounded-3xl border border-asphalt-700/50 text-center">
+                <p className="text-[8px] font-black text-asphalt-text-400 uppercase tracking-widest mb-1">Non-Fisik</p>
+                <p className="text-base font-black text-brand-500">{formatRupiah(myBranch.capital || 0)}</p>
+              </div>
+              <div className="bg-asphalt-900/60 p-4 rounded-3xl border border-asphalt-700/50 text-center">
+                <p className="text-[8px] font-black text-asphalt-text-400 uppercase tracking-widest mb-1">Saldo Fisik</p>
+                <p className="text-base font-black text-emerald-500">{formatRupiah(myBranch.physicalCapital || 0)}</p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Nominal Transfer</label>
+              <div className="relative">
+                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-asphalt-text-400 text-sm font-black">Rp</span>
+                <input
+                  type="text"
+                  placeholder="0"
+                  inputMode="numeric"
+                  className="w-full pl-12 pr-24 py-4 text-xl bg-asphalt-900 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none text-white font-black shadow-inner"
+                  value={formatNumberInput(transferAmount)}
+                  onChange={(e) => handleNumericInput(e, setTransferAmount)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setTransferAmount(Math.max(myBranch.capital || 0, myBranch.physicalCapital || 0).toString())}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-brand-500/10 text-brand-500 text-[8px] font-black uppercase tracking-widest rounded-lg border border-brand-500/20"
+                >
+                  Max Saldo
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <button
+                  onClick={async () => {
+                    if (!transferAmount || isTransferring || !branchId) return;
+                    const amt = parseInt(transferAmount.replace(/\D/g, ''), 10);
+                    if (amt <= 0) return;
+                    setIsTransferring(true);
+                    try {
+                      await store.transferBranchCapital(branchId, amt, 'to_non_physical');
+                      setSuccessMsg("Saldo berhasil dipindah ke Non-Fisik");
+                      setShowSuccess(true);
+                      setTransferAmount('');
+                    } catch (err: any) {
+                      alert(err.message || "Gagal transfer");
+                    } finally {
+                      setIsTransferring(false);
+                    }
+                  }}
+                  disabled={isTransferring}
+                  className="w-full py-4 bg-brand-500 shadow-xl shadow-brand-500/20 text-white rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all active:scale-[0.98] disabled:opacity-50"
+                >
+                  Ke Non-Fisik
+                </button>
+                <button
+                  onClick={async () => {
+                    if (isTransferring || !branchId) return;
+                    const amt = myBranch.physicalCapital || 0;
+                    if (amt <= 0) return;
+                    setIsTransferring(true);
+                    try {
+                      await store.transferBranchCapital(branchId, amt, 'to_non_physical');
+                      setSuccessMsg("Semua Saldo Fisik dipindah ke Non-Fisik");
+                      setShowSuccess(true);
+                    } catch (err: any) {
+                      alert(err.message || "Gagal transfer");
+                    } finally {
+                      setIsTransferring(false);
+                    }
+                  }}
+                  disabled={isTransferring}
+                  className="w-full py-1 text-[7px] font-black text-brand-500/60 uppercase tracking-tighter"
+                >
+                  Pindahkan Semua Fisik
+                </button>
+              </div>
+
+              <div className="space-y-2">
+                <button
+                  onClick={async () => {
+                    if (!transferAmount || isTransferring || !branchId) return;
+                    const amt = parseInt(transferAmount.replace(/\D/g, ''), 10);
+                    if (amt <= 0) return;
+                    setIsTransferring(true);
+                    try {
+                      await store.transferBranchCapital(branchId, amt, 'to_physical');
+                      setSuccessMsg("Saldo berhasil dipindah ke Fisik");
+                      setShowSuccess(true);
+                      setTransferAmount('');
+                    } catch (err: any) {
+                      alert(err.message || "Gagal transfer");
+                    } finally {
+                      setIsTransferring(false);
+                    }
+                  }}
+                  disabled={isTransferring}
+                  className="w-full py-4 bg-emerald-500 shadow-xl shadow-emerald-500/20 text-white rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all active:scale-[0.98] disabled:opacity-50"
+                >
+                  Ke Saldo Fisik
+                </button>
+                <button
+                  onClick={async () => {
+                    if (isTransferring || !branchId) return;
+                    const amt = myBranch.capital || 0;
+                    if (amt <= 0) return;
+                    setIsTransferring(true);
+                    try {
+                      await store.transferBranchCapital(branchId, amt, 'to_physical');
+                      setSuccessMsg("Semua Saldo Non-Fisik dipindah ke Fisik");
+                      setShowSuccess(true);
+                    } catch (err: any) {
+                      alert(err.message || "Gagal transfer");
+                    } finally {
+                      setIsTransferring(false);
+                    }
+                  }}
+                  disabled={isTransferring}
+                  className="w-full py-1 text-[7px] font-black text-emerald-500/60 uppercase tracking-tighter"
+                >
+                  Pindahkan Semua Non-Fisik
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

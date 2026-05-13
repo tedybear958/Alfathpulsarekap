@@ -50,6 +50,7 @@ interface FinanceState {
   updateVoucherRecap: (id: string, data: Partial<VoucherRecap>) => Promise<void>;
   reportVoucherRecaps: (branchId: string) => Promise<void>;
   deleteVoucherRecap: (id: string) => Promise<void>;
+  transferBranchCapital: (branchId: string, amount: number, direction: 'to_non_physical' | 'to_physical') => Promise<void>;
   
   getTotalBankBalance: () => number;
   getPersonTotalDebt: (person: Debt) => number;
@@ -473,6 +474,34 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
       await deleteDoc(doc(db, 'voucherRecaps', id));
     } catch (error) {
       handleFirestoreError(error, OperationType.DELETE, `voucherRecaps/${id}`);
+    }
+  },
+  
+  transferBranchCapital: async (branchId, amount, direction) => {
+    try {
+      const branch = get().branches.find(b => b.id === branchId);
+      if (!branch) throw new Error("Branch not found");
+
+      const currentCapital = branch.capital || 0;
+      const currentPhysical = branch.physicalCapital || 0;
+
+      if (direction === 'to_non_physical') {
+        if (currentPhysical < amount) throw new Error("Saldo Fisik tidak mencukupi");
+        await updateDoc(doc(db, 'branches', branchId), {
+          capital: currentCapital + amount,
+          physicalCapital: currentPhysical - amount,
+          updatedAt: new Date().toISOString()
+        });
+      } else {
+        if (currentCapital < amount) throw new Error("Saldo Non-Fisik tidak mencukupi");
+        await updateDoc(doc(db, 'branches', branchId), {
+          capital: currentCapital - amount,
+          physicalCapital: currentPhysical + amount,
+          updatedAt: new Date().toISOString()
+        });
+      }
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `branches/${branchId}`);
     }
   },
 
