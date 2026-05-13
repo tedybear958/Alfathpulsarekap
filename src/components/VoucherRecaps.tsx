@@ -346,7 +346,7 @@ export function VoucherRecaps() {
               </div>
 
               {/* Stats Grid - Vertical Focus */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="bg-asphalt-900/40 p-5 rounded-2xl border border-asphalt-700/30">
                   <p className="text-[9px] text-brand-400 font-black uppercase tracking-widest mb-1 leading-none">Admin (Net)</p>
                   <p className="text-2xl font-black text-white tracking-tight">
@@ -399,7 +399,7 @@ export function VoucherRecaps() {
         {/* Monthly Performance Overview */}
         <div className="space-y-4">
            <h3 className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-[0.2em] px-2">Kinerja Bulanan</h3>
-           <div className="grid grid-cols-1 gap-3">
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {monthlyData.slice(0, 5).map(([key, data]) => (
                 <div key={key} className="bg-asphalt-800 p-4 rounded-2xl border border-asphalt-700/50 flex items-center justify-between">
                   <div>
@@ -422,7 +422,7 @@ export function VoucherRecaps() {
             <span className="text-[9px] font-black text-brand-500 bg-brand-500/10 border border-brand-500/20 px-3 py-1 rounded-xl uppercase tracking-widest">Status Aktif</span>
           </div>
           
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {topBranches.map((branch, index) => {
               return (
                 <button
@@ -621,71 +621,73 @@ export function VoucherRecaps() {
                 {errorMessage}
               </div>
             )}
-            <div className="space-y-2.5">
-              <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Periode Tanggal</label>
-              <div className="relative group">
-                <Calendar className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-brand-500 transition-transform group-focus-within:scale-110" />
-                <input
-                  type="date"
-                  className="w-full pl-14 pr-5 py-4.5 text-sm bg-asphalt-900 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none text-white font-black shadow-inner appearance-none"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  required
-                />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-7">
+              <div className="space-y-2.5">
+                <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Periode Tanggal</label>
+                <div className="relative group">
+                  <Calendar className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-brand-500 transition-transform group-focus-within:scale-110" />
+                  <input
+                    type="date"
+                    className="w-full pl-14 pr-5 py-4.5 text-sm bg-asphalt-900 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none text-white font-black shadow-inner appearance-none"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
-            </div>
 
-            <div className="grid grid-cols-2 gap-5">
-              <div className="space-y-2.5">
-                <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Admin Siang</label>
-                <input
-                  type="text"
-                  placeholder="Rp 0"
-                  inputMode="numeric"
-                  className="w-full px-5 py-4.5 text-sm bg-asphalt-900 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none text-white font-black shadow-inner placeholder:text-asphalt-text-400/30"
-                  value={formatNumberInput(adminSiang)}
-                  onChange={(e) => handleNumericInput(e, setAdminSiang)}
-                  required
-                />
+              <div className="grid grid-cols-2 gap-5">
+                <div className="space-y-2.5">
+                  <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Admin Siang</label>
+                  <input
+                    type="text"
+                    placeholder="Rp 0"
+                    inputMode="numeric"
+                    className="w-full px-5 py-4.5 text-sm bg-asphalt-900 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none text-white font-black shadow-inner placeholder:text-asphalt-text-400/30"
+                    value={formatNumberInput(adminSiang)}
+                    onChange={(e) => handleNumericInput(e, setAdminSiang)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2.5">
+                  <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Admin Malam</label>
+                  <input
+                    type="text"
+                    placeholder="Rp 0"
+                    inputMode="numeric"
+                    className="w-full px-5 py-4.5 text-sm bg-asphalt-900 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none text-white font-black shadow-inner placeholder:text-asphalt-text-400/30"
+                    value={formatNumberInput(adminMalam)}
+                    onChange={(e) => handleNumericInput(e, setAdminMalam)}
+                    required
+                  />
+                </div>
               </div>
-              <div className="space-y-2.5">
-                <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Admin Malam</label>
-                <input
-                  type="text"
-                  placeholder="Rp 0"
-                  inputMode="numeric"
-                  className="w-full px-5 py-4.5 text-sm bg-asphalt-900 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none text-white font-black shadow-inner placeholder:text-asphalt-text-400/30"
-                  value={formatNumberInput(adminMalam)}
-                  onChange={(e) => handleNumericInput(e, setAdminMalam)}
-                  required
-                />
-              </div>
-            </div>
 
-            <div className="grid grid-cols-2 gap-5">
-              <div className="space-y-2.5">
-                <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Voucher Siang</label>
-                <input
-                  type="text"
-                  placeholder="Rp 0"
-                  inputMode="numeric"
-                  className="w-full px-5 py-4.5 text-sm bg-asphalt-900 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-emerald-500 font-black shadow-inner placeholder:text-emerald-500/20"
-                  value={formatNumberInput(voucherSiang)}
-                  onChange={(e) => handleNumericInput(e, setVoucherSiang)}
-                  required
-                />
-              </div>
-              <div className="space-y-2.5">
-                <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Voucher Malam</label>
-                <input
-                  type="text"
-                  placeholder="Rp 0"
-                  inputMode="numeric"
-                  className="w-full px-5 py-4.5 text-sm bg-asphalt-900 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-emerald-500 font-black shadow-inner placeholder:text-emerald-500/20"
-                  value={formatNumberInput(voucherMalam)}
-                  onChange={(e) => handleNumericInput(e, setVoucherMalam)}
-                  required
-                />
+              <div className="grid grid-cols-2 gap-5">
+                <div className="space-y-2.5">
+                  <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Voucher Siang</label>
+                  <input
+                    type="text"
+                    placeholder="Rp 0"
+                    inputMode="numeric"
+                    className="w-full px-5 py-4.5 text-sm bg-asphalt-900 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-emerald-500 font-black shadow-inner placeholder:text-emerald-500/20"
+                    value={formatNumberInput(voucherSiang)}
+                    onChange={(e) => handleNumericInput(e, setVoucherSiang)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2.5">
+                  <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Voucher Malam</label>
+                  <input
+                    type="text"
+                    placeholder="Rp 0"
+                    inputMode="numeric"
+                    className="w-full px-5 py-4.5 text-sm bg-asphalt-900 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-emerald-500 font-black shadow-inner placeholder:text-emerald-500/20"
+                    value={formatNumberInput(voucherMalam)}
+                    onChange={(e) => handleNumericInput(e, setVoucherMalam)}
+                    required
+                  />
+                </div>
               </div>
             </div>
 
@@ -854,7 +856,7 @@ export function VoucherRecaps() {
             Rincian Pengeluaran Bulan Ini
           </h3>
         </div>
-        <div className="divide-y divide-asphalt-700/30">
+        <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-asphalt-700/30">
           {groupedRecaps.every(c => c.items.every(r => r.expenseAmount === 0)) ? (
             <div className="p-10 text-center">
               <TrendingDown className="w-8 h-8 text-asphalt-900 mx-auto mb-4" />

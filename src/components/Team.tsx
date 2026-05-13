@@ -245,119 +245,99 @@ export function Team() {
           <h3 className="text-sm font-black text-white uppercase tracking-tight">Daftar Cabang</h3>
         </div>
         
-        <div className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden">
-          <div className={`p-6 border-b border-asphalt-700/50 bg-asphalt-900/40 ${!isBos ? 'opacity-50 pointer-events-none' : ''}`}>
-            <form onSubmit={handleAddBranch} className="flex gap-3">
-              <input
-                type="text"
-                placeholder="Nama Cabang Baru"
-                disabled={!isBos}
-                className="flex-1 px-5 py-4 text-sm bg-asphalt-900 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none text-white font-bold shadow-inner placeholder:text-asphalt-text-400/30"
-                value={newBranchName}
-                onChange={(e) => setNewBranchName(e.target.value)}
-                required
-              />
-              <button type="submit" className="px-6 py-4 bg-brand-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-600 active:scale-[0.98] transition-all flex items-center gap-2 shadow-lg shadow-brand-500/20">
-                <Plus className="w-5 h-5" />
-                <span>TAMBAH</span>
-              </button>
-            </form>
-          </div>
-          
-          <div className="divide-y divide-asphalt-700/50 max-h-80 overflow-y-auto no-scrollbar">
-            {branches.length === 0 ? (
-              <div className="p-10 text-center">
-                <Store className="w-10 h-10 text-asphalt-800 mx-auto mb-3" />
-                <p className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest">Belum ada cabang terdaftar.</p>
-              </div>
-            ) : (
-              branches.map(branch => (
-                <div key={branch.id} className="p-5 flex flex-col gap-4 hover:bg-asphalt-900/20 transition-colors group">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-2xl bg-asphalt-900 border border-asphalt-700 flex items-center justify-center text-brand-500 text-xs font-black shadow-inner">
-                        {branch.name.substring(0, 2).toUpperCase()}
-                      </div>
-                      <span className="text-sm font-black text-white uppercase tracking-tight">{branch.name}</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {branches.length === 0 ? (
+            <div className="p-10 text-center col-span-full">
+              <Store className="w-10 h-10 text-asphalt-800 mx-auto mb-3" />
+              <p className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest">Belum ada cabang terdaftar.</p>
+            </div>
+          ) : (
+            branches.map(branch => (
+              <div key={branch.id} className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden p-5 flex flex-col gap-4 hover:bg-asphalt-900/20 transition-colors group">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-2xl bg-asphalt-900 border border-asphalt-700 flex items-center justify-center text-brand-500 text-xs font-black shadow-inner">
+                      {branch.name.substring(0, 2).toUpperCase()}
                     </div>
-                    <div className="flex items-center gap-2">
-                      {isBos && (
-                        <button
-                          onClick={() => setEditingBranch({ 
-                            id: branch.id, 
-                            capital: (branch.capital || 0).toString(),
-                            physicalCapital: (branch.physicalCapital || 0).toString()
-                          })}
-                          className="w-10 h-10 flex items-center justify-center text-asphalt-text-400 hover:text-brand-500 hover:bg-brand-500/10 rounded-xl transition-all"
-                        >
-                          <Shield className="w-5 h-5" />
-                        </button>
-                      )}
-                      {isBos && (
-                        <button
-                          onClick={() => setDeleteConfirm({ isOpen: true, type: 'branch', id: branch.id, name: branch.name })}
-                          className="w-10 h-10 flex items-center justify-center text-asphalt-text-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
-                      )}
-                    </div>
+                    <span className="text-sm font-black text-white uppercase tracking-tight">{branch.name}</span>
                   </div>
-                  
-                  <div className="grid grid-cols-2 gap-4 pl-14">
-                    <div className="bg-asphalt-900/40 p-3 rounded-2xl border border-asphalt-700/50">
-                      <p className="text-[8px] text-asphalt-text-400 uppercase font-black tracking-widest mb-1">Modal Non-Fisik</p>
-                      {editingBranch?.id === branch.id ? (
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="text"
-                            className="w-full bg-asphalt-800 border border-brand-500/30 rounded-lg px-2 py-1 text-xs font-black text-white focus:outline-none focus:ring-1 focus:ring-brand-500"
-                            value={editingBranch.capital.replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
-                            onChange={(e) => setEditingBranch({ ...editingBranch, capital: e.target.value.replace(/\D/g, '') })}
-                            autoFocus
-                          />
-                          <button 
-                            onClick={() => handleUpdateBranchCapital(branch.id, editingBranch.capital, editingBranch.physicalCapital)} 
-                            className="p-1 bg-brand-500 text-white rounded-lg shadow-lg active:scale-90 transition-all"
-                          >
-                            <Check className="w-3 h-3 stroke-[3px]" />
-                          </button>
-                        </div>
-                      ) : (
-                        <p className="text-xs font-black text-brand-500 tracking-tight">
-                          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(branch.capital || 0)}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="bg-asphalt-900/40 p-3 rounded-2xl border border-asphalt-700/50 relative overflow-hidden">
-                      <p className="text-[8px] text-asphalt-text-400 uppercase font-black tracking-widest mb-1">Modal Fisik</p>
-                      {editingBranch?.id === branch.id ? (
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="text"
-                            className="flex-1 bg-asphalt-800 border border-brand-500/30 rounded-lg px-2 py-1 text-xs font-black text-white focus:outline-none focus:ring-1 focus:ring-brand-500"
-                            value={editingBranch.physicalCapital.replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
-                            onChange={(e) => setEditingBranch({ ...editingBranch, physicalCapital: e.target.value.replace(/\D/g, '') })}
-                          />
-                          <button 
-                            onClick={() => handleUpdateBranchCapital(branch.id, editingBranch.capital, editingBranch.physicalCapital)} 
-                            className="p-1 bg-brand-500 text-white rounded-lg shadow-lg active:scale-90 transition-all"
-                          >
-                            <Check className="w-3 h-3 stroke-[3px]" />
-                          </button>
-                        </div>
-                      ) : (
-                        <p className="text-xs font-black text-emerald-500 tracking-tight">
-                          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(branch.physicalCapital || 0)}
-                        </p>
-                      )}
-                    </div>
+                  <div className="flex items-center gap-2">
+                    {isBos && (
+                      <button
+                        onClick={() => setEditingBranch({ 
+                          id: branch.id, 
+                          capital: (branch.capital || 0).toString(),
+                          physicalCapital: (branch.physicalCapital || 0).toString()
+                        })}
+                        className="w-10 h-10 flex items-center justify-center text-asphalt-text-400 hover:text-brand-500 hover:bg-brand-500/10 rounded-xl transition-all"
+                      >
+                        <Shield className="w-5 h-5" />
+                      </button>
+                    )}
+                    {isBos && (
+                      <button
+                        onClick={() => setDeleteConfirm({ isOpen: true, type: 'branch', id: branch.id, name: branch.name })}
+                        className="w-10 h-10 flex items-center justify-center text-asphalt-text-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    )}
                   </div>
                 </div>
-              ))
-            )}
-          </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-asphalt-900/40 p-3 rounded-2xl border border-asphalt-700/50">
+                    <p className="text-[8px] text-asphalt-text-400 uppercase font-black tracking-widest mb-1">Modal Non-Fisik</p>
+                    {editingBranch?.id === branch.id ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          className="w-full bg-asphalt-800 border border-brand-500/30 rounded-lg px-2 py-1 text-xs font-black text-white focus:outline-none focus:ring-1 focus:ring-brand-500"
+                          value={editingBranch.capital.replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
+                          onChange={(e) => setEditingBranch({ ...editingBranch, capital: e.target.value.replace(/\D/g, '') })}
+                          autoFocus
+                        />
+                        <button 
+                          onClick={() => handleUpdateBranchCapital(branch.id, editingBranch.capital, editingBranch.physicalCapital)} 
+                          className="p-1 bg-brand-500 text-white rounded-lg shadow-lg active:scale-90 transition-all"
+                        >
+                          <Check className="w-3 h-3 stroke-[3px]" />
+                        </button>
+                      </div>
+                    ) : (
+                      <p className="text-xs font-black text-brand-500 tracking-tight">
+                        {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(branch.capital || 0)}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="bg-asphalt-900/40 p-3 rounded-2xl border border-asphalt-700/50 relative overflow-hidden">
+                    <p className="text-[8px] text-asphalt-text-400 uppercase font-black tracking-widest mb-1">Modal Fisik</p>
+                    {editingBranch?.id === branch.id ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          className="flex-1 bg-asphalt-800 border border-brand-500/30 rounded-lg px-2 py-1 text-xs font-black text-white focus:outline-none focus:ring-1 focus:ring-brand-500"
+                          value={editingBranch.physicalCapital.replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
+                          onChange={(e) => setEditingBranch({ ...editingBranch, physicalCapital: e.target.value.replace(/\D/g, '') })}
+                        />
+                        <button 
+                          onClick={() => handleUpdateBranchCapital(branch.id, editingBranch.capital, editingBranch.physicalCapital)} 
+                          className="p-1 bg-brand-500 text-white rounded-lg shadow-lg active:scale-90 transition-all"
+                        >
+                          <Check className="w-3 h-3 stroke-[3px]" />
+                        </button>
+                      </div>
+                    ) : (
+                      <p className="text-xs font-black text-emerald-500 tracking-tight">
+                        {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(branch.physicalCapital || 0)}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
@@ -378,10 +358,9 @@ export function Team() {
           )}
         </div>
 
-        <div className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden">
-          <div className="divide-y divide-asphalt-700/50">
-            {users.map((user) => (
-              <div key={user.uid} className="p-6 flex flex-col gap-6 hover:bg-asphalt-900/20 transition-all group">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {users.map((user) => (
+            <div key={user.uid} className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden p-6 flex flex-col gap-6 hover:bg-asphalt-900/20 transition-all group">
                 <div className="flex items-center gap-4">
                   <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-lg border border-white/10 ${
                     user.role === 'bos' ? 'bg-purple-500/10 text-purple-500' :
@@ -514,7 +493,6 @@ export function Team() {
               </div>
             ))}
           </div>
-        </div>
       </div>
 
       <ConfirmModal

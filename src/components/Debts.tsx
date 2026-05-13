@@ -142,8 +142,8 @@ export function Debts() {
           </div>
         </header>
 
-        <div className="p-4 space-y-6">
-          <div className="bg-asphalt-800 p-8 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 text-center relative overflow-hidden group">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+          <div className="bg-asphalt-800 p-8 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 text-center relative overflow-hidden group h-full flex flex-col justify-center">
             <div className="absolute inset-0 bg-gradient-to-b from-rose-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
             <p className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-[0.2em] mb-3 relative z-10">Total Hutang</p>
             <p className={`text-4xl font-black tracking-tighter relative z-10 transition-transform duration-500 group-hover:scale-110 ${totalDebt > 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
@@ -153,7 +153,8 @@ export function Debts() {
 
           {canEdit && (
             <div className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden">
-              <div className="p-5 bg-asphalt-900/40 border-b border-asphalt-700/50">
+              <div className="p-7 bg-asphalt-900/40 h-full flex flex-col justify-center">
+                <h3 className="text-sm font-black text-white uppercase tracking-tight mb-4">Transaksi Baru</h3>
                 <form onSubmit={handleAddDetail} className="space-y-4">
                   <div className="grid grid-cols-3 gap-3">
                     <select
@@ -180,7 +181,7 @@ export function Debts() {
                   <div className="flex gap-3">
                     <input
                       type="text"
-                      placeholder="Keterangan (ex: Rokok, Pulsa)"
+                      placeholder="Keterangan transaksi..."
                       className="flex-1 px-4 py-3.5 text-sm bg-asphalt-800 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none text-white font-medium"
                       value={descInput}
                       onChange={(e) => setDescInput(e.target.value)}
@@ -200,72 +201,46 @@ export function Debts() {
                   </div>
                 </form>
               </div>
-
-              <div className="divide-y divide-asphalt-700/50">
-                {selectedPerson.details.length === 0 ? (
-                  <div className="py-16 flex flex-col items-center justify-center opacity-20">
-                    <HistoryIcon className="w-12 h-12 text-asphalt-text-400 mb-2" />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-asphalt-text-400">Belum ada aktivitas</p>
-                  </div>
-                ) : (
-                  [...selectedPerson.details].reverse().map((detail) => (
-                    <div key={detail.id} className="p-3.5 flex items-center gap-3 hover:bg-asphalt-700/20 transition-all group">
-                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border transition-colors ${detail.type === 'add' ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'}`}>
-                        {detail.type === 'add' ? <ArrowUpFromLine className="w-4 h-4" /> : <ArrowDownToLine className="w-4 h-4" />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-black text-white uppercase tracking-tight truncate">{detail.description}</p>
-                        <p className="text-[8px] font-bold text-asphalt-text-400 uppercase tracking-widest mt-0.5">{formatDate(detail.date)}</p>
-                      </div>
-                      <div className="text-right shrink-0 ml-1">
-                        <p className={`text-[13px] font-black ${detail.type === 'add' ? 'text-rose-500' : 'text-emerald-500'}`}>
-                          {detail.type === 'add' ? '+' : '-'}{formatRupiah(detail.amount)}
-                        </p>
-                        {canDelete && (
-                          <button
-                            onClick={() => setDeleteConfirm({ isOpen: true, type: 'detail', personId: selectedPerson.id, detailId: detail.id, name: detail.description })}
-                            className="text-[7px] font-black text-rose-500/50 hover:text-rose-500 uppercase tracking-widest mt-0.5 transition-all"
-                          >
-                            Hapus
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
             </div>
           )}
+        </div>
 
-          {!canEdit && (
-            <div className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden">
-              <div className="divide-y divide-asphalt-700/50">
-                {selectedPerson.details.length === 0 ? (
-                  <div className="py-20 flex flex-col items-center justify-center opacity-20">
-                    <HistoryIcon className="w-12 h-12 text-asphalt-text-400 mb-2" />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-asphalt-text-400">Belum ada aktivitas</p>
-                  </div>
-                ) : (
-                  [...selectedPerson.details].reverse().map((detail) => (
-                    <div key={detail.id} className="p-4 flex items-center gap-3 hover:bg-asphalt-700/20 transition-all">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${detail.type === 'add' ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'}`}>
-                        {detail.type === 'add' ? <ArrowUpFromLine className="w-4 h-4" /> : <ArrowDownToLine className="w-4 h-4" />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-black text-white uppercase tracking-tight">{detail.description}</p>
-                        <p className="text-[8px] font-bold text-asphalt-text-400 uppercase tracking-widest mt-0.5">{formatDate(detail.date)}</p>
-                      </div>
-                      <div className="text-right shrink-0 ml-2">
-                        <p className={`text-sm font-black ${detail.type === 'add' ? 'text-rose-500' : 'text-emerald-500'}`}>
-                          {detail.type === 'add' ? '+' : '-'}{formatRupiah(detail.amount)}
-                        </p>
-                      </div>
+        <div className="p-4 space-y-6">
+          <div className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden">
+            <div className="divide-y divide-asphalt-700/50">
+              {selectedPerson.details.length === 0 ? (
+                <div className="py-16 flex flex-col items-center justify-center opacity-20">
+                  <HistoryIcon className="w-12 h-12 text-asphalt-text-400 mb-2" />
+                  <p className="text-[10px] font-black uppercase tracking-widest text-asphalt-text-400">Belum ada aktivitas</p>
+                </div>
+              ) : (
+                [...selectedPerson.details].reverse().map((detail) => (
+                  <div key={detail.id} className="p-3.5 flex items-center gap-3 hover:bg-asphalt-700/20 transition-all group">
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border transition-colors ${detail.type === 'add' ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'}`}>
+                      {detail.type === 'add' ? <ArrowUpFromLine className="w-4 h-4" /> : <ArrowDownToLine className="w-4 h-4" />}
                     </div>
-                  ))
-                )}
-              </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-black text-white uppercase tracking-tight truncate">{detail.description}</p>
+                      <p className="text-[8px] font-bold text-asphalt-text-400 uppercase tracking-widest mt-0.5">{formatDate(detail.date)}</p>
+                    </div>
+                    <div className="text-right shrink-0 ml-1">
+                      <p className={`text-[13px] font-black ${detail.type === 'add' ? 'text-rose-500' : 'text-emerald-500'}`}>
+                        {detail.type === 'add' ? '+' : '-'}{formatRupiah(detail.amount)}
+                      </p>
+                      {canDelete && (
+                        <button
+                          onClick={() => setDeleteConfirm({ isOpen: true, type: 'detail', personId: selectedPerson.id, detailId: detail.id, name: detail.description })}
+                          className="text-[7px] font-black text-rose-500/50 hover:text-rose-500 uppercase tracking-widest mt-0.5 transition-all"
+                        >
+                          Hapus
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
-          )}
+          </div>
         </div>
 
         <ConfirmModal
@@ -427,9 +402,9 @@ export function Debts() {
             </div>
           </div>
 
-          <div className="divide-y divide-asphalt-700/50">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 divide-y sm:divide-y-0 divide-asphalt-700/50">
             {filteredDebts.length === 0 ? (
-              <div className="text-center py-16 bg-asphalt-800/50">
+              <div className="col-span-full text-center py-16 bg-asphalt-800/50">
                 <div className="w-20 h-20 bg-asphalt-900 rounded-[2rem] flex items-center justify-center mx-auto mb-5 border border-asphalt-700/50">
                   <Users className="w-10 h-10 text-asphalt-700" />
                 </div>

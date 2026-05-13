@@ -39,7 +39,7 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
 
   return (
     <div className="min-h-[100dvh] bg-[#0B111D] flex justify-center selection:bg-brand-500/30" data-theme={theme}>
-      <div className="w-full max-w-md bg-[#0B111D] h-[100dvh] flex flex-col relative shadow-2xl overflow-hidden text-asphalt-text-100 border-x border-asphalt-800/30">
+      <div className="w-full md:max-w-3xl lg:max-w-5xl xl:max-w-7xl bg-[#0B111D] h-[100dvh] flex flex-col relative shadow-2xl overflow-hidden text-asphalt-text-100 md:border-x md:border-asphalt-800/30">
         {/* Global Error Display */}
         {error && (
           <div
@@ -170,7 +170,7 @@ export function Layout({ children, activeTab, setActiveTab, role }: LayoutProps)
         </main>
 
         {/* Bottom Navigation */}
-        <nav className="fixed bottom-0 max-w-md w-full bg-[#0B111D]/80 backdrop-blur-2xl border-t border-asphalt-800/30 z-30 pb-safe shadow-[0_-15px_50px_rgba(0,0,0,0.6)]">
+        <nav className="fixed bottom-0 md:relative max-w-md md:max-w-full w-full bg-[#0B111D]/80 backdrop-blur-2xl border-t border-asphalt-800/30 z-30 pb-safe shadow-[0_-15px_50px_rgba(0,0,0,0.6)]">
           <div className="flex justify-around items-center h-[4.5rem] px-3 relative">
             
             {/* Nav background indicator */}

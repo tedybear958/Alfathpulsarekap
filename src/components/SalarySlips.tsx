@@ -412,94 +412,100 @@ export function SalarySlips() {
             <button onClick={() => setIsAdding(false)} className="text-asphalt-text-400 p-2"><ArrowLeft className="w-5 h-5" /></button>
           </div>
 
-                  <form onSubmit={handleAddSlip} className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Pilih Anggota</label>
-              <select
-                value={selectedUserId}
-                onChange={(e) => setSelectedUserId(e.target.value)}
-                required
-                className="w-full px-5 py-4 bg-asphalt-900 border border-asphalt-700 rounded-2xl text-sm text-white font-bold focus:ring-2 focus:ring-brand-500 outline-none uppercase tracking-widest"
-              >
-                <option value="">-- Pilih Karyawan/Mandor --</option>
-                {users.map(u => (
-                  <option key={u.uid} value={u.uid}>{(u.name || 'TANPA NAMA').toUpperCase()} ({(u.role || 'ROLE').toUpperCase()})</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
+          <form onSubmit={handleAddSlip} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Bulan</label>
+                <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Pilih Anggota</label>
                 <select
-                  value={month}
-                  onChange={(e) => setMonth(parseInt(e.target.value))}
-                  className="w-full px-5 py-4 bg-asphalt-900 border border-asphalt-700 rounded-2xl text-sm text-white font-bold outline-none uppercase tracking-widest"
-                >
-                  {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
-                    <option key={m} value={m}>{getMonthName(m).toUpperCase()}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Tahun</label>
-                <select
-                  value={year}
-                  onChange={(e) => setYear(parseInt(e.target.value))}
-                  className="w-full px-5 py-4 bg-asphalt-900 border border-asphalt-700 rounded-2xl text-sm text-white font-bold outline-none uppercase tracking-widest"
-                >
-                  {[year - 1, year, year + 1].map(y => (
-                    <option key={y} value={y}>{y}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Gaji Pokok</label>
-              <div className="relative">
-                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-asphalt-text-400 text-xs font-black">Rp</span>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="0"
-                  className="w-full pl-12 pr-5 py-4 bg-asphalt-900 border border-asphalt-700 rounded-2xl text-sm text-white font-black outline-none focus:ring-2 focus:ring-brand-500 shadow-inner"
-                  value={formatNumberInput(baseSalary)}
-                  onChange={(e) => handleNumericInput(e, setBaseSalary)}
+                  value={selectedUserId}
+                  onChange={(e) => setSelectedUserId(e.target.value)}
                   required
-                />
+                  className="w-full px-5 py-4 bg-asphalt-900 border border-asphalt-700 rounded-2xl text-sm text-white font-bold focus:ring-2 focus:ring-brand-500 outline-none uppercase tracking-widest"
+                >
+                  <option value="">-- Pilih Karyawan/Mandor --</option>
+                  {users.map(u => (
+                    <option key={u.uid} value={u.uid}>{(u.name || 'TANPA NAMA').toUpperCase()} ({(u.role || 'ROLE').toUpperCase()})</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Bulan</label>
+                  <select
+                    value={month}
+                    onChange={(e) => setMonth(parseInt(e.target.value))}
+                    className="w-full px-5 py-4 bg-asphalt-900 border border-asphalt-700 rounded-2xl text-sm text-white font-bold outline-none uppercase tracking-widest"
+                  >
+                    {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
+                      <option key={m} value={m}>{getMonthName(m).toUpperCase()}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Tahun</label>
+                  <select
+                    value={year}
+                    onChange={(e) => setYear(parseInt(e.target.value))}
+                    className="w-full px-5 py-4 bg-asphalt-900 border border-asphalt-700 rounded-2xl text-sm text-white font-bold outline-none uppercase tracking-widest"
+                  >
+                    {[year - 1, year, year + 1].map(y => (
+                      <option key={y} value={y}>{y}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Bonus</label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  className="w-full px-5 py-4 bg-asphalt-900 border border-asphalt-700 rounded-2xl text-sm text-emerald-500 font-black outline-none focus:ring-2 focus:ring-emerald-500 shadow-inner"
-                  value={formatNumberInput(bonus)}
-                  onChange={(e) => handleNumericInput(e, setBonus)}
-                />
+                <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Gaji Pokok</label>
+                <div className="relative">
+                  <span className="absolute left-5 top-1/2 -translate-y-1/2 text-asphalt-text-400 text-xs font-black">Rp</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="0"
+                    className="w-full pl-12 pr-5 py-4 bg-asphalt-900 border border-asphalt-700 rounded-2xl text-sm text-white font-black outline-none focus:ring-2 focus:ring-brand-500 shadow-inner"
+                    value={formatNumberInput(baseSalary)}
+                    onChange={(e) => handleNumericInput(e, setBaseSalary)}
+                    required
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Potongan</label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  className="w-full px-5 py-4 bg-asphalt-900 border border-asphalt-700 rounded-2xl text-sm text-rose-500 font-black outline-none focus:ring-2 focus:ring-rose-500 shadow-inner"
-                  value={formatNumberInput(deductions)}
-                  onChange={(e) => handleNumericInput(e, setDeductions)}
-                />
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Bonus</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    className="w-full px-5 py-4 bg-asphalt-900 border border-asphalt-700 rounded-2xl text-sm text-emerald-500 font-black outline-none focus:ring-2 focus:ring-emerald-500 shadow-inner"
+                    value={formatNumberInput(bonus)}
+                    onChange={(e) => handleNumericInput(e, setBonus)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Potongan</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    className="w-full px-5 py-4 bg-asphalt-900 border border-asphalt-700 rounded-2xl text-sm text-rose-500 font-black outline-none focus:ring-2 focus:ring-rose-500 shadow-inner"
+                    value={formatNumberInput(deductions)}
+                    onChange={(e) => handleNumericInput(e, setDeductions)}
+                  />
+                </div>
               </div>
             </div>
 
-            <button
-              type="submit"
-              className="w-full py-4.5 bg-brand-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.25em] hover:bg-brand-600 active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-lg shadow-brand-500/20"
-            >
-              SIMPAN SLIP GAJI
-            </button>
+            <div className="md:col-span-2 pt-2">
+              <button
+                type="submit"
+                className="w-full py-4.5 bg-brand-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.25em] hover:bg-brand-600 active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-lg shadow-brand-500/20"
+              >
+                SIMPAN SLIP GAJI
+              </button>
+            </div>
           </form>
         </div>
       )}
@@ -550,9 +556,9 @@ export function SalarySlips() {
           )}
         </div>
 
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {slips.length === 0 ? (
-            <div className="bg-asphalt-800 rounded-[2.5rem] p-10 text-center border border-asphalt-700/50">
+            <div className="col-span-full bg-asphalt-800 rounded-[2.5rem] p-10 text-center border border-asphalt-700/50">
               <FileText className="w-12 h-12 text-asphalt-900 mx-auto mb-4" />
               <p className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest">Belum ada slip gaji tersedia.</p>
             </div>

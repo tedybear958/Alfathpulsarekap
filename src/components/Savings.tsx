@@ -151,8 +151,8 @@ export function Savings() {
           </div>
         </header>
 
-        <div className="p-4 space-y-6">
-          <div className="bg-gradient-to-br from-emerald-500 to-emerald-700 p-8 rounded-[2.5rem] shadow-2xl shadow-emerald-500/20 text-center text-white relative overflow-hidden group">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+          <div className="bg-gradient-to-br from-emerald-500 to-emerald-700 p-8 rounded-[2.5rem] shadow-2xl shadow-emerald-500/20 text-center text-white relative overflow-hidden group h-full flex flex-col justify-center">
             <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-24 -mt-24 blur-3xl group-hover:scale-125 transition-transform duration-1000"></div>
             <div className="relative z-10">
               <p className="text-[10px] font-black text-emerald-100/80 uppercase tracking-[0.25em] mb-2">Total Tabungan</p>
@@ -164,7 +164,8 @@ export function Savings() {
 
           {canEdit && (
             <div className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden">
-              <div className="p-5 bg-asphalt-900/40 border-b border-asphalt-700/50">
+              <div className="p-7 bg-asphalt-900/40 h-full flex flex-col justify-center">
+                <h3 className="text-sm font-black text-white uppercase tracking-tight mb-4">Transaksi Baru</h3>
                 <form onSubmit={handleAddTransaction} className="space-y-4">
                   <div className="grid grid-cols-3 gap-3">
                     <select
@@ -191,7 +192,7 @@ export function Savings() {
                   <div className="flex gap-3">
                     <input
                       type="text"
-                      placeholder="Keterangan (ex: Tabungan Lebaran)"
+                      placeholder="Keterangan transaksi..."
                       className="flex-1 px-4 py-3.5 text-sm bg-asphalt-800 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-white font-medium"
                       value={descInput}
                       onChange={(e) => setDescInput(e.target.value)}
@@ -211,123 +212,74 @@ export function Savings() {
                   </div>
                 </form>
               </div>
-
-              <div className="overflow-x-auto">
-                {selectedPerson.transactions.length === 0 ? (
-                  <div className="py-16 flex flex-col items-center justify-center opacity-20">
-                    <PiggyBank className="w-12 h-12 text-asphalt-text-400 mb-2" />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-asphalt-text-400">Belum ada transaksi</p>
-                  </div>
-                ) : (
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="bg-asphalt-900/40 border-b border-asphalt-700/50 text-[8px] font-black text-asphalt-text-400 uppercase tracking-widest">
-                        <th className="px-2 py-2 whitespace-nowrap">Tanggal</th>
-                        <th className="px-2 py-2">Keterangan</th>
-                        <th className="px-2 py-2 text-right">In/Out</th>
-                        <th className="px-2 py-2 text-right">Saldo</th>
-                        <th className="p-0.5 w-6"></th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-asphalt-700/50 text-xs">
-                      {(() => {
-                        let runningBalance = 0;
-                        const txsWithBalance = [...selectedPerson.transactions].map(tx => {
-                          if (tx.type === 'deposit') runningBalance += tx.amount;
-                          else runningBalance -= tx.amount;
-                          return { ...tx, balance: runningBalance };
-                        });
-                        
-                        return txsWithBalance.reverse().map((transaction) => (
-                          <tr key={transaction.id} className="hover:bg-asphalt-700/20 transition-all group">
-                            <td className="px-2 py-2 whitespace-nowrap">
-                              <p className="text-white font-bold text-[10px]">{formatDate(transaction.date).split(' ')[0]}</p>
-                              <p className="text-[7px] text-asphalt-text-400">{formatDate(transaction.date).split(' ')[1]}</p>
-                            </td>
-                            <td className="px-2 py-2">
-                              <p className="font-black text-white uppercase tracking-tight leading-tight text-[10px] line-clamp-1">{transaction.description}</p>
-                              {transaction.createdByName && (
-                                <p className="text-[7px] text-brand-500 font-black uppercase tracking-widest mt-0.5">{transaction.createdByName}</p>
-                              )}
-                            </td>
-                            <td className={`px-2 py-2 text-right font-black text-[10px] ${transaction.type === 'deposit' ? 'text-emerald-500' : 'text-rose-500'}`}>
-                              {transaction.type === 'deposit' ? '+' : '-'}{formatRupiah(transaction.amount)}
-                            </td>
-                            <td className="px-2 py-2 text-right font-black text-white text-[10px]">
-                              {formatRupiah(transaction.balance)}
-                            </td>
-                            <td className="p-0.5 text-center">
-                        {canDelete && (
-                          <button
-                            onClick={() => setDeleteConfirm({ isOpen: true, type: 'transaction', personId: selectedPerson.id, transactionId: transaction.id, name: transaction.description })}
-                            className="p-1 text-asphalt-text-400 hover:text-rose-500 transition-all"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
-                        )}
-                            </td>
-                          </tr>
-                        ));
-                      })()}
-                    </tbody>
-                  </table>
-                )}
-              </div>
             </div>
           )}
+        </div>
 
-          {!canEdit && (
-            <div className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden">
-              <div className="overflow-x-auto">
-                {selectedPerson.transactions.length === 0 ? (
-                  <div className="py-20 flex flex-col items-center justify-center opacity-20">
-                    <PiggyBank className="w-12 h-12 text-asphalt-text-400 mb-2" />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-asphalt-text-400">Belum ada transaksi</p>
-                  </div>
-                ) : (
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="bg-asphalt-900/40 border-b border-asphalt-700/50 text-[8px] font-black text-asphalt-text-400 uppercase tracking-widest">
-                        <th className="px-3 py-2 whitespace-nowrap">Tanggal</th>
-                        <th className="px-3 py-2">Keterangan</th>
-                        <th className="px-3 py-2 text-right">In/Out</th>
-                        <th className="px-3 py-2 text-right">Saldo</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-asphalt-700/50 text-xs text-white">
-                      {(() => {
-                        let runningBalance = 0;
-                        const txsWithBalance = [...selectedPerson.transactions].map(tx => {
-                          if (tx.type === 'deposit') runningBalance += tx.amount;
-                          else runningBalance -= tx.amount;
-                          return { ...tx, balance: runningBalance };
-                        });
-                        return txsWithBalance.reverse().map((transaction) => (
-                          <tr key={transaction.id} className="hover:bg-asphalt-700/20 transition-all">
-                            <td className="px-3 py-2.5 whitespace-nowrap text-asphalt-text-100 font-bold text-[10px]">
-                              {formatDate(transaction.date)}
-                            </td>
-                            <td className="px-3 py-2.5">
-                              <p className="font-black uppercase tracking-tight leading-tight">{transaction.description}</p>
-                              {transaction.createdByName && (
-                                <p className="text-[8px] text-brand-500 font-black uppercase tracking-widest mt-0.5">{transaction.createdByName}</p>
-                              )}
-                            </td>
-                            <td className={`px-3 py-2.5 text-right font-black ${transaction.type === 'deposit' ? 'text-emerald-500' : 'text-rose-500'}`}>
-                              {transaction.type === 'deposit' ? '+' : '-'}{formatRupiah(transaction.amount)}
-                            </td>
-                            <td className="px-3 py-2.5 text-right font-black">
-                              {formatRupiah(transaction.balance)}
-                            </td>
-                          </tr>
-                        ));
-                      })()}
-                    </tbody>
-                  </table>
-                )}
-              </div>
+        <div className="p-4 space-y-6">
+          <div className="bg-asphalt-800 rounded-[2.5rem] shadow-2xl border border-asphalt-700/50 overflow-hidden">
+            <div className="overflow-x-auto">
+              {selectedPerson.transactions.length === 0 ? (
+                <div className="py-16 flex flex-col items-center justify-center opacity-20">
+                  <PiggyBank className="w-12 h-12 text-asphalt-text-400 mb-2" />
+                  <p className="text-[10px] font-black uppercase tracking-widest text-asphalt-text-400">Belum ada transaksi</p>
+                </div>
+              ) : (
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-asphalt-900/40 border-b border-asphalt-700/50 text-[8px] font-black text-asphalt-text-400 uppercase tracking-widest">
+                      <th className="px-2 py-2 whitespace-nowrap">Tanggal</th>
+                      <th className="px-2 py-2">Keterangan</th>
+                      <th className="px-2 py-2 text-right">In/Out</th>
+                      <th className="px-2 py-2 text-right">Saldo</th>
+                      <th className="p-0.5 w-6"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-asphalt-700/50 text-xs text-white">
+                    {(() => {
+                      let runningBalance = 0;
+                      const txsWithBalance = [...selectedPerson.transactions].map(tx => {
+                        if (tx.type === 'deposit') runningBalance += tx.amount;
+                        else runningBalance -= tx.amount;
+                        return { ...tx, balance: runningBalance };
+                      });
+                      
+                      return txsWithBalance.reverse().map((transaction) => (
+                        <tr key={transaction.id} className="hover:bg-asphalt-700/20 transition-all group">
+                          <td className="px-2 py-2 whitespace-nowrap">
+                            <p className="text-white font-bold text-[10px]">{formatDate(transaction.date).split(' ')[0]}</p>
+                            <p className="text-[7px] text-asphalt-text-400">{formatDate(transaction.date).split(' ')[1]}</p>
+                          </td>
+                          <td className="px-2 py-2">
+                            <p className="font-black text-white uppercase tracking-tight leading-tight text-[10px] line-clamp-1">{transaction.description}</p>
+                            {transaction.createdByName && (
+                              <p className="text-[7px] text-brand-500 font-black uppercase tracking-widest mt-0.5">{transaction.createdByName}</p>
+                            )}
+                          </td>
+                          <td className={`px-2 py-2 text-right font-black text-[10px] ${transaction.type === 'deposit' ? 'text-emerald-500' : 'text-rose-500'}`}>
+                            {transaction.type === 'deposit' ? '+' : '-'}{formatRupiah(transaction.amount)}
+                          </td>
+                          <td className="px-2 py-2 text-right font-black text-white text-[10px]">
+                            {formatRupiah(transaction.balance)}
+                          </td>
+                          <td className="p-0.5 text-center">
+                            {canDelete && (
+                              <button
+                                onClick={() => setDeleteConfirm({ isOpen: true, type: 'transaction', personId: selectedPerson.id, transactionId: transaction.id, name: transaction.description })}
+                                className="p-1 text-asphalt-text-400 hover:text-rose-500 transition-all"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ));
+                    })()}
+                  </tbody>
+                </table>
+              )}
             </div>
-          )}
+          </div>
         </div>
 
         <ConfirmModal
@@ -525,9 +477,9 @@ export function Savings() {
                 </div>
               )}
 
-              <div className="divide-y divide-asphalt-700/50">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 divide-y sm:divide-y-0 divide-asphalt-700/50">
                 {filteredSavings.length === 0 ? (
-                  <div className="text-center py-16 bg-asphalt-800/50">
+                  <div className="col-span-full text-center py-16 bg-asphalt-800/50">
                     <div className="w-20 h-20 bg-asphalt-900 rounded-[2rem] flex items-center justify-center mx-auto mb-5 border border-asphalt-700/50">
                       <PiggyBank className="w-10 h-10 text-asphalt-700" />
                     </div>
@@ -582,9 +534,9 @@ export function Savings() {
               </div>
             </>
           ) : (
-            <div className="divide-y divide-asphalt-700/50">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 divide-y sm:divide-y-0 divide-asphalt-700/50">
               {globalTransactionHistory.length === 0 ? (
-                <div className="text-center py-20">
+                <div className="col-span-full text-center py-20">
                   <p className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest">Belum ada riwayat transaksi</p>
                 </div>
               ) : (

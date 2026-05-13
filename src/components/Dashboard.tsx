@@ -318,40 +318,40 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
 
       {/* Main Balance Card (GoPay Inspired Card) */}
       <div 
-        className="bg-asphalt-800 rounded-[2.5rem] p-6 border border-asphalt-700/50 shadow-2xl relative overflow-hidden group"
+        className="bg-asphalt-800 rounded-[2.5rem] p-6 md:p-10 border border-asphalt-700/50 shadow-2xl relative overflow-hidden group"
       >
-        <div className="absolute top-0 right-0 w-48 h-48 bg-brand-500/10 rounded-full -mr-24 -mt-24 blur-[80px] group-hover:bg-brand-500/20 transition-all duration-700"></div>
-        <div className="relative z-10 space-y-6">
+        <div className="absolute top-0 right-0 w-48 md:w-96 h-48 md:h-96 bg-brand-500/10 rounded-full -mr-24 -mt-24 blur-[80px] group-hover:bg-brand-500/20 transition-all duration-700"></div>
+        <div className="relative z-10 space-y-6 md:space-y-8">
           <div className="space-y-1">
             <div className="flex items-center gap-2 mb-2">
               <div className="p-1.5 bg-brand-500/10 rounded-lg">
-                <Coins className="w-3.5 h-3.5 text-brand-500" />
+                <Coins className="w-3.5 h-3.5 md:w-5 md:h-5 text-brand-500" />
               </div>
-              <h3 className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-[0.2em]">
+              <h3 className="text-[10px] md:text-sm font-black text-asphalt-text-400 uppercase tracking-[0.2em]">
                 {isBosGlobal ? 'Total Dana Terkelola' : `Sisa Saldo Tunai`}
               </h3>
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-xl font-black text-brand-500">Rp</span>
-              <p className="text-4xl font-black tracking-tighter text-white">
+              <span className="text-xl md:text-3xl font-black text-brand-500">Rp</span>
+              <p className="text-4xl md:text-6xl font-black tracking-tighter text-white">
                 {(isBosGlobal ? totalGlobalCapital : cashInHand).toLocaleString('id-ID')}
               </p>
             </div>
           </div>
           
-          <div className="grid grid-cols-2 gap-6 pt-5 border-t border-asphalt-700/50">
+          <div className="grid grid-cols-2 gap-6 md:gap-12 pt-5 border-t border-asphalt-700/50">
             <div className="space-y-2">
-              <p className="text-[9px] font-black text-asphalt-text-400 uppercase tracking-widest">
+              <p className="text-[9px] md:text-xs font-black text-asphalt-text-400 uppercase tracking-widest">
                 Dana Digital
               </p>
               {isEditingFixed ? (
                 <div className="flex items-center gap-2">
                   <div className="relative flex-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-asphalt-text-400 text-[10px] font-bold">Rp</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-asphalt-text-400 text-[10px] md:text-xs font-bold">Rp</span>
                     <input
                       type="text"
                       inputMode="numeric"
-                      className="w-full pl-8 pr-3 py-2 bg-asphalt-900 border border-asphalt-700 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all"
+                      className="w-full pl-8 pr-3 py-2 bg-asphalt-900 border border-asphalt-700 rounded-xl text-sm md:text-base text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all"
                       value={formatNumberInput(fixedInput)}
                       onChange={(e) => handleNumericInput(e, setFixedInput)}
                       autoFocus
@@ -365,19 +365,19 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
                     {isSavingFixed ? (
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     ) : (
-                      <Check className="w-4 h-4 stroke-[3px]" />
+                      <Check className="w-4 h-4 md:w-5 md:h-5 stroke-[3px]" />
                     )}
                   </button>
                 </div>
               ) : (
                 <div className="flex items-center justify-between group/row">
-                  <p className="text-base font-black text-white">{formatRupiah(isBosGlobal ? totalAllBranchesNonPhysicalCapital : effectiveFixedBalance)}</p>
+                  <p className="text-base md:text-xl font-black text-white">{formatRupiah(isBosGlobal ? totalAllBranchesNonPhysicalCapital : effectiveFixedBalance)}</p>
                   {isBos && !isBosGlobal && (
                     <button 
                       onClick={() => { setFixedInput(effectiveFixedBalance.toString()); setIsEditingFixed(true); }} 
                       className="text-asphalt-text-400 hover:text-brand-500 p-2 bg-asphalt-700/50 rounded-lg transition-all opacity-0 group-hover/row:opacity-100"
                     >
-                      <Edit3 className="w-3.5 h-3.5" />
+                      <Edit3 className="w-3.5 h-3.5 md:w-4 md:h-4" />
                     </button>
                   )}
                 </div>
@@ -419,8 +419,8 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
       )}
 
       {/* Grid Services - Asphalt Style Menu */}
-      <div className="bg-asphalt-800 rounded-[2.5rem] p-5 border border-asphalt-700/50 shadow-2xl">
-        <div className="grid grid-cols-4 gap-y-7">
+      <div className="bg-asphalt-800 rounded-[2.5rem] p-5 md:p-8 border border-asphalt-700/50 shadow-2xl">
+        <div className="grid grid-cols-4 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-y-7 md:gap-y-10">
           {role !== 'mandor' && (
             <>
               <ServiceIcon 
@@ -486,7 +486,7 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
             <h3 className="text-xs font-black text-asphalt-text-100 uppercase tracking-[0.2em]">Kinerja Cabang</h3>
           </div>
           
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {branches.map((branch) => {
               const currentBranchData = branchData.find(b => b.id === branch.id);
               if (!currentBranchData) return null;
@@ -528,8 +528,8 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
 
       {/* Mini Stats - Hidden for Bos Global as requested */}
       {!isBosGlobal && (
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-asphalt-800 p-4 rounded-3xl border border-asphalt-700/50 shadow-xl flex flex-col justify-center space-y-2 group hover:border-emerald-500/30 transition-all col-span-2">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          <div className="bg-asphalt-800 p-4 md:p-6 rounded-3xl border border-asphalt-700/50 shadow-xl flex flex-col justify-center space-y-2 group hover:border-emerald-500/30 transition-all col-span-2 lg:col-span-1">
             <div className="flex items-center gap-2 text-emerald-500">
               <div className="p-1.5 bg-emerald-500/10 rounded-lg">
                 <Landmark className="w-4 h-4" />
