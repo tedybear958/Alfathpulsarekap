@@ -484,12 +484,14 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
 
       const currentCapital = branch.capital || 0;
       const currentPhysical = branch.physicalCapital || 0;
+      const currentShifted = branch.shiftedCapital || 0;
 
       if (direction === 'to_non_physical') {
         if (currentPhysical < amount) throw new Error("Saldo Fisik tidak mencukupi");
         await updateDoc(doc(db, 'branches', branchId), {
           capital: currentCapital + amount,
           physicalCapital: currentPhysical - amount,
+          shiftedCapital: currentShifted + amount,
           updatedAt: new Date().toISOString()
         });
       } else {
@@ -497,6 +499,7 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
         await updateDoc(doc(db, 'branches', branchId), {
           capital: currentCapital - amount,
           physicalCapital: currentPhysical + amount,
+          shiftedCapital: Math.max(0, currentShifted - amount),
           updatedAt: new Date().toISOString()
         });
       }
@@ -753,6 +756,7 @@ export const initFinanceStoreListeners = () => {
             name: data.name, 
             capital: data.capital, 
             physicalCapital: data.physicalCapital,
+            shiftedCapital: data.shiftedCapital,
             totalSetor: data.totalSetor, 
             deposits: existing ? existing.deposits : [] 
           } as Branch;

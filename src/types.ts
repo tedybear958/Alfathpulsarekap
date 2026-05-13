@@ -74,6 +74,7 @@ export interface Branch {
   name: string;
   capital?: number;
   physicalCapital?: number;
+  shiftedCapital?: number;
   totalSetor?: number;
   deposits: BranchDeposit[];
 }

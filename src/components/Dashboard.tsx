@@ -3,7 +3,7 @@ import { useFinanceStore } from '../hooks/useFinanceStore';
 import { useAuthStore } from '../store/authStore';
 import { checkIsBos } from '../utils/authUtils';
 import { formatRupiah, formatNumberInput, formatDate } from '../utils/formatters';
-import { Building2, Plus, Trash2, Landmark, Receipt, Coins, Edit3, Check, Send, PiggyBank, Users, Ticket, Store, BookOpen, MoreHorizontal, History as HistoryIcon, UserCog, X, FileText } from 'lucide-react';
+import { Building2, Plus, Trash2, Landmark, Receipt, Coins, Edit3, Check, Send, PiggyBank, Users, Ticket, Store, BookOpen, MoreHorizontal, History as HistoryIcon, UserCog, X, FileText, ArrowLeftRight } from 'lucide-react';
 import { ConfirmModal } from './ConfirmModal';
 import { SuccessToast } from './SuccessToast';
 
@@ -68,6 +68,7 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
 
   const [editingBankId, setEditingBankId] = useState<string | null>(null);
   const [bankInput, setBankInput] = useState('');
+  const [isTransferring, setIsTransferring] = useState(false);
 
   const [toast, setToast] = useState<{ show: boolean; message: string }>({
     show: false,
@@ -235,6 +236,28 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
     }
   };
 
+  const handleQuickTransfer = async () => {
+    if (!branchId || !myBranch || isTransferring) return;
+    setIsTransferring(true);
+    try {
+      if (myBranch.branchPhysicalCapital > 0) {
+        // Move all physical to digital
+        const amount = myBranch.branchPhysicalCapital;
+        await store.transferBranchCapital(branchId, amount, 'to_non_physical');
+        setToast({ show: true, message: `Dana Fisik Rp ${amount.toLocaleString('id-ID')} dipindah ke Digital` });
+      } else if ((myBranch.shiftedCapital || 0) > 0) {
+        // Return exactly what was shifted
+        const amount = myBranch.shiftedCapital || 0;
+        await store.transferBranchCapital(branchId, amount, 'to_physical');
+        setToast({ show: true, message: `Dana Fisik Rp ${amount.toLocaleString('id-ID')} telah dikembalikan` });
+      }
+    } catch (error: any) {
+      console.error(error);
+    } finally {
+      setIsTransferring(false);
+    }
+  };
+
   return (
     <div className="p-4 space-y-6 pb-32">
       {/* Announcement Editor for Bos */}
@@ -370,6 +393,30 @@ export function Dashboard({ onNavigate }: { onNavigate?: (tab: string) => void }
           </div>
         </div>
       </div>
+
+      {/* Simplified Quick Transfer for Karyawan/Mandor */}
+      {(role === 'karyawan' || role === 'mandor') && myBranch && (
+        <div className="bg-asphalt-800 rounded-[2rem] p-4 border border-asphalt-700/50 shadow-xl flex items-center justify-between group transition-all hover:border-brand-500/30">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-brand-500/10 flex items-center justify-center text-brand-500 border border-brand-500/20 shadow-inner">
+              <ArrowLeftRight className={`w-6 h-6 transition-transform duration-500 ${myBranch.branchPhysicalCapital > 0 ? '' : 'rotate-180'}`} />
+            </div>
+            <div>
+              <p className="text-[10px] font-black text-white uppercase tracking-tight">Pindah Saldo Cepat</p>
+              <p className="text-[8px] text-asphalt-text-400 font-bold uppercase tracking-widest mt-0.5">
+                {myBranch.branchPhysicalCapital > 0 ? 'FISIK ➔ DIGITAL' : 'KEMBALIKAN FISIK'}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleQuickTransfer}
+            disabled={isTransferring || (myBranch.branchPhysicalCapital <= 0 && (myBranch.shiftedCapital || 0) <= 0)}
+            className="px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50 shadow-lg shadow-brand-500/20"
+          >
+            {isTransferring ? 'PROSES...' : (myBranch.branchPhysicalCapital > 0 ? 'PINDAHKAN' : 'KEMBALIKAN')}
+          </button>
+        </div>
+      )}
 
       {/* Grid Services - Asphalt Style Menu */}
       <div className="bg-asphalt-800 rounded-[2.5rem] p-5 border border-asphalt-700/50 shadow-2xl">
