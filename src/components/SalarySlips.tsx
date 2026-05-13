@@ -52,8 +52,8 @@ export function SalarySlips() {
   };
 
   const isBos = checkIsBos(user, role);
-  const isMandor = role === 'mandor';
-  const canSeeBatch = isBos || isMandor;
+  // Only Bos can manage slips. Mandors and Karyawan only see their own.
+  const canManageSlips = isBos;
   
   // Bos Pusat (Global) adalah Bos tanpa branchId
   const isGlobalBos = isBos && !currentUserBranchId;
@@ -77,22 +77,15 @@ export function SalarySlips() {
     let q;
     
     // Determine query based on role
+    // As per user request: Only Bos handles all, employees see their own.
     if (isBos) {
       if (isGlobalBos) {
         q = query(collection(db, 'salarySlips'));
       } else {
         q = query(collection(db, 'salarySlips'), where('branchId', '==', currentUserBranchId));
       }
-    } else if (isMandor) {
-      if (!currentUserBranchId) {
-        // Global Mandor can see all
-        q = query(collection(db, 'salarySlips'));
-      } else {
-        // Branch Mandor only see their branch
-        q = query(collection(db, 'salarySlips'), where('branchId', '==', currentUserBranchId));
-      }
     } else {
-      // Regular user only see their own
+      // Regular user (including Mandor for this page) only see their own
       q = query(collection(db, 'salarySlips'), where('userId', '==', uid));
     }
 
@@ -120,9 +113,9 @@ export function SalarySlips() {
       setIsLoading(false);
     });
 
-    if (isBos || isMandor) {
+    if (isBos) {
       let usersQuery;
-      if (isGlobalBos || (isMandor && !currentUserBranchId)) {
+      if (isGlobalBos) {
         usersQuery = query(collection(db, 'users'));
       } else {
         usersQuery = query(collection(db, 'users'), where('branchId', '==', currentUserBranchId));
@@ -135,13 +128,13 @@ export function SalarySlips() {
       }, (error) => {
         if (!isMounted) return;
         console.error("Error fetching users for salary slips:", error);
-        handleFirestoreError(error, OperationType.GET, 'users-for-slips');
+        // Silently handle - maybe they are no longer Bos
       });
       return () => { isMounted = false; unsub(); unsubUsers(); };
     }
 
     return () => { isMounted = false; unsub(); };
-  }, [isBos, isMandor, isGlobalBos, currentUserBranchId, uid, isAuthLoaded, filterMonth, filterYear, showAllHistory]);
+  }, [isBos, isGlobalBos, currentUserBranchId, uid, isAuthLoaded, filterMonth, filterYear, showAllHistory]);
 
   // Auto-fill base salary when user selected
   useEffect(() => {
@@ -321,7 +314,7 @@ export function SalarySlips() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {isBos && slips.length > 0 && !isAdding && (
+          {canManageSlips && slips.length > 0 && !isAdding && (
             <button
               onClick={() => setDeleteConfirm({ isOpen: true, id: 'ALL', name: 'SEMUA SLIP GAJI' })}
               className="px-3 py-2 bg-asphalt-800 text-rose-500 border border-asphalt-700/50 rounded-xl text-[8px] font-black uppercase tracking-widest hover:bg-asphalt-700 transition-all"
@@ -329,7 +322,7 @@ export function SalarySlips() {
               BERSIHKAN
             </button>
           )}
-          {isBos && !isAdding && (
+          {canManageSlips && !isAdding && (
              <button
               onClick={() => setIsGeneratingBatch(!isGeneratingBatch)}
               disabled={isLoading || users.length === 0}
@@ -342,7 +335,7 @@ export function SalarySlips() {
               {users.length === 0 ? 'TIDAK ADA KARYAWAN' : 'GAJIAN MASAL'}
             </button>
           )}
-          {isBos && !isAdding && (
+          {canManageSlips && !isAdding && (
             <button
               onClick={() => setIsAdding(true)}
               className="px-4 py-2 bg-brand-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-600 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-brand-500/20"
