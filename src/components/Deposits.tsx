@@ -348,25 +348,27 @@ export function Deposits() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest ml-1">Nominal Transfer</label>
+            <div className="space-y-3">
+              <div className="flex justify-between items-end px-1">
+                <label className="text-[10px] font-black text-asphalt-text-400 uppercase tracking-widest">Nominal Transfer</label>
+                <button
+                  type="button"
+                  onClick={() => setTransferAmount(Math.max(myBranch.capital || 0, myBranch.physicalCapital || 0).toString())}
+                  className="px-3 py-1 bg-brand-500/10 text-brand-500 text-[9px] font-black uppercase tracking-widest rounded-lg border border-brand-500/20 active:scale-95 transition-all"
+                >
+                  MAX SALDO
+                </button>
+              </div>
               <div className="relative">
                 <span className="absolute left-5 top-1/2 -translate-y-1/2 text-asphalt-text-400 text-sm font-black">Rp</span>
                 <input
                   type="text"
                   placeholder="0"
                   inputMode="numeric"
-                  className="w-full pl-12 pr-24 py-4 text-xl bg-asphalt-900 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none text-white font-black shadow-inner"
+                  className="w-full pl-12 pr-5 py-4 text-xl bg-asphalt-900 border border-asphalt-700 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none text-white font-black shadow-inner transition-all focus:border-brand-500/50"
                   value={formatNumberInput(transferAmount)}
                   onChange={(e) => handleNumericInput(e, setTransferAmount)}
                 />
-                <button
-                  type="button"
-                  onClick={() => setTransferAmount(Math.max(myBranch.capital || 0, myBranch.physicalCapital || 0).toString())}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-brand-500/10 text-brand-500 text-[8px] font-black uppercase tracking-widest rounded-lg border border-brand-500/20"
-                >
-                  Max Saldo
-                </button>
               </div>
             </div>
 
@@ -411,7 +413,7 @@ export function Deposits() {
                     }
                   }}
                   disabled={isTransferring}
-                  className="w-full py-1 text-[7px] font-black text-brand-500/60 uppercase tracking-tighter"
+                  className="w-full py-1 text-[8px] font-black text-brand-500/80 uppercase tracking-widest active:opacity-50 transition-opacity"
                 >
                   Pindahkan Semua Fisik
                 </button>
@@ -457,7 +459,7 @@ export function Deposits() {
                     }
                   }}
                   disabled={isTransferring}
-                  className="w-full py-1 text-[7px] font-black text-emerald-500/60 uppercase tracking-tighter"
+                  className="w-full py-1 text-[8px] font-black text-emerald-500/80 uppercase tracking-widest active:opacity-50 transition-opacity"
                 >
                   Pindahkan Semua Non-Fisik
                 </button>
